@@ -10,7 +10,7 @@ function copySearchParams(oldSearchString: string, newURL: URL): void {
 
 export function downloadAgent(options: AgentOptions): Promise<CloudFrontResultResponse> {
   return new Promise((resolve) => {
-    const data: any[] = []
+    const data: Buffer[] = []
 
     const url = new URL(`https://${options.fpCdnUrl}`)
     url.pathname = getEndpoint(options.apiKey, options.version, options.loaderVersion)
@@ -26,14 +26,7 @@ export function downloadAgent(options: AgentOptions): Promise<CloudFrontResultRe
         headers: options.headers,
       },
       (response) => {
-        let binary = false
-        if (response.headers['content-encoding']) {
-          binary = true
-        }
-
-        response.setEncoding(binary ? 'binary' : 'utf8')
-
-        response.on('data', (chunk) => data.push(Buffer.from(chunk, 'binary')))
+        response.on('data', (chunk) => data.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk, 'utf8')))
 
         response.on('end', () => {
           const body = Buffer.concat(data)
