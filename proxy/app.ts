@@ -2,24 +2,25 @@ import { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
 
 import { downloadAgent, handleResult, handleStatus } from './handlers'
 import {
+  createRoute,
   filterRequestHeaders,
+  generateRandom,
   getAgentUri,
-  getResultUri,
-  getStatusUri,
-  prepareHeadersForIngressAPI,
-  getRegion,
-  getVersion,
   getApiKey,
   getLoaderVersion,
+  getRegion,
+  getResultUri,
+  getStatusUri,
+  getVersion,
+  prepareHeadersForIngressAPI,
   setLogLevel,
-  createRoute,
-  generateRandom,
 } from './utils'
 import { CustomerVariables } from './utils/customer-variables/customer-variables'
 import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables'
 import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables'
 import { getFpCdnUrl, getFpIngressBaseHost } from './utils/customer-variables/selectors'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
+import { V4 } from './v4'
 
 export type Route = {
   pathPattern: RegExp
@@ -44,9 +45,19 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
     pathPattern: createRoute(getStatusUri()),
     handler: (request, env) => handleStatusPage(request, env),
   }
+
+  routes.push({
+    pathPattern: createRoute(V4.CDN_PATH),
+    handler: V4.handleCDN,
+  })
   routes.push(downloadScriptRoute)
   routes.push(ingressAPIRoute)
   routes.push(statusRoute)
+  // Since in V4, an ingress path is just `/`, it needs to be at the bottom of routes
+  routes.push({
+    pathPattern: createRoute(V4.INGRESS_PATH),
+    handler: V4.handleIngress,
+  })
 
   return routes
 }
