@@ -78,6 +78,8 @@ async function getVisitorData(): Promise<VisitorData> {
 
       const result = await agent.get()
 
+      console.info('V4 result', result)
+
       return {
         visitorId: result.visitor_id ?? '',
       }
