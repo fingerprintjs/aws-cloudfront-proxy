@@ -6,4 +6,5 @@ export const agentV4Paths = {
 
 export const CDN_PATH = '/web(/.*)?'
 
+// In V4, the ingress path is just /
 export const INGRESS_PATH = '/.*'
