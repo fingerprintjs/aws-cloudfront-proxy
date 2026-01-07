@@ -16,10 +16,9 @@ export async function handleIngress(
   let suffix = ''
 
   // If there's more than one segment, join everything after the first
-  // TODO This is not ideal, as it won't work for more complex behavior paths.
+  // TODO This is not ideal, as it won't work for more complex behavior paths. This needs to be addressed when working on the official V4 support.
   // E.g, it will work for `/fpjs/0zDYhBT/o6Kgn` -> the extracted path will be `/0zDYhBT/o6Kgn`
   // But it won't work for `/my/behavior/path/0zDYhBT/o6Kgn -> it will extract `/behavior/path/0zDYhBT/o6Kgn`.
-  // Possible solution: extracting only last two path segments that we know are used by browser cache endpoint, otherwise skipping path all-together for ingress endpoint?
   if (segments.length > 1) {
     suffix = '/' + segments.slice(1).join('/')
   }

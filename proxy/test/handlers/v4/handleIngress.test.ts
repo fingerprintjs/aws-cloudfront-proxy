@@ -186,6 +186,20 @@ describe('Ingress Endpoint V4', () => {
     )
   })
 
+  // It will fail for now until support for nested behavior path is added
+  test.skip('Call with suffix and nested behavior path', async () => {
+    const event = mockEvent(mockRequest('/nested/behavior/with/suffix'))
+    await handler(event)
+    expect(handleResult).toHaveBeenCalledTimes(1)
+    expect(https.request).toHaveBeenCalledWith(
+      expect.objectContaining<Partial<URL>>({
+        href: `https://${origin}/with/suffix${queryString}`,
+      }),
+      expect.anything(),
+      expect.anything()
+    )
+  })
+
   test('Call with suffix and region', async () => {
     const request = mockRequest('/behavior/with/suffix')
     const event = mockEvent(request)
