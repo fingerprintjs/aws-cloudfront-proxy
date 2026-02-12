@@ -11,6 +11,13 @@ exports[`Get status info returns correct response with empty non obfuscated vari
       "value": "result",
     },
     {
+      "envVarName": "fpjs_behavior_path_nest_level",
+      "isInternal": false,
+      "isSet": true,
+      "resolvedBy": "test provider",
+      "value": 1,
+    },
+    {
       "envVarName": "fpjs_pre_shared_secret",
       "isInternal": false,
       "isSet": true,
@@ -55,6 +62,13 @@ exports[`Get status info returns correct response with empty pre shared secret 1
       "value": "result",
     },
     {
+      "envVarName": "fpjs_behavior_path_nest_level",
+      "isInternal": false,
+      "isSet": true,
+      "resolvedBy": "test provider",
+      "value": 1,
+    },
+    {
       "envVarName": "fpjs_pre_shared_secret",
       "isInternal": false,
       "isSet": false,
@@ -97,6 +111,13 @@ exports[`Get status info returns correct status info 1`] = `
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "result",
+    },
+    {
+      "envVarName": "fpjs_behavior_path_nest_level",
+      "isInternal": false,
+      "isSet": true,
+      "resolvedBy": "test provider",
+      "value": 1,
     },
     {
       "envVarName": "fpjs_pre_shared_secret",

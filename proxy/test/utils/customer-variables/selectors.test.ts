@@ -3,7 +3,7 @@ import { CustomerVariables } from '../../../utils/customer-variables/customer-va
 import { HeaderCustomerVariables } from '../../../utils/customer-variables/header-customer-variables'
 import { getAgentUri, getResultUri, getStatusUri } from '../../../utils'
 import { SecretsManagerVariables } from '../../../utils/customer-variables/secrets-manager/secrets-manager-variables'
-import { CustomerVariablesRecord, CustomerVariableType } from '../../../utils/customer-variables/types'
+import { CustomerVariablesRecord, CustomerVariableName } from '../../../utils/customer-variables/types'
 import { clearSecretsCache } from '../../../utils/customer-variables/secrets-manager/retrieve-secret'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { mockClient } from 'aws-sdk-client-mock'
@@ -215,9 +215,9 @@ describe('customer variables selectors', () => {
     })
 
     const variablesRecord = {
-      [CustomerVariableType.AgentDownloadPath]: 'download',
-      [CustomerVariableType.GetResultPath]: 'result',
-      [CustomerVariableType.PreSharedSecret]: 'abcd',
+      [CustomerVariableName.AgentDownloadPath]: 'download',
+      [CustomerVariableName.GetResultPath]: 'result',
+      [CustomerVariableName.PreSharedSecret]: 'abcd',
     } as CustomerVariablesRecord
     const variablesRecordStr = JSON.stringify(variablesRecord)
 

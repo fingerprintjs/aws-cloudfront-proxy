@@ -1,11 +1,11 @@
 import { CloudFrontResultResponse } from 'aws-lambda'
 import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { CustomerVariableType, CustomerVariableValue, internalVariables } from '../utils/customer-variables/types'
+import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types'
 import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable'
 
 export interface EnvVarInfo {
   envVarName: string
-  value: CustomerVariableValue
+  value: string | number | null | undefined
   isSet: boolean
   isInternal: boolean
   // If null, the variable was resolved with the default value, otherwise it was resolved by the provider with the given name
@@ -20,7 +20,7 @@ export interface StatusInfo {
 
 async function getEnvInfo(customerVariables: CustomerVariables) {
   const infoArray: EnvVarInfo[] = await Promise.all(
-    Object.values(CustomerVariableType).map(async (variable) => {
+    Object.values(CustomerVariableName).map(async (variable) => {
       const value = await maybeObfuscateVariable(customerVariables, variable)
 
       return {

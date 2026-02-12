@@ -1,4 +1,4 @@
-import { CustomerVariableProvider, CustomerVariableType } from './types'
+import { CustomerVariableProvider, CustomerVariableName } from './types'
 import { CloudFrontRequest } from 'aws-lambda'
 import { getHeaderValue } from '../headers'
 
@@ -7,7 +7,7 @@ export class HeaderCustomerVariables implements CustomerVariableProvider {
 
   constructor(private readonly request: CloudFrontRequest) {}
 
-  async getVariable(variable: CustomerVariableType): Promise<string | null> {
+  async getVariable(variable: CustomerVariableName): Promise<string | null> {
     return getHeaderValue(this.request, variable)
   }
 }

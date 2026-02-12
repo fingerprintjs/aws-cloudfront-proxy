@@ -1,5 +1,5 @@
 import { validateSecret } from '../../../../utils/customer-variables/secrets-manager/validate-secret'
-import { CustomerVariableType } from '../../../../utils/customer-variables/types'
+import { CustomerVariableName } from '../../../../utils/customer-variables/types'
 
 describe('Validate secret', () => {
   it.each(['not_a_secret', null])('throws if secret is not an object', (value) => {
@@ -16,7 +16,7 @@ describe('Validate secret', () => {
 
   it('throws if object contains invalid values', () => {
     const object = {
-      [CustomerVariableType.AgentDownloadPath]: {},
+      [CustomerVariableName.AgentDownloadPath]: {},
     }
 
     expect(() => validateSecret(object)).toThrow(
@@ -26,8 +26,8 @@ describe('Validate secret', () => {
 
   it('does not throw for object with partial values', () => {
     const object = {
-      [CustomerVariableType.PreSharedSecret]: null,
-      [CustomerVariableType.GetResultPath]: 'result',
+      [CustomerVariableName.PreSharedSecret]: null,
+      [CustomerVariableName.GetResultPath]: 'result',
     }
 
     expect(() => validateSecret(object)).not.toThrow()

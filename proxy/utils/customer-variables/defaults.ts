@@ -1,15 +1,16 @@
-import { CustomerVariableValue, CustomerVariableType } from './types'
+import { CustomerVariableName, CustomerVariablesRecord, CustomerVariableType } from './types'
 
-const defaultCustomerVariables: Record<CustomerVariableType, CustomerVariableValue> = {
-  [CustomerVariableType.GetResultPath]: '',
-  [CustomerVariableType.PreSharedSecret]: null,
-  [CustomerVariableType.AgentDownloadPath]: 'agent',
-  [CustomerVariableType.FpCdnUrl]: '__FPCDN__',
-  [CustomerVariableType.FpIngressBaseHost]: '__INGRESS_API__',
-}
+const defaultCustomerVariables = {
+  [CustomerVariableName.GetResultPath]: '',
+  [CustomerVariableName.PreSharedSecret]: null,
+  [CustomerVariableName.AgentDownloadPath]: 'agent',
+  [CustomerVariableName.FpCdnUrl]: '__FPCDN__',
+  [CustomerVariableName.FpIngressBaseHost]: '__INGRESS_API__',
+  [CustomerVariableName.BehaviorPathNestLevel]: 1,
+} satisfies CustomerVariablesRecord
 
-export function getDefaultCustomerVariable(variable: CustomerVariableType): CustomerVariableValue {
-  return defaultCustomerVariables[variable]
+export function getDefaultCustomerVariable<T extends CustomerVariableName>(variable: T): CustomerVariableType<T> {
+  return defaultCustomerVariables[variable] as CustomerVariableType<T>
 }
 
 export const DEFAULT_REGION = 'us-east-1'
