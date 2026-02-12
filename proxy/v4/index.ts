@@ -1,10 +1,8 @@
-import { handleCDN, handleIngress } from './handlers'
-import { CDN_PATH, INGRESS_PATH } from './paths'
+import { INGRESS_PATH } from './paths'
+import { handleIngress } from './handleIngress'
 
 export const V4 = {
-  handleCDN,
   handleIngress,
 
-  CDN_PATH,
   INGRESS_PATH,
 }

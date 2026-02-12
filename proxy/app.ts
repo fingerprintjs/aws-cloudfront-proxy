@@ -46,14 +46,10 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
     handler: (request, env) => handleStatusPage(request, env),
   }
 
-  routes.push({
-    pathPattern: createRoute(V4.CDN_PATH),
-    handler: V4.handleCDN,
-  })
   routes.push(downloadScriptRoute)
   routes.push(ingressAPIRoute)
   routes.push(statusRoute)
-  // Since in V4, an ingress path is just `/`, it needs to be at the bottom of routes
+  // For V4, proxy all remaining routes through Warden (CDN + Ingress)
   routes.push({
     pathPattern: createRoute(V4.INGRESS_PATH),
     handler: V4.handleIngress,

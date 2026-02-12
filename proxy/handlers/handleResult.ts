@@ -1,9 +1,9 @@
-import { ResultOptions } from '../model'
+import { Region, ResultOptions } from '../model'
 import { CloudFrontResultResponse } from 'aws-lambda'
 import https from 'https'
-import { Region } from '../model'
 
-import { updateResponseHeaders, addTrafficMonitoringSearchParamsForVisitorIdRequest } from '../utils'
+import { addTrafficMonitoringSearchParamsForVisitorIdRequest, updateResponseHeaders } from '../utils'
+import { generateErrorResponse } from '../utils/generateErrorResponse'
 
 export function handleResult(options: ResultOptions): Promise<CloudFrontResultResponse> {
   return new Promise((resolve) => {
@@ -73,39 +73,7 @@ export function handleResult(options: ResultOptions): Promise<CloudFrontResultRe
   })
 }
 
-function generateErrorResponse(err: Error): string {
-  const body = {
-    v: '2',
-    error: {
-      code: 'Failed',
-      message: `An error occurred with Fingerprint Pro Lambda function. Reason ${err}`,
-    },
-    requestId: generateRequestId,
-    products: {},
-  }
-  return JSON.stringify(body)
-}
-
-function generateRequestId(): string {
-  const uniqueId = generateRequestUniqueId()
-  const now = new Date().getTime()
-  return `${now}.aws-${uniqueId}`
-}
-
-function generateRandomString(length: number): string {
-  let result = ''
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length))
-  }
-  return result
-}
-
-function generateRequestUniqueId(): string {
-  return generateRandomString(2)
-}
-
-function getIngressAPIHost(region: Region, baseHost: string): string {
+export function getIngressAPIHost(region: Region, baseHost: string): string {
   const prefix = region === Region.us ? '' : `${region}.`
   return `https://${prefix}${baseHost}`
 }

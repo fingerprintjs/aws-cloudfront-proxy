@@ -5,7 +5,7 @@ import { updateCacheControlHeader } from './cache-control'
 import { CustomerVariables } from './customer-variables/customer-variables'
 import { getPreSharedSecret } from './customer-variables/selectors'
 
-const BLACKLISTED_HEADERS = new Set([
+export const BLACKLISTED_HEADERS = new Set([
   'age',
   'connection',
   'expect',
@@ -35,7 +35,7 @@ const BLACKLISTED_HEADERS = new Set([
   'strict-transport-security',
 ])
 
-const BLACKLISTED_HEADERS_PREFIXES = ['x-edge-', 'x-amz-cf-']
+export const BLACKLISTED_HEADERS_PREFIXES = ['x-edge-', 'x-amz-cf-']
 
 const READ_ONLY_RESPONSE_HEADERS = new Set([
   'accept-encoding',
@@ -50,7 +50,7 @@ const READ_ONLY_RESPONSE_HEADERS = new Set([
 
 const READ_ONLY_REQUEST_HEADERS = new Set(['content-length', 'host', 'transfer-encoding', 'via'])
 
-const CACHE_CONTROL_HEADER_NAME = 'cache-control'
+export const CACHE_CONTROL_HEADER_NAME = 'cache-control'
 
 export async function prepareHeadersForIngressAPI(
   request: CloudFrontRequest,
@@ -142,7 +142,7 @@ function isHeaderAllowedForRequest(headerName: string) {
   return true
 }
 
-function isHeaderAllowedForResponse(headerName: string) {
+export function isHeaderAllowedForResponse(headerName: string) {
   if (READ_ONLY_RESPONSE_HEADERS.has(headerName) || BLACKLISTED_HEADERS.has(headerName)) {
     return false
   }

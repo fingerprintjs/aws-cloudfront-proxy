@@ -34,7 +34,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Call with region', async () => {
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
     request.querystring = `${request.querystring}&region=eu`
     const event = mockEvent(request)
 
@@ -52,7 +52,7 @@ describe('Result Endpoint', function () {
 
   test('Call with wrong region', async () => {
     const queryString = 'apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2'
-    const request = mockRequest('/behavior/result', queryString)
+    const request = mockRequest({ uri: '/behavior/result', querystring: queryString })
     request.querystring = `${request.querystring}&region=bar.baz/foo`
     const event = mockEvent(request)
 
@@ -70,7 +70,7 @@ describe('Result Endpoint', function () {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
     const queryStringWithUSRegion =
       '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
-    const request = mockRequest('/behavior/result', queryString)
+    const request = mockRequest({ uri: '/behavior/result', querystring: queryString })
     request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
@@ -87,7 +87,7 @@ describe('Result Endpoint', function () {
   test('Suffix with dot', async () => {
     const suffix = '.suffix/more/path'
     const iiParam = 'ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
-    const request = mockRequest(`/behavior/result/${suffix}`, '')
+    const request = mockRequest({ uri: `/behavior/result/${suffix}`, querystring: '' })
     const event = mockEvent(request)
 
     await handler(event)
@@ -104,7 +104,7 @@ describe('Result Endpoint', function () {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
     const queryStringWithUSRegion =
       '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
-    const request = mockRequest('/behavior/result', queryString, 'GET')
+    const request = mockRequest({ uri: '/behavior/result', querystring: queryString, method: 'GET' })
     request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
@@ -121,7 +121,7 @@ describe('Result Endpoint', function () {
   test('Suffix with dot, GET request', async () => {
     const suffix = '.suffix/more/path'
     const iiParam = 'ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
-    const request = mockRequest(`/behavior/result/${suffix}`, '', 'GET')
+    const request = mockRequest({ uri: `/behavior/result/${suffix}`, querystring: '', method: 'GET' })
     const event = mockEvent(request)
 
     await handler(event)
@@ -135,7 +135,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Call without suffix', async () => {
-    const event = mockEvent(mockRequest('/behavior/result'))
+    const event = mockEvent(mockRequest({ uri: '/behavior/result' }))
     await handler(event)
     expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
@@ -148,7 +148,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Call with suffix', async () => {
-    const event = mockEvent(mockRequest('/behavior/result/with/suffix'))
+    const event = mockEvent(mockRequest({ uri: '/behavior/result/with/suffix' }))
     await handler(event)
     expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
@@ -161,7 +161,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Call with suffix and region', async () => {
-    const request = mockRequest('/behavior/result/with/suffix')
+    const request = mockRequest({ uri: '/behavior/result/with/suffix' })
     const event = mockEvent(request)
 
     request.querystring = `${request.querystring}&region=eu`
@@ -181,14 +181,14 @@ describe('Result Endpoint', function () {
   // No longer relevant, as this will now be handled by now ingress handler for V4
   // Leaving this as a skipped test for awareness.
   test.skip('Call with bad suffix', async () => {
-    const event = mockEvent(mockRequest('/behavior/resultwith/bad/suffix'))
+    const event = mockEvent(mockRequest({ uri: '/behavior/resultwith/bad/suffix' }))
     await handler(event)
     expect(handleResult).toHaveBeenCalledTimes(0)
     expect(https.request).toHaveBeenCalledTimes(0)
   })
 
   test('Traffic monitoring', async () => {
-    const event = mockEvent(mockRequest('/behavior/result'))
+    const event = mockEvent(mockRequest({ uri: '/behavior/result' }))
     await handler(event)
     expect(handleResult).toHaveBeenCalledTimes(1)
 
@@ -200,7 +200,11 @@ describe('Result Endpoint', function () {
 
   test('No traffic monitoring on cache endpoint', async () => {
     const event = mockEvent(
-      mockRequest('/behavior/result', 'apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2', 'GET')
+      mockRequest({
+        uri: '/behavior/result',
+        querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2',
+        method: 'GET',
+      })
     )
     await handler(event)
 
@@ -216,7 +220,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Headers with proxy secret', async () => {
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
     const event = mockEvent(request)
     await handler(event)
     expect(handleResult).toHaveBeenCalledTimes(1)
@@ -232,7 +236,7 @@ describe('Result Endpoint', function () {
   })
 
   test('Includes only _iidt in cookies', async () => {
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
 
     request.headers.cookie[0].value =
       '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; auth_token=123456'
@@ -267,7 +271,7 @@ describe('Result Endpoint', function () {
       emitter.emit('end')
     })
 
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
 
     const event = mockEvent(request)
     const response = await handler(event)
@@ -319,7 +323,7 @@ describe('Result Endpoint', function () {
       emitter.emit('end')
     })
 
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
 
     const event = mockEvent(request)
     const response = await handler(event)
@@ -367,7 +371,7 @@ describe('Result Endpoint', function () {
       return emitter
     })
 
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
 
     const event = mockEvent(request)
     const response = await handler(event)
@@ -407,7 +411,7 @@ describe('Result Endpoint', function () {
       emitter.emit('end')
     })
 
-    const request = mockRequest('/behavior/result')
+    const request = mockRequest({ uri: '/behavior/result' })
 
     const event = mockEvent(request)
     const response = await handler(event)
@@ -459,13 +463,13 @@ describe('Browser caching endpoint', () => {
   })
 
   test('cache-control header is returned as is', async () => {
-    const reqEvent = mockEvent(mockRequest('/behavior/result/some/suffix', '', 'GET'))
+    const reqEvent = mockEvent(mockRequest({ uri: '/behavior/result/some/suffix', querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
     expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {
-    const request = mockRequest('/behavior/result/some/suffix', '', 'GET')
+    const request = mockRequest({ uri: '/behavior/result/some/suffix', querystring: '', method: 'GET' })
 
     Object.assign(request.headers, {
       cookie: [

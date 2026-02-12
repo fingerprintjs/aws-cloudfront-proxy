@@ -53,7 +53,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Call with no params', async () => {
-    const event = mockEvent(mockRequest('/behavior/greiodsfkljlds', 'apiKey=ujKG34hUYKLJKJ1F'))
+    const event = mockEvent(mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F' }))
 
     await handler(event)
 
@@ -67,7 +67,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Call with version', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds', 'apiKey=ujKG34hUYKLJKJ1F&version=5')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5' })
 
     const event = mockEvent(request)
 
@@ -83,7 +83,10 @@ describe('Download agent endpoint', () => {
   })
 
   test('Call with version and loaderVersion', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds', 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5')
+    const request = mockRequest({
+      uri: '/behavior/greiodsfkljlds',
+      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5',
+    })
 
     const event = mockEvent(request)
 
@@ -99,10 +102,10 @@ describe('Download agent endpoint', () => {
   })
 
   test('Call with a custom query', async () => {
-    const request = mockRequest(
-      '/behavior/greiodsfkljlds',
-      'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue'
-    )
+    const request = mockRequest({
+      uri: '/behavior/greiodsfkljlds',
+      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue',
+    })
 
     const event = mockEvent(request)
 
@@ -118,7 +121,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Browser cache set to an hour when original value is higher', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613',
@@ -141,7 +144,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Browser cache is the same when original value is lower than an hour', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=100',
@@ -164,7 +167,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Proxy cache set to a minute when original value is higher', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613, s-maxage=575500',
@@ -187,7 +190,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Proxy cache is the same when original value is lower than a minute', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613, s-maxage=10',
@@ -210,7 +213,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Response headers are the same, but strict-transport-security is removed', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(mockHttpResponse.headers, {
       'content-type': 'text/javascript; charset=utf-8',
@@ -241,7 +244,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Req body and headers are the same, except cookies, which should be dropped', async () => {
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     Object.assign(request.headers, {
       cookie: [
@@ -310,7 +313,7 @@ describe('Download agent endpoint', () => {
       return mockHttpRequest
     })
 
-    const request = mockRequest('/behavior/greiodsfkljlds')
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
 
     const event = mockEvent(request)
 
