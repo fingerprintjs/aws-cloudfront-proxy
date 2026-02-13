@@ -28,9 +28,9 @@ test.describe('[v4] visitorId', () => {
     await checkResponse(page)
 
     const requests = getRequests()
-    expect(requests).toHaveLength(6)
+    expect(requests).toHaveLength(7)
 
-    const [, , agentRequest, , apiRequest] = requests
+    const [, , agentRequest, , , apiRequest] = requests
 
     const agentRequestUrl = new URL(agentRequest.url())
     expect(agentRequestUrl.hostname).toBe(rootUrl.hostname)
