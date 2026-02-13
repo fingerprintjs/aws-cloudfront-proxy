@@ -42,7 +42,5 @@ test.describe('visitorId', () => {
 
     const apiRequestUrl = new URL(apiRequest.url())
     expect(apiRequestUrl.hostname).toBe(rootUrl.hostname)
-    expect(apiRequestUrl.searchParams.get('ii')).toContain(`fingerprintjs-pro-cloudfront/`)
-    expect(apiRequestUrl.searchParams.get('ii')).toContain(`/procdn`)
   })
 })

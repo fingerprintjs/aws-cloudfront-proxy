@@ -18,6 +18,10 @@ resource "aws_cloudfront_distribution" "with_secret" {
     }
   }
 
+  depends_on = [
+    aws_s3_bucket_policy.website_bucket_policy
+  ]
+
   origin {
     domain_name = aws_s3_bucket.website_bucket.bucket_domain_name
     origin_id   = aws_s3_bucket.website_bucket.bucket_domain_name
@@ -86,6 +90,10 @@ resource "aws_cloudfront_distribution" "with_headers" {
       }
     }
   }
+  
+  depends_on = [
+    aws_s3_bucket_policy.website_bucket_policy
+  ]
 
   origin {
     domain_name = aws_s3_bucket.website_bucket.bucket_domain_name

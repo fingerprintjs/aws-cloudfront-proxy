@@ -48,6 +48,7 @@ function setupAgentVersion() {
 
 type VisitorData = {
   visitorId: string
+  requestId: string
 }
 
 async function getVisitorData(): Promise<VisitorData> {
@@ -65,6 +66,7 @@ async function getVisitorData(): Promise<VisitorData> {
 
       return {
         visitorId: result.visitorId,
+        requestId: result.requestId,
       }
     }
 
@@ -82,6 +84,7 @@ async function getVisitorData(): Promise<VisitorData> {
 
       return {
         visitorId: result.visitor_id ?? '',
+        requestId: result.event_id,
       }
     }
 
@@ -100,7 +103,7 @@ async function getAndPrintData() {
 
   try {
     const response = await getVisitorData()
-    const { visitorId } = response
+    const { visitorId, requestId } = response
 
     console.log('Got response', response)
 
@@ -124,7 +127,15 @@ async function getAndPrintData() {
       output,
       header: 'Visitor ID:',
       content: visitorId,
-      id: 'confidence',
+      id: 'visitorId',
+      comment: '',
+      size: 'big',
+    })
+    addOutputSection({
+      output,
+      header: 'Request ID:',
+      content: requestId,
+      id: 'requestId',
       comment: '',
       size: 'big',
     })
