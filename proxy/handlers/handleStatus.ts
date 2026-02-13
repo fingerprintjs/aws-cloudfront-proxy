@@ -8,9 +8,12 @@ export interface EnvVarInfo {
   value: string | number | null | undefined
   isSet: boolean
   isInternal: boolean
+  isOptional: boolean
   // If null, the variable was resolved with the default value, otherwise it was resolved by the provider with the given name
   resolvedBy: string | null
 }
+
+const optionalValues = [CustomerVariableName.BehaviorPathNestLevel]
 
 export interface StatusInfo {
   version: string
@@ -28,6 +31,7 @@ async function getEnvInfo(customerVariables: CustomerVariables) {
         value: value.value,
         isSet: Boolean(value.value),
         isInternal: internalVariables.has(variable),
+        isOptional: optionalValues.includes(variable),
         resolvedBy: value.resolvedBy,
       }
     })
@@ -38,7 +42,7 @@ async function getEnvInfo(customerVariables: CustomerVariables) {
 
 function renderEnvInfo(envInfo: EnvVarInfo[]) {
   const isAllCustomerDefinedVariablesSet = envInfo
-    .filter((info) => !info.isInternal)
+    .filter((info) => !info.isInternal && !info.isOptional)
     .every((info) => info.isSet && info.resolvedBy)
 
   if (isAllCustomerDefinedVariablesSet) {
