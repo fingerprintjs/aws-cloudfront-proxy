@@ -48,7 +48,7 @@ const existingLambdaAfterUpdate: GetFunctionResponse = {
     FunctionArn: 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function',
     LastModified: '2024-03-13T19:48:15.722+0000',
     LastUpdateStatus: 'Successful',
-    Runtime: 'nodejs20.x',
+    Runtime: 'nodejs24.x',
     Version: '$LATEST',
     Handler: 'fingerprintjs-pro-cloudfront-lambda-function.handler',
     RevisionId: 'b4b060ce-0554-49cb-9639-69c2b5eeef11',
