@@ -33,11 +33,6 @@ export async function handleIngress(
   customerVariables: CustomerVariables
 ): Promise<CloudFrontResultResponse> {
   const behaviorPathNestLevel = await getBehaviorPathNestLevel(customerVariables)
-  if (!behaviorPathNestLevel) {
-    return {
-      status: '500',
-    }
-  }
 
   const wardenBaseHost = await getFpIngressBaseHost(customerVariables)
   if (!wardenBaseHost) {
