@@ -1,28 +1,57 @@
+import https from 'https'
+import { EventEmitter } from 'events'
 import { mockEvent, mockRequest } from '../../aws'
 import { handler } from '../../../app'
+import { generateErrorResponse } from '../../../utils/generateErrorResponse'
 
+const requestUri = '/behavior/web/v4/ujKG34hUYKLJKJ1F'
 describe('Download agent endpoint V4', () => {
   const origin: string = '__ingress_api__'
 
-  let fetchSpy: jest.SpyInstance
+  let requestSpy: jest.SpyInstance
 
-  let mockFetchResponse: Response
+  const setEncoding = jest.fn()
+
+  let mockHttpResponse: EventEmitter & {
+    setEncoding: jest.Mock
+    headers: any
+    statusCode: number
+  }
+  let mockHttpRequest: EventEmitter
 
   const agentScript =
     '/** FingerprintJS Pro - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com) /** function hi() { console.log("hello world!!") }'
 
-  beforeEach(() => {
-    fetchSpy = jest.spyOn(globalThis, 'fetch')
+  function addResponseHeader(key: string, value: string) {
+    Object.assign(mockHttpResponse.headers, {
+      [key]: value,
+    })
+  }
 
-    mockFetchResponse = new Response(Buffer.from(agentScript).toString('binary'), {
-      status: 200,
+  beforeEach(() => {
+    requestSpy = jest.spyOn(https, 'request')
+
+    mockHttpResponse = new EventEmitter() as any
+    mockHttpRequest = new EventEmitter()
+
+    Object.assign(mockHttpRequest, {
+      end: jest.fn(),
+    })
+    Object.assign(mockHttpResponse, {
+      setEncoding,
       headers: {
         'content-type': 'text/javascript; charset=utf-8',
       },
+      statusCode: 200,
     })
 
-    fetchSpy.mockImplementation(async () => {
-      return mockFetchResponse
+    requestSpy.mockImplementation((_url: any, _options: any, callback) => {
+      callback(mockHttpResponse)
+
+      mockHttpResponse.emit('data', Buffer.from(agentScript).toString('binary'))
+      mockHttpResponse.emit('end')
+
+      return mockHttpRequest
     })
   })
 
@@ -30,182 +59,147 @@ describe('Download agent endpoint V4', () => {
     jest.clearAllMocks()
   })
 
-  test('Agent call to /web', async () => {
-    const event = mockEvent(
-      mockRequest({
-        uri: '/behavior/web/v4/ujKG34hUYKLJKJ1F',
-        querystring: 'ci=jsl/4.0.0-beta.3',
-        method: 'GET',
-      })
-    )
+  test('Successful call', async () => {
+    const event = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
 
     await handler(event)
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
-    const request = fetchSpy.mock.calls[0][0] as Request
-    expect(request.url).toEqual(
-      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?ci=jsl%2F4.0.0-beta.3&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
-    )
-  })
+    const [url] = requestSpy.mock.calls[0]
 
-  test('Agent call to /web without params', async () => {
-    const event = mockEvent(
-      mockRequest({
-        uri: '/behavior/web',
-        querystring: '',
-        method: 'GET',
-      })
-    )
-
-    await handler(event)
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
-
-    const request = fetchSpy.mock.calls[0][0] as Request
-    expect(request.url).toEqual(
-      `https://${origin}/web?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+    expect(url.toString()).toEqual(
+      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Call with a custom query', async () => {
     const request = mockRequest({
-      uri: '/behavior/web/v4/ujKG34hUYKLJKJ1F',
-      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue',
-      method: 'GET',
+      uri: requestUri,
+      querystring: 'someKey=someValue',
     })
 
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    const [url] = requestSpy.mock.calls[0]
 
-    const fetchRequest = fetchSpy.mock.calls[0][0] as Request
-    expect(fetchRequest.url).toEqual(
-      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+    expect(url.toString()).toEqual(
+      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Browser cache set to an hour when original value is higher', async () => {
-    const request = mockRequest({
-      uri: '/behavior/web',
-      querystring: '',
-      method: 'GET',
-    })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    mockFetchResponse.headers.set('cache-control', 'public, max-age=3613')
+    addResponseHeader('cache-control', 'public, max-age=3613')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(response.headers).toEqual({
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=60',
-        },
-      ],
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
+        },
+      ],
+      'cache-control': [
+        {
+          key: 'cache-control',
+          value: 'public, max-age=3600, s-maxage=60',
         },
       ],
     })
   })
 
   test('Browser cache is the same when original value is lower than an hour', async () => {
-    const request = mockRequest({ uri: '/behavior/web', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    mockFetchResponse.headers.set('cache-control', 'public, max-age=100')
+    addResponseHeader('cache-control', 'public, max-age=100')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(response.headers).toEqual({
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
       'cache-control': [
         {
           key: 'cache-control',
           value: 'public, max-age=100, s-maxage=60',
         },
       ],
+    })
+  })
+
+  test('Proxy cache set to a minute when original value is higher', async () => {
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
+
+    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=575500')
+
+    const event = mockEvent(request)
+
+    const response = await handler(event)
+
+    expect(response.headers).toEqual({
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
         },
       ],
-    })
-  })
-
-  test('Proxy cache set to a minute when original value is higher', async () => {
-    const request = mockRequest({ uri: '/behavior/web', method: 'GET' })
-
-    mockFetchResponse.headers.set('cache-control', 'public, max-age=3613, s-maxage=575500')
-
-    const event = mockEvent(request)
-
-    const response = await handler(event)
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(response.headers).toEqual({
       'cache-control': [
         {
           key: 'cache-control',
           value: 'public, max-age=3600, s-maxage=60',
         },
       ],
+    })
+  })
+
+  test('Proxy cache is the same when original value is lower than a minute', async () => {
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
+
+    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=10')
+
+    const event = mockEvent(request)
+
+    const response = await handler(event)
+
+    expect(response.headers).toEqual({
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
         },
       ],
-    })
-  })
-
-  test('Proxy cache is the same when original value is lower than a minute', async () => {
-    const request = mockRequest({ uri: '/behavior/web', method: 'GET' })
-
-    mockFetchResponse.headers.set('cache-control', 'public, max-age=3613, s-maxage=10')
-
-    const event = mockEvent(request)
-
-    const response = await handler(event)
-
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(response.headers).toEqual({
       'cache-control': [
         {
           key: 'cache-control',
           value: 'public, max-age=3600, s-maxage=10',
         },
       ],
-      'content-type': [
-        {
-          key: 'content-type',
-          value: 'text/javascript; charset=utf-8',
-        },
-      ],
     })
   })
 
   test('Response headers are the same, but strict-transport-security is removed', async () => {
-    const request = mockRequest({ uri: '/behavior/web', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    mockFetchResponse.headers.set('strict-transport-security', 'max-age=63072000')
-    mockFetchResponse.headers.set('some-header', 'some-value')
+    addResponseHeader('strict-transport-security', 'max-age=63072000')
+    addResponseHeader('some-header', 'some-value')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(response.headers).toEqual({
       'content-type': [
         {
@@ -223,7 +217,7 @@ describe('Download agent endpoint V4', () => {
   })
 
   test('Req body and headers are the same, except cookies, which should be dropped', async () => {
-    const request = mockRequest({ uri: '/behavior/web', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     Object.assign(request.headers, {
       cookie: [
@@ -268,35 +262,36 @@ describe('Download agent endpoint V4', () => {
     const event = mockEvent(request)
 
     const response = await handler(event)
-    const body = Buffer.from(response.body as string, 'binary').toString('utf-8')
-    const fetchRequest = fetchSpy.mock.calls[0][0] as Request
+    const body = Buffer.from(response.body as string, 'base64').toString('utf-8')
+    const [, options] = requestSpy.mock.calls[0]
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(body).toEqual(agentScript)
 
-    expect(fetchRequest.headers).toEqual(
-      new Headers({
-        'cache-control': 'no-cache',
-        'accept-language': 'en-US',
-        'user-agent': 'Mozilla/5.0',
-        'x-some-header': 'some value',
-        'content-type': 'text/javascript; charset=utf-8',
-      })
-    )
+    expect(options.headers).toEqual({
+      'cache-control': 'no-cache',
+      'accept-language': 'en-US',
+      'user-agent': 'Mozilla/5.0',
+      'x-some-header': 'some value',
+      'content-type': 'text/javascript; charset=utf-8',
+    })
   })
 
-  test('Response body for error', async () => {
-    mockFetchResponse = new Response('error', {
-      status: 500,
+  test('Req body for error', async () => {
+    requestSpy.mockImplementation(() => {
+      setTimeout(() => {
+        mockHttpRequest.emit('error', new Error('Network error'))
+      }, 1)
+
+      return mockHttpRequest
     })
 
-    const request = mockRequest({ uri: '/behavior/web' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
-    expect(response.body).toEqual('error')
+    expect(response.body).toEqual(generateErrorResponse(new Error('Network error')))
     expect(response.status).toEqual('500')
   })
 })
