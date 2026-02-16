@@ -15,10 +15,11 @@ function extractIngressPath(uri: string, behaviorPathNestLevel: number) {
   return uri.split('/').filter(Boolean).slice(behaviorPathNestLevel).join('/')
 }
 
-function handleTrafficMonitoring(requestUrl: URL) {
+function handleTrafficMonitoring(requestUrl: URL, requestMethod: string) {
   if (requestUrl.pathname.includes(CDN_PATH)) {
     addTrafficMonitoringSearchParamsForProCDN(requestUrl)
-  } else {
+    // Add traffic monitoring only for POST ingress, skip browser cache
+  } else if (requestMethod === 'POST') {
     addTrafficMonitoringSearchParamsForVisitorIdRequest(requestUrl)
   }
 }
@@ -53,7 +54,7 @@ export async function handleIngress(
     requestUrl.searchParams.set('region', region)
   }
 
-  handleTrafficMonitoring(requestUrl)
+  handleTrafficMonitoring(requestUrl, incomingRequest.method)
 
   return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }
