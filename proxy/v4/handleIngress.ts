@@ -17,7 +17,7 @@ function extractIngressPath(uri: string, behaviorPathNestLevel: number) {
 }
 
 function getRequestBody(incomingRequest: CloudFrontRequest) {
-  return incomingRequest.body?.data ? Buffer.from(incomingRequest.body.data, 'base64') : null
+  return incomingRequest.body?.data ? incomingRequest.body.data : null
 }
 
 function handleTrafficMonitoring(requestUrl: URL) {
