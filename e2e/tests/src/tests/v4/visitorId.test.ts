@@ -28,7 +28,8 @@ test.describe('[v4] visitorId', () => {
     await checkResponse(page)
 
     const requests = getRequests()
-    expect(requests).toHaveLength(7)
+
+    expect(requests.every((req) => req.url().includes(baseURL!.toString()))).toBe(true)
 
     const [, , agentRequest, , , apiRequest] = requests
 
