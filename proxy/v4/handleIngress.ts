@@ -20,6 +20,14 @@ function getRequestBody(incomingRequest: CloudFrontRequest) {
   return incomingRequest.body?.data ? Buffer.from(incomingRequest.body.data, 'base64') : null
 }
 
+function handleTrafficMonitoring(requestUrl: URL) {
+  if (requestUrl.pathname.includes(CDN_PATH)) {
+    addTrafficMonitoringSearchParamsForProCDN(requestUrl)
+  } else {
+    addTrafficMonitoringSearchParamsForVisitorIdRequest(requestUrl)
+  }
+}
+
 export async function handleIngress(
   incomingRequest: CloudFrontRequest,
   customerVariables: CustomerVariables
@@ -44,25 +52,22 @@ export async function handleIngress(
   const requestPath = extractIngressPath(incomingRequest.uri, behaviorPathNestLevel)
 
   const isIngressCall = incomingRequest.method === 'POST'
+
   const requestHeaders = (await prepareHeadersForIngressAPI(
     incomingRequest,
     customerVariables,
     isIngressCall
   )) as HeadersInit
+
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
   requestUrl.search = incomingRequest.querystring
-
   // Ensure valid region in query params
   if (requestUrl.searchParams.has('region')) {
     requestUrl.searchParams.set('region', region)
   }
 
-  if (requestPath.includes(CDN_PATH)) {
-    addTrafficMonitoringSearchParamsForProCDN(requestUrl)
-  } else {
-    addTrafficMonitoringSearchParamsForVisitorIdRequest(requestUrl)
-  }
+  handleTrafficMonitoring(requestUrl)
 
   const requestBody = getRequestBody(incomingRequest)
 
@@ -107,6 +112,8 @@ export async function handleIngress(
       body: responseBody,
     }
   } catch (error) {
+    // This should be triggered only on network or timeout errors
+    // `fetch` doesn't throw errors based on request status code
     return {
       status: '500',
       statusDescription: 'Bad request',
