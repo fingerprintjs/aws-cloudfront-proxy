@@ -6,18 +6,13 @@ import {
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
   prepareHeadersForIngressAPI,
 } from '../utils'
-import { updateResponseHeaders } from './headers'
 import { getValidRegion } from '../utils/request'
 import { getIngressAPIHost } from '../handlers/handleResult'
 import { CDN_PATH } from './paths'
-import { generateErrorResponse } from '../utils/generateErrorResponse'
+import { sendIngressRequest } from './transport'
 
 function extractIngressPath(uri: string, behaviorPathNestLevel: number) {
   return uri.split('/').filter(Boolean).slice(behaviorPathNestLevel).join('/')
-}
-
-function getRequestBody(incomingRequest: CloudFrontRequest) {
-  return incomingRequest.body?.data ? incomingRequest.body.data : null
 }
 
 function handleTrafficMonitoring(requestUrl: URL) {
@@ -48,11 +43,7 @@ export async function handleIngress(
 
   const isIngressCall = incomingRequest.method === 'POST'
 
-  const requestHeaders = (await prepareHeadersForIngressAPI(
-    incomingRequest,
-    customerVariables,
-    isIngressCall
-  )) as HeadersInit
+  const requestHeaders = await prepareHeadersForIngressAPI(incomingRequest, customerVariables, isIngressCall)
 
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
@@ -64,54 +55,5 @@ export async function handleIngress(
 
   handleTrafficMonitoring(requestUrl)
 
-  const requestBody = getRequestBody(incomingRequest)
-
-  const ingressRequest = new Request(requestUrl.toString(), {
-    method: incomingRequest.method,
-    headers: requestHeaders,
-    body: requestBody,
-  })
-  console.debug('Prepared ingress request', {
-    requestUrl: ingressRequest.url,
-    hasBody: Boolean(requestBody),
-    method: ingressRequest.method,
-  })
-
-  try {
-    const response = await fetch(ingressRequest)
-
-    const contentType = response.headers.get('content-type')
-    const isJavascript = contentType?.includes('text/javascript')
-
-    const updatedResponseHeaders = updateResponseHeaders(response.headers, isJavascript)
-
-    const responseBody = await response.text()
-
-    console.debug('Ingress response', {
-      status: response.status,
-      statusText: response.statusText,
-      rawHeaders: response.headers,
-      headers: updatedResponseHeaders,
-      body: responseBody,
-      isJavascript,
-    })
-
-    return {
-      status: response.status.toString(),
-      statusDescription: response.statusText,
-      headers: updatedResponseHeaders,
-      bodyEncoding: 'text',
-      body: responseBody,
-    }
-  } catch (error) {
-    // This should be triggered only on network or timeout errors
-    // `fetch` doesn't throw errors based on response status code
-    return {
-      status: '500',
-      statusDescription: 'Bad request',
-      headers: {},
-      bodyEncoding: 'text',
-      body: generateErrorResponse(error instanceof Error ? error : new Error(String(error))),
-    }
-  }
+  return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }
