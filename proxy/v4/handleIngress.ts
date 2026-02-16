@@ -85,30 +85,27 @@ export async function handleIngress(
   try {
     const response = await fetch(ingressRequest)
 
-    const isBinary = Boolean(response.headers.get('content-encoding'))
-    const data = await response.arrayBuffer()
     const contentType = response.headers.get('content-type')
     const isJavascript = contentType?.includes('text/javascript')
 
     const updatedResponseHeaders = updateResponseHeaders(response.headers, isJavascript)
+
+    const responseBody = await response.text()
 
     console.debug('Ingress response', {
       status: response.status,
       statusText: response.statusText,
       rawHeaders: response.headers,
       headers: updatedResponseHeaders,
-      body: data,
-      isBinary,
+      body: responseBody,
       isJavascript,
     })
-
-    const responseBody = Buffer.from(data).toString(isBinary ? 'base64' : 'utf8')
 
     return {
       status: response.status.toString(),
       statusDescription: response.statusText,
       headers: updatedResponseHeaders,
-      bodyEncoding: isBinary ? 'base64' : 'text',
+      bodyEncoding: 'text',
       body: responseBody,
     }
   } catch (error) {
