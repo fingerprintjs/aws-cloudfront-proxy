@@ -110,7 +110,7 @@ export async function handleIngress(
     }
   } catch (error) {
     // This should be triggered only on network or timeout errors
-    // `fetch` doesn't throw errors based on request status code
+    // `fetch` doesn't throw errors based on response status code
     return {
       status: '500',
       statusDescription: 'Bad request',
