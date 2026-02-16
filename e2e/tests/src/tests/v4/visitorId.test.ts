@@ -31,13 +31,10 @@ test.describe('[v4] visitorId', () => {
 
     expect(requests.every((req) => req.url().includes(baseURL!.toString()))).toBe(true)
 
-    const [, , agentRequest, , , apiRequest] = requests
+    const agentRequest = requests.find((req) => req.url().includes('/fpjs/web/v4'))
+    expect(agentRequest).toBeTruthy()
 
-    const agentRequestUrl = new URL(agentRequest.url())
-    expect(agentRequestUrl.hostname).toBe(rootUrl.hostname)
-    expect(agentRequestUrl.pathname).toContain('/web/v4')
-
-    const apiRequestUrl = new URL(apiRequest.url())
-    expect(apiRequestUrl.hostname).toBe(rootUrl.hostname)
+    const apiRequest = requests.find((req) => req.url().includes('/fpjs/?'))
+    expect(apiRequest).toBeTruthy()
   })
 })
