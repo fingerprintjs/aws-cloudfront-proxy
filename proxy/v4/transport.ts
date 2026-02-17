@@ -1,69 +1,84 @@
-import https from 'https'
+import https, { RequestOptions } from 'https'
 import { updateResponseHeaders } from '../utils'
 import { generateErrorResponse } from '../utils/generateErrorResponse'
 import { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
-import { OutgoingHttpHeaders } from 'http'
+import { IncomingMessage, OutgoingHttpHeaders } from 'http'
 import { CloudFrontResultResponse } from 'aws-lambda'
 
-export function sendIngressRequest(
-  incomingRequest: CloudFrontRequest,
-  requestHeaders: OutgoingHttpHeaders,
-  requestUrl: URL
-) {
-  return new Promise<CloudFrontResultResponse>((resolve) => {
-    const request = https.request(
-      requestUrl,
-      {
-        method: incomingRequest.method,
-        headers: requestHeaders,
-      },
-      (response) => {
-        const data: Buffer[] = []
-        const isBinary = Boolean(response.headers['content-encoding'])
-        const isJavascript = response.headers['content-type']?.includes('text/javascript')
+type SendHttpRequestResult = {
+  response: IncomingMessage
+  data: Buffer
+}
 
-        response.setEncoding(isBinary ? 'binary' : 'utf8')
+function sendHttpRequest(
+  url: URL,
+  { data, ...options }: RequestOptions & { data: string | undefined }
+): Promise<SendHttpRequestResult> {
+  return new Promise<SendHttpRequestResult>((resolve, reject) => {
+    const request = https.request(url, options, (response) => {
+      const data: Buffer[] = []
+      const isBinary = Boolean(response.headers['content-encoding'])
 
-        response.on('data', (chunk) => {
-          data.push(Buffer.from(chunk, isBinary ? 'binary' : 'utf8'))
+      response.setEncoding(isBinary ? 'binary' : 'utf8')
+
+      response.on('data', (chunk) => {
+        data.push(Buffer.from(chunk, isBinary ? 'binary' : 'utf8'))
+      })
+
+      response.on('error', reject)
+
+      response.on('end', () => {
+        const payload = Buffer.concat(data)
+
+        resolve({
+          response,
+          data: payload,
         })
-
-        response.on('end', () => {
-          const payload = Buffer.concat(data)
-
-          console.debug('Response from Ingress API', {
-            statusCode: response.statusCode,
-            payload: payload.toString('utf-8'),
-            isBinary,
-            isJavascript,
-          })
-
-          resolve({
-            status: response.statusCode?.toString() ?? '500',
-            statusDescription: response.statusMessage,
-            headers: updateResponseHeaders(response.headers, isJavascript),
-            bodyEncoding: 'base64',
-            body: payload.toString('base64'),
-          })
-        })
-      }
-    )
-
-    if (incomingRequest.body?.data) {
-      request.write(Buffer.from(incomingRequest.body.data, 'base64'))
-    }
-
-    request.on('error', (error) => {
-      console.error('ingress request error', { error })
-      resolve({
-        status: '500',
-        statusDescription: 'Bad request',
-        headers: {},
-        bodyEncoding: 'text',
-        body: generateErrorResponse(error),
       })
     })
 
+    request.on('error', reject)
+
+    if (data) {
+      request.write(Buffer.from(data, 'base64'))
+    }
     request.end()
   })
+}
+
+export async function sendIngressRequest(
+  incomingRequest: CloudFrontRequest,
+  requestHeaders: OutgoingHttpHeaders,
+  requestUrl: URL
+): Promise<CloudFrontResultResponse> {
+  try {
+    const { response, data } = await sendHttpRequest(requestUrl, {
+      method: incomingRequest.method,
+      data: incomingRequest.body?.data,
+      headers: requestHeaders,
+    })
+    const isJavascript = response.headers['content-type']?.includes('text/javascript')
+
+    console.debug('Response from Ingress API', {
+      statusCode: response.statusCode,
+      payload: data.toString('utf-8'),
+      isJavascript,
+    })
+
+    return {
+      status: response.statusCode?.toString() ?? '500',
+      statusDescription: response.statusMessage,
+      headers: updateResponseHeaders(response.headers, isJavascript),
+      bodyEncoding: 'base64',
+      body: data.toString('base64'),
+    }
+  } catch (error) {
+    return {
+      status: '500',
+      statusDescription: 'Bad request',
+      headers: {},
+      bodyEncoding: 'text',
+      body: generateErrorResponse(error as Error),
+    }
+  }
 }
