@@ -16,19 +16,22 @@ function sendHttpRequest(
 ): Promise<SendHttpRequestResult> {
   return new Promise<SendHttpRequestResult>((resolve, reject) => {
     const request = https.request(url, options, (response) => {
-      const data: Buffer[] = []
+      const chunks: Buffer[] = []
       const isBinary = Boolean(response.headers['content-encoding'])
 
       response.setEncoding(isBinary ? 'binary' : 'utf8')
 
-      response.on('data', (chunk) => {
-        data.push(Buffer.from(chunk, isBinary ? 'binary' : 'utf8'))
+      response.on('data', (data) => {
+        const encoding = isBinary ? 'binary' : 'utf8'
+        const chunk = Buffer.isBuffer(data) ? data : Buffer.from(data, encoding)
+
+        chunks.push(chunk)
       })
 
       response.on('error', reject)
 
       response.on('end', () => {
-        const payload = Buffer.concat(data)
+        const payload = Buffer.concat(chunks)
 
         resolve({
           response,
