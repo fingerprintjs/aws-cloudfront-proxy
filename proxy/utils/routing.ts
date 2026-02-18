@@ -18,6 +18,8 @@ export function addEndingTrailingSlashToRoute(route: string): string {
   return `${route}\\/*`
 }
 
+const RAW_PATTERN_SYMBOL = Symbol('RAW_PATTERN_SYMBOL')
+
 export function createRoute(route: string): RegExp {
   let routeRegExp = route
   // routeRegExp = addTrailingWildcard(routeRegExp) // Can be uncommented if wildcard (*) is needed
@@ -25,5 +27,8 @@ export function createRoute(route: string): RegExp {
   routeRegExp = addPathnameMatchBeforeRoute(routeRegExp)
   routeRegExp = addEndingTrailingSlashToRoute(routeRegExp)
   // routeRegExp = replaceDot(routeRegExp) // Can be uncommented if dot (.) is needed
-  return RegExp(`^${routeRegExp}$`)
+  const regexp = RegExp(`^${routeRegExp}$`)
+  Object.assign(regexp, { [RAW_PATTERN_SYMBOL]: route })
+
+  return regexp
 }

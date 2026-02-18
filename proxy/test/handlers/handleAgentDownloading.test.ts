@@ -1,12 +1,10 @@
-import * as handlers from '../../handlers'
-import { downloadAgent } from '../../handlers'
 import https from 'https'
 import { mockEvent, mockRequest } from '../aws'
 import { handler } from '../../app'
 import { EventEmitter } from 'events'
 
 describe('Download agent endpoint', () => {
-  const origin: string = '__fpcdn__'
+  const origin: string = '__ingress_api__'
 
   let requestSpy: jest.SpyInstance
 
@@ -23,7 +21,6 @@ describe('Download agent endpoint', () => {
     '/** FingerprintJS Pro - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com) /** function hi() { console.log("hello world!!") }'
 
   beforeEach(() => {
-    jest.spyOn(handlers, 'downloadAgent')
     requestSpy = jest.spyOn(https, 'request')
 
     mockHttpResponse = new EventEmitter() as any
@@ -34,7 +31,9 @@ describe('Download agent endpoint', () => {
     })
     Object.assign(mockHttpResponse, {
       setEncoding,
-      headers: {},
+      headers: {
+        'content-type': 'text/javascript; charset=utf-8',
+      },
       statusCode: 200,
     })
 
@@ -53,32 +52,34 @@ describe('Download agent endpoint', () => {
   })
 
   test('Call with no params', async () => {
-    const event = mockEvent(mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F' }))
+    const event = mockEvent(
+      mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F', method: 'GET' })
+    )
 
     await handler(event)
-
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
 
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/v3/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v3/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Call with version', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5' })
+    const request = mockRequest({
+      uri: '/behavior/greiodsfkljlds',
+      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5',
+      method: 'GET',
+    })
 
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/v5/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&version=5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&version=5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
@@ -86,18 +87,17 @@ describe('Download agent endpoint', () => {
     const request = mockRequest({
       uri: '/behavior/greiodsfkljlds',
       querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5',
+      method: 'GET',
     })
 
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
@@ -105,23 +105,22 @@ describe('Download agent endpoint', () => {
     const request = mockRequest({
       uri: '/behavior/greiodsfkljlds',
       querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue',
+      method: 'GET',
     })
 
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Browser cache set to an hour when original value is higher', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613',
@@ -131,8 +130,6 @@ describe('Download agent endpoint', () => {
 
     const response = await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     expect(response.headers).toEqual({
       'cache-control': [
         {
@@ -140,11 +137,17 @@ describe('Download agent endpoint', () => {
           value: 'public, max-age=3600, s-maxage=60',
         },
       ],
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
     })
   })
 
   test('Browser cache is the same when original value is lower than an hour', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=100',
@@ -154,8 +157,6 @@ describe('Download agent endpoint', () => {
 
     const response = await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     expect(response.headers).toEqual({
       'cache-control': [
         {
@@ -163,11 +164,17 @@ describe('Download agent endpoint', () => {
           value: 'public, max-age=100, s-maxage=60',
         },
       ],
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
     })
   })
 
   test('Proxy cache set to a minute when original value is higher', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613, s-maxage=575500',
@@ -177,8 +184,6 @@ describe('Download agent endpoint', () => {
 
     const response = await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     expect(response.headers).toEqual({
       'cache-control': [
         {
@@ -186,11 +191,17 @@ describe('Download agent endpoint', () => {
           value: 'public, max-age=3600, s-maxage=60',
         },
       ],
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
     })
   })
 
   test('Proxy cache is the same when original value is lower than a minute', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613, s-maxage=10',
@@ -200,8 +211,6 @@ describe('Download agent endpoint', () => {
 
     const response = await handler(event)
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
-
     expect(response.headers).toEqual({
       'cache-control': [
         {
@@ -209,11 +218,17 @@ describe('Download agent endpoint', () => {
           value: 'public, max-age=3600, s-maxage=10',
         },
       ],
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
     })
   })
 
   test('Response headers are the same, but strict-transport-security is removed', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'content-type': 'text/javascript; charset=utf-8',
@@ -224,8 +239,6 @@ describe('Download agent endpoint', () => {
     const event = mockEvent(request)
 
     const response = await handler(event)
-
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
 
     expect(response.headers).toEqual({
       'content-type': [
@@ -244,7 +257,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Req body and headers are the same, except cookies, which should be dropped', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
     Object.assign(request.headers, {
       cookie: [
@@ -292,7 +305,6 @@ describe('Download agent endpoint', () => {
     const body = Buffer.from(response.body as string, 'base64').toString('utf-8')
     const [, options] = requestSpy.mock.calls[0]
 
-    expect(downloadAgent).toHaveBeenCalledTimes(1)
     expect(body).toEqual(agentScript)
 
     expect(options.headers).toEqual({
@@ -319,7 +331,16 @@ describe('Download agent endpoint', () => {
 
     const response = await handler(event)
 
-    expect(response.body).toEqual('error')
+    expect(response.body).toEqual(
+      JSON.stringify({
+        v: '2',
+        error: {
+          code: 'Failed',
+          message: 'An error occurred with Fingerprint Pro Lambda function. Reason Error: Network error',
+        },
+        products: {},
+      })
+    )
     expect(response.status).toEqual('500')
   })
 })

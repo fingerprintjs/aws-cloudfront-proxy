@@ -1,26 +1,13 @@
 import { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
 
-import { downloadAgent, handleResult, handleStatus } from './handlers'
-import {
-  createRoute,
-  filterRequestHeaders,
-  generateRandom,
-  getAgentUri,
-  getApiKey,
-  getLoaderVersion,
-  getRegion,
-  getResultUri,
-  getStatusUri,
-  getVersion,
-  prepareHeadersForIngressAPI,
-  setLogLevel,
-} from './utils'
+import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils'
 import { CustomerVariables } from './utils/customer-variables/customer-variables'
 import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables'
 import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables'
-import { getFpCdnUrl, getFpIngressBaseHost } from './utils/customer-variables/selectors'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
-import { V4 } from './v4'
+import { createIngressHandler } from './handlers/handleIngress'
+import { handleStatus } from './handlers/handleStatus'
+import { V4_INGRESS_PATH } from './utils/paths'
 
 export type Route = {
   pathPattern: RegExp
@@ -35,11 +22,11 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   const routes: Route[] = []
   const downloadScriptRoute: Route = {
     pathPattern: createRoute(await getAgentUri(customerVariables)),
-    handler: handleDownloadScript,
+    handler: createIngressHandler('agentV3'),
   }
   const ingressAPIRoute: Route = {
     pathPattern: createRoute(await getResultUri(customerVariables)),
-    handler: handleIngressAPI,
+    handler: createIngressHandler('ingressV3'),
   }
   const statusRoute: Route = {
     pathPattern: createRoute(getStatusUri()),
@@ -51,69 +38,11 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   routes.push(statusRoute)
   // For V4, proxy all remaining routes through Warden (CDN + Ingress)
   routes.push({
-    pathPattern: createRoute(V4.INGRESS_PATH),
-    handler: V4.handleIngress,
+    pathPattern: createRoute(V4_INGRESS_PATH),
+    handler: createIngressHandler('v4'),
   })
 
   return routes
-}
-
-async function handleDownloadScript(
-  request: CloudFrontRequest,
-  customerVariables: CustomerVariables
-): Promise<CloudFrontResultResponse> {
-  const fpCdnUrl = await getFpCdnUrl(customerVariables)
-  if (!fpCdnUrl) {
-    return new Promise((resolve) =>
-      resolve({
-        status: '500',
-      })
-    )
-  }
-
-  return downloadAgent({
-    querystring: request.querystring,
-    fpCdnUrl,
-    apiKey: getApiKey(request),
-    version: getVersion(request),
-    loaderVersion: getLoaderVersion(request),
-    method: request.method,
-    headers: filterRequestHeaders(request, true),
-  })
-}
-
-async function handleIngressAPI(
-  request: CloudFrontRequest,
-  customerVariables: CustomerVariables,
-  resultPathMatches: RegExpMatchArray | undefined
-): Promise<CloudFrontResultResponse> {
-  const fpIngressBaseHost = await getFpIngressBaseHost(customerVariables)
-  if (!fpIngressBaseHost) {
-    return new Promise((resolve) =>
-      resolve({
-        status: '500',
-      })
-    )
-  }
-
-  let suffix = ''
-  if (resultPathMatches && resultPathMatches.length >= 1) {
-    suffix = resultPathMatches[1] ?? ''
-  }
-  if (suffix.length > 0 && !suffix.startsWith('/')) {
-    suffix = '/' + suffix
-  }
-  const isIngressCall = suffix.length === 0
-
-  return handleResult({
-    fpIngressBaseHost,
-    region: getRegion(request),
-    querystring: request.querystring,
-    method: request.method,
-    headers: await prepareHeadersForIngressAPI(request, customerVariables, isIngressCall),
-    body: request.body?.data || '',
-    suffix,
-  })
 }
 
 function handleStatusPage(

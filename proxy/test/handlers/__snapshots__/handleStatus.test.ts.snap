@@ -277,7 +277,7 @@ exports[`Handle status returns correct status info in html if some variables are
     <div class="env-info">
       
         <div class="env-info-item">
-            ⚠️ <strong>fpjs_get_result_path </strong> is not defined
+            ⚠️ <strong>fpjs_get_result_path </strong> is not defined and uses default value
         </div>
         <div class="env-info-item">
             ⚠️ <strong>fpjs_pre_shared_secret </strong> is not defined

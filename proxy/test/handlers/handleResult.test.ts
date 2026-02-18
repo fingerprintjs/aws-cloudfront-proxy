@@ -1,16 +1,14 @@
-import { handler } from '../../app'
-import * as handlers from '../../handlers'
-import { handleResult } from '../../handlers'
 import https, { Agent } from 'https'
 import { ClientRequest, IncomingMessage } from 'http'
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
 import { mockEvent, mockRequest } from '../aws'
+import * as utils from '../../utils'
 import {
   addTrafficMonitoringSearchParamsForProCDN,
   addTrafficMonitoringSearchParamsForVisitorIdRequest,
 } from '../../utils'
-import * as utils from '../../utils'
+import { handler } from '../../app'
 
 describe('Result Endpoint', function () {
   const origin: string = '__ingress_api__'
@@ -23,7 +21,6 @@ describe('Result Endpoint', function () {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(handlers, 'handleResult')
     jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForProCDN')
     jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForVisitorIdRequest')
     requestSpy = jest.spyOn(https, 'request')
@@ -40,11 +37,8 @@ describe('Result Endpoint', function () {
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      expect.objectContaining<Partial<URL>>({
-        href: `https://eu.${origin}/${queryStringWithRegion('eu')}`,
-      }),
+      `https://eu.${origin}/${queryStringWithRegion('eu')}`,
       expect.anything(),
       expect.anything()
     )
@@ -58,9 +52,8 @@ describe('Result Endpoint', function () {
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      new URL(`https://${origin}/${queryStringWithRegion('us')}`),
+      `https://${origin}/${queryStringWithRegion('us')}`,
       expect.anything(),
       expect.anything()
     )
@@ -76,9 +69,8 @@ describe('Result Endpoint', function () {
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      new URL(`https://${origin}/${queryStringWithUSRegion}`),
+      `https://${origin}/${queryStringWithUSRegion}`,
       expect.anything(),
       expect.anything()
     )
@@ -92,9 +84,8 @@ describe('Result Endpoint', function () {
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      new URL(`https://${origin}/${suffix}?${iiParam}`),
+      `https://${origin}/${suffix}?${iiParam}`,
       expect.anything(),
       expect.anything()
     )
@@ -102,17 +93,15 @@ describe('Result Endpoint', function () {
 
   test('Invalid query parameters, GET request', async () => {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
-    const queryStringWithUSRegion =
-      '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
+    const queryStringWithUSRegion = '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo'
     const request = mockRequest({ uri: '/behavior/result', querystring: queryString, method: 'GET' })
     request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      new URL(`https://${origin}/${queryStringWithUSRegion}`),
+      `https://${origin}/${queryStringWithUSRegion}`,
       expect.anything(),
       expect.anything()
     )
@@ -120,41 +109,27 @@ describe('Result Endpoint', function () {
 
   test('Suffix with dot, GET request', async () => {
     const suffix = '.suffix/more/path'
-    const iiParam = 'ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
     const request = mockRequest({ uri: `/behavior/result/${suffix}`, querystring: '', method: 'GET' })
     const event = mockEvent(request)
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
-    expect(https.request).toHaveBeenCalledWith(
-      new URL(`https://${origin}/${suffix}?${iiParam}`),
-      expect.anything(),
-      expect.anything()
-    )
+    expect(https.request).toHaveBeenCalledWith(`https://${origin}/${suffix}`, expect.anything(), expect.anything())
   })
 
   test('Call without suffix', async () => {
     const event = mockEvent(mockRequest({ uri: '/behavior/result' }))
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
-    expect(https.request).toHaveBeenCalledWith(
-      expect.objectContaining<Partial<URL>>({
-        href: `https://${origin}/${queryString}`,
-      }),
-      expect.anything(),
-      expect.anything()
-    )
+
+    expect(https.request).toHaveBeenCalledWith(`https://${origin}/${queryString}`, expect.anything(), expect.anything())
   })
 
   test('Call with suffix', async () => {
     const event = mockEvent(mockRequest({ uri: '/behavior/result/with/suffix' }))
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
+
     expect(https.request).toHaveBeenCalledWith(
-      expect.objectContaining<Partial<URL>>({
-        href: `https://${origin}/with/suffix${queryString}`,
-      }),
+      `https://${origin}/with/suffix${queryString}`,
       expect.anything(),
       expect.anything()
     )
@@ -168,11 +143,8 @@ describe('Result Endpoint', function () {
 
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
     expect(https.request).toHaveBeenCalledWith(
-      expect.objectContaining<Partial<URL>>({
-        href: `https://eu.${origin}/with/suffix${queryStringWithRegion('eu')}`,
-      }),
+      `https://eu.${origin}/with/suffix${queryStringWithRegion('eu')}`,
       expect.anything(),
       expect.anything()
     )
@@ -183,17 +155,15 @@ describe('Result Endpoint', function () {
   test.skip('Call with bad suffix', async () => {
     const event = mockEvent(mockRequest({ uri: '/behavior/resultwith/bad/suffix' }))
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(0)
     expect(https.request).toHaveBeenCalledTimes(0)
   })
 
   test('Traffic monitoring', async () => {
     const event = mockEvent(mockRequest({ uri: '/behavior/result' }))
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     const url = requestSpy.mock.calls[0][0]
-    const iiParam = url.searchParams.get('ii')
+    const iiParam = new URL(url).searchParams.get('ii')
 
     expect(iiParam).toEqual('fingerprintjs-pro-cloudfront/__lambda_func_version__/ingress')
   })
@@ -208,10 +178,8 @@ describe('Result Endpoint', function () {
     )
     await handler(event)
 
-    expect(handleResult).toHaveBeenCalledTimes(1)
-
     const url = requestSpy.mock.calls[0][0]
-    const iiParam = url.searchParams.get('ii')
+    const iiParam = new URL(url).searchParams.get('ii')
 
     expect(iiParam).toBeFalsy()
 
@@ -223,7 +191,6 @@ describe('Result Endpoint', function () {
     const request = mockRequest({ uri: '/behavior/result' })
     const event = mockEvent(request)
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     const options = requestSpy.mock.calls[0][1]
 
@@ -243,7 +210,6 @@ describe('Result Endpoint', function () {
 
     const event = mockEvent(request)
     await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     const options = requestSpy.mock.calls[0][1]
     expect(options.headers.cookie).toEqual(
@@ -257,6 +223,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 200,
+        setEncoding: jest.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -275,7 +242,6 @@ describe('Result Endpoint', function () {
 
     const event = mockEvent(request)
     const response = await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     const body = Buffer.from(response.body as string, 'base64').toString('utf-8')
 
@@ -309,6 +275,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 500,
+        setEncoding: jest.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -327,7 +294,6 @@ describe('Result Endpoint', function () {
 
     const event = mockEvent(request)
     const response = await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     const body = Buffer.from(response.body as string, 'base64').toString('utf-8')
 
@@ -375,7 +341,6 @@ describe('Result Endpoint', function () {
 
     const event = mockEvent(request)
     const response = await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     expect(response.status).toEqual('500')
     expect(JSON.parse(response.body as string)).toEqual({
@@ -394,6 +359,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 200,
+        setEncoding: jest.fn(),
         headers: {
           'set-cookie': [
             '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
@@ -415,7 +381,6 @@ describe('Result Endpoint', function () {
 
     const event = mockEvent(request)
     const response = await handler(event)
-    expect(handleResult).toHaveBeenCalledTimes(1)
 
     expect(response.headers).toEqual({
       'set-cookie': [

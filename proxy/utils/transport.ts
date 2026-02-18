@@ -1,6 +1,6 @@
 import https, { RequestOptions } from 'https'
-import { updateResponseHeaders } from '../utils'
-import { generateErrorResponse } from '../utils/generateErrorResponse'
+import { updateResponseHeaders } from './index'
+import { generateErrorResponse } from './generateErrorResponse'
 import { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
 import { IncomingMessage, OutgoingHttpHeaders } from 'http'
 import { CloudFrontResultResponse } from 'aws-lambda'
@@ -10,19 +10,31 @@ type SendHttpRequestResult = {
   data: Buffer
 }
 
+/**
+ * Sends an HTTP request to the specified URL with the given options and data.
+ *
+ * @param {URL} url - The URL to send the request to.
+ * @param {Object} options - The request options.
+ * @param {string | undefined} options.data - The base64 encoded string to be sent as the request body.
+ * @param {Object} [options.headers] - Additional HTTP headers for the request.
+ * @param {string} [options.method] - The HTTP method to use (e.g., "GET", "POST").
+ * @return {Promise<SendHttpRequestResult>} A promise that resolves with the result of the HTTP request, including the response and the response data.
+ */
 function sendHttpRequest(
   url: URL,
   { data, ...options }: RequestOptions & { data: string | undefined }
 ): Promise<SendHttpRequestResult> {
   return new Promise<SendHttpRequestResult>((resolve, reject) => {
-    const request = https.request(url, options, (response) => {
+    const request = https.request(url.toString(), options, (response) => {
       const chunks: Buffer[] = []
       const isBinary = Boolean(response.headers['content-encoding'])
 
-      response.setEncoding(isBinary ? 'binary' : 'utf8')
+      if (isBinary) {
+        response.setEncoding('binary')
+      }
 
       response.on('data', (data) => {
-        const encoding = isBinary ? 'binary' : 'utf8'
+        const encoding = isBinary ? 'binary' : undefined
         const chunk = Buffer.isBuffer(data) ? data : Buffer.from(data, encoding)
 
         chunks.push(chunk)
@@ -49,6 +61,16 @@ function sendHttpRequest(
   })
 }
 
+/**
+ * Sends an ingress request to the specified URL with the provided request details and headers,
+ * processes the response, and returns a formatted CloudFront result.
+ *
+ * @param {CloudFrontRequest} incomingRequest - The original CloudFront request object containing method, headers, and body.
+ * @param {OutgoingHttpHeaders} requestHeaders - The headers to be sent with the HTTP request.
+ * @param {URL} requestUrl - The URL endpoint where the request will be sent.
+ * @return {Promise<CloudFrontResultResponse>} A promise that resolves to a CloudFront result object containing the response status,
+ *                                            headers, body, and encoding.
+ */
 export async function sendIngressRequest(
   incomingRequest: CloudFrontRequest,
   requestHeaders: OutgoingHttpHeaders,

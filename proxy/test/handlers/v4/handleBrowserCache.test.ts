@@ -3,7 +3,6 @@ import { mockEvent, mockRequest } from '../../aws'
 import { ClientRequest, IncomingMessage } from 'http'
 import https, { Agent } from 'https'
 import { Socket } from 'net'
-import { V4 } from '../../../v4'
 
 describe('Browser caching endpoint V4', () => {
   const requestUri = '/behavior/some/suffix'
@@ -12,8 +11,6 @@ describe('Browser caching endpoint V4', () => {
   const cacheControlValue = 'max-age=31536000, immutable, private'
 
   beforeEach(() => {
-    jest.spyOn(V4, 'handleIngress')
-
     requestSpy = jest.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
@@ -34,7 +31,6 @@ describe('Browser caching endpoint V4', () => {
     const reqEvent = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
     expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
-    expect(V4.handleIngress).toHaveBeenCalledTimes(1)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {
@@ -91,7 +87,5 @@ describe('Browser caching endpoint V4', () => {
       'x-some-header': 'some value',
       'content-type': 'text/javascript; charset=utf-8',
     })
-
-    expect(V4.handleIngress).toHaveBeenCalledTimes(1)
   })
 })

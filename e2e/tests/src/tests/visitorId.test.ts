@@ -23,6 +23,7 @@ test.describe('visitorId', () => {
     await checkResponse(page)
 
     const requests = getRequests()
+    expect(requests.every((req) => req.url().includes(baseURL!.toString()))).toBe(true)
     expect(requests).toHaveLength(5)
 
     const [, , agentRequest, , apiRequest] = requests
