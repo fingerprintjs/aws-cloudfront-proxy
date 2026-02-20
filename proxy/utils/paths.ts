@@ -15,7 +15,7 @@ export const INGRESS_CDN_PATH = 'web'
  *                                  - `version`: The API version to use; defaults to '3' if not specified.
  * @return {string} The constructed URL for the agent endpoint.
  */
-export function getAgentPath(params: URLSearchParams): string {
+export function getV3AgentPath(params: URLSearchParams): string {
   const apiKey = params.get('apiKey') ?? ''
   const loaderVersion = params.get('loaderVersion')
   const version = params.get('version') ?? '3'

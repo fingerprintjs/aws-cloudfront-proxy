@@ -3,7 +3,7 @@ import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/custome
 import { CustomerVariables } from '../utils/customer-variables/customer-variables'
 import { prepareHeadersForIngressRequest } from '../utils'
 import { getValidRegion } from '../utils/request'
-import { INGRESS_CDN_PATH, extractIngressPath, getAgentPath, getIngressAPIHost } from '../utils/paths'
+import { INGRESS_CDN_PATH, extractIngressPath, getV3AgentPath, getIngressAPIHost } from '../utils/paths'
 import { sendIngressRequest } from '../utils/transport'
 import { handleTrafficMonitoring } from '../utils/traffic'
 import { Region } from '../model'
@@ -73,7 +73,7 @@ async function handleIngress(
   switch (requestType) {
     // For V3 request, we need to prepend the INGRESS_CDN_PATH to the request path
     case 'agentV3':
-      suffix = `${INGRESS_CDN_PATH}/${getAgentPath(requestUrlParams)}`
+      suffix = `${INGRESS_CDN_PATH}/${getV3AgentPath(requestUrlParams)}`
       break
 
     // For V4 request, we just use the path from incoming request and leverage the behavior path nest level
