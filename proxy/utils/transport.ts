@@ -77,6 +77,12 @@ export async function sendIngressRequest(
   requestUrl: URL
 ): Promise<CloudFrontResultResponse> {
   try {
+    console.debug('Sending request to Ingress API', {
+      method: incomingRequest.method,
+      url: requestUrl.toString(),
+      body: incomingRequest.body?.data,
+    })
+
     const { response, data } = await sendHttpRequest(requestUrl, {
       method: incomingRequest.method,
       data: incomingRequest.body?.data,
