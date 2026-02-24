@@ -34,8 +34,20 @@ describe('test handle traffic monitoring', () => {
     expect(url.searchParams.get('ii')).toBeNull()
   })
 
-  it('should handle agent request', () => {
-    const url = new URL('https://foo.bar/web/api_key')
+  it.each([
+    '/web/api_key',
+    '/web',
+    'web',
+    'web/api_key',
+    'behavior/web/api_key',
+    'behavior/web',
+    '/web/nested_path',
+    '/behavior/web/api_key',
+    '/behavior/web',
+    '/behavior/web/nested_path',
+  ])('should handle agent request %s', (path) => {
+    const url = new URL('https://foo.bar')
+    url.pathname = path
 
     handleTrafficMonitoring(url, getPathSegments(url.pathname), 'GET')
 
