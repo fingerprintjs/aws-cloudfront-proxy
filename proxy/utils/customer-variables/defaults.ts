@@ -1,7 +1,7 @@
 import { CustomerVariableName, CustomerVariablesRecord, CustomerVariableType } from './types'
 
 const defaultCustomerVariables = {
-  [CustomerVariableName.GetResultPath]: 'result',
+  [CustomerVariableName.GetResultPath]: 'resultId',
   [CustomerVariableName.PreSharedSecret]: null,
   [CustomerVariableName.AgentDownloadPath]: 'agent',
   [CustomerVariableName.FpCdnUrl]: '__FPCDN__',
