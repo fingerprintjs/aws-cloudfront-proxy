@@ -3,7 +3,7 @@ export function generateErrorResponse(err: Error): string {
     v: '2',
     error: {
       code: 'Failed',
-      message: `An error occurred with Fingerprint Pro Lambda function. Reason ${err}`,
+      message: `An error occurred with Fingerprint Lambda function. Reason ${err}`,
     },
     requestId: generateRequestId,
     products: {},
