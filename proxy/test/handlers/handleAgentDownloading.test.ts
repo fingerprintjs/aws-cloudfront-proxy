@@ -336,7 +336,7 @@ describe('Download agent endpoint', () => {
         v: '2',
         error: {
           code: 'Failed',
-          message: 'An error occurred with Fingerprint Pro Lambda function. Reason Error: Network error',
+          message: 'An error occurred with Fingerprint Lambda function. Reason Error: Network error',
         },
         products: {},
       })

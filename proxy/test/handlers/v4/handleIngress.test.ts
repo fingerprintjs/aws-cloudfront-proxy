@@ -341,7 +341,7 @@ describe('Result Endpoint V4', () => {
       v: '2',
       error: {
         code: 'Failed',
-        message: 'An error occurred with Fingerprint Pro Lambda function. Reason Error: Request timeout',
+        message: 'An error occurred with Fingerprint Lambda function. Reason Error: Request timeout',
       },
       products: {},
     })
