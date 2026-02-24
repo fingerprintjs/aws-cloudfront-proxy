@@ -14,9 +14,14 @@ export const internalVariables: Set<CustomerVariableName> = new Set<CustomerVari
 
 const stringParser = (value: string) => value
 
+const intParser = (fallbackValue: number) => (value: string) => {
+  const parsed = parseInt(value)
+  return isNaN(parsed) ? fallbackValue : parsed
+}
+
 export const customerVariableParsers = {
   [CustomerVariableName.GetResultPath]: stringParser,
-  [CustomerVariableName.BehaviorPathNestLevel]: parseInt,
+  [CustomerVariableName.BehaviorPathNestLevel]: intParser(1),
   [CustomerVariableName.PreSharedSecret]: stringParser,
   [CustomerVariableName.AgentDownloadPath]: stringParser,
   [CustomerVariableName.FpCdnUrl]: stringParser,
