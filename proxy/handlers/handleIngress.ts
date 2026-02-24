@@ -88,7 +88,8 @@ async function handleIngress(
       }
   }
 
-  const requestPath = extractIngressPath(suffix, behaviorPathNestLevel)
+  const requestPathSegments = extractIngressPath(suffix, behaviorPathNestLevel)
+  const requestPath = requestPathSegments.join('/')
 
   const isIngressCall = incomingRequest.method === 'POST'
 
@@ -97,7 +98,7 @@ async function handleIngress(
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
-  handleTrafficMonitoring(requestUrl, incomingRequest.method)
+  handleTrafficMonitoring(requestUrl, requestPathSegments, incomingRequest.method)
 
   return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }

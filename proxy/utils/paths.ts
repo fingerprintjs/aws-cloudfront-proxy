@@ -37,12 +37,22 @@ export function getIngressAPIHost(region: Region, baseHost: string): string {
 }
 
 /**
+ * Splits a given URI into its individual path segments, excluding empty segments.
+ *
+ * @param {string} uri - The URI to be split into segments.
+ * @return {string[]} An array of non-empty path segments derived from the URI.
+ */
+export function getPathSegments(uri: string): string[] {
+  return uri.split('/').filter(Boolean)
+}
+
+/**
  * Extracts the ingress path from the given URI by removing a specified number of path segments from the start.
  *
  * @param {string} uri - The input URI from which the ingress path is extracted.
  * @param {number} behaviorPathNestLevel - The number of nesting levels to remove from the beginning of the path.
- * @return {string} The resulting ingress path after removing the specified number of path segments.
+ * @return {string} The resulting ingress path segments after removing the specified number of path segments.
  */
-export function extractIngressPath(uri: string, behaviorPathNestLevel: number): string {
-  return uri.split('/').filter(Boolean).slice(behaviorPathNestLevel).join('/')
+export function extractIngressPath(uri: string, behaviorPathNestLevel: number): string[] {
+  return getPathSegments(uri).slice(behaviorPathNestLevel)
 }
