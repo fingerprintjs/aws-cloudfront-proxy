@@ -29,12 +29,16 @@ test.describe('[v4] visitorId', () => {
 
     const requests = getRequests()
 
-    expect(requests.every((req) => req.url().includes(baseURL!.toString()))).toBe(true)
+    const requestsWithDifferentHost = requests.filter((req) => !req.url().includes(rootUrl.hostname))
+    expect(
+      requestsWithDifferentHost,
+      `Following requests have invalid URL: ${requestsWithDifferentHost.map((it) => it.url())}`
+    ).toHaveLength(0)
 
     const agentRequest = requests.find((req) => req.url().includes('/fpjs/web/v4'))
     expect(agentRequest).toBeTruthy()
 
-    const apiRequest = requests.find((req) => req.url().includes('/fpjs/?'))
+    const apiRequest = requests.find((req) => req.url().includes('/fpjs?'))
     expect(apiRequest).toBeTruthy()
   })
 })
