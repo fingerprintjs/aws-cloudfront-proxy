@@ -8,6 +8,7 @@
   "scripts": {
     "prepare": "husky",
     "build": "rimraf dist && NODE_OPTIONS=\"--max_old_space_size=4098\" rollup -c rollup.config.js --bundleConfigAsCjs && cp cloudformation/template.yml dist/template.yml",
+    "build:release": "pnpm build && pnpm prepare-package",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore --max-warnings 0 .",
     "lint:fix": "pnpm lint --fix",
     "test": "jest",
@@ -33,7 +34,9 @@
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.832.0",
+    "@changesets/cli": "^2.30.0",
     "@commitlint/cli": "^19.8.1",
+    "@fingerprintjs/changesets-changelog-format": "^0.2.0",
     "@fingerprintjs/commit-lint-dx-team": "^0.0.2",
     "@fingerprintjs/conventional-changelog-dx-team": "^0.1.0",
     "@fingerprintjs/eslint-config-dx-team": "^0.1.0",

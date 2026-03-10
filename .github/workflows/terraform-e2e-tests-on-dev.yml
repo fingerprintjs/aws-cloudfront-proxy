@@ -23,14 +23,15 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_IAM_AUTH_REGION }}
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .node-version
 
       - uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
         with:
           version: 9
-      
+
       - run: pnpm install
       
       - run: pnpm exec playwright install
@@ -76,9 +77,10 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_IAM_AUTH_REGION }}
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version-file: .node-version
 
       - uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
         with:
@@ -86,7 +88,7 @@ jobs:
 
       - run: pnpm install && npm install ts-node -g
 
-      - run: pnpm build && bash scripts/preparePackage.sh
+      - run: pnpm build:release
         env:
           FPCDN: ${{ secrets.MOCK_WARDEN_URL }}
           INGRESS_API: ${{ secrets.MOCK_WARDEN_URL }}
