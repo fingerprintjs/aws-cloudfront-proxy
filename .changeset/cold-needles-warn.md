@@ -1,5 +1,5 @@
 ---
-'@fingerprint/cloudfront-proxy': major
+'@fingerprint/cloudfront-proxy': minor
 ---
 
 Add support for API V4
