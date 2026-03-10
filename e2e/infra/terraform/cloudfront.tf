@@ -49,7 +49,7 @@ resource "aws_cloudfront_distribution" "with_secret" {
   }
 
   ordered_cache_behavior {
-    path_pattern = "${var.fpjs_behavior_path}*"
+    path_pattern = "${var.fpjs_behavior_path}/*"
 
     allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD"]
@@ -132,7 +132,7 @@ resource "aws_cloudfront_distribution" "with_headers" {
   }
 
   ordered_cache_behavior {
-    path_pattern = "${var.fpjs_behavior_path}*"
+    path_pattern = "${var.fpjs_behavior_path}/*"
 
     allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD"]
