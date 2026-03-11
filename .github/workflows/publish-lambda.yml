@@ -20,17 +20,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
+        with:
+          version: 9
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-
-      - uses: pnpm/action-setup@129abb77bf5884e578fcaf1f37628e41622cc371
-        with:
-          version: 9
 
       - run: pnpm install
 
