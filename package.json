@@ -14,7 +14,9 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:dts": "tsc --noEmit --isolatedModules dist/fingerprintjs-pro-cloudfront-lambda-function.d.ts",
-    "prepare-package": "bash ./scripts/preparePackage.sh"
+    "prepare-package": "bash ./scripts/preparePackage.sh",
+    "changeset:publish": "HUSKY=0 changeset publish",
+    "changeset:version": "changeset version"
   },
   "main": "dist/fingerprintjs-pro-cloudflare-lambda-function.js",
   "sideEffects": false,
