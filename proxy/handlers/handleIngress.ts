@@ -2,7 +2,7 @@ import { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
 import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors'
 import { CustomerVariables } from '../utils/customer-variables/customer-variables'
 import { prepareHeadersForIngressRequest } from '../utils'
-import { getValidRegion } from '../utils/request'
+import { getValidRegion, isMethodSafe } from '../utils/request'
 import { INGRESS_CDN_PATH, extractIngressPath, getV3AgentPath, getIngressAPIHost } from '../utils/paths'
 import { sendIngressRequest } from '../utils/transport'
 import { handleTrafficMonitoring } from '../utils/traffic'
@@ -91,9 +91,11 @@ async function handleIngress(
   const requestPathSegments = extractIngressPath(suffix, behaviorPathNestLevel)
   const requestPath = requestPathSegments.join('/')
 
-  const isIngressCall = incomingRequest.method === 'POST'
-
-  const requestHeaders = await prepareHeadersForIngressRequest(incomingRequest, customerVariables, isIngressCall)
+  const requestHeaders = await prepareHeadersForIngressRequest(
+    incomingRequest,
+    customerVariables,
+    isMethodSafe(incomingRequest.method)
+  )
 
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath

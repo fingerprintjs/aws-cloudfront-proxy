@@ -58,15 +58,15 @@ export const CACHE_CONTROL_HEADER_NAME = 'cache-control'
  *
  * @param {CloudFrontRequest} request - The incoming request object from CloudFront, containing headers and client-related information.
  * @param {CustomerVariables} variables - The customer-specific variables required for fetching the pre-shared secret.
- * @param {boolean} isIngressCall - A flag indicating whether the request is an ingress call.
+ * @param {boolean} isSafeMethodCall - A flag indicating whether the request method is safe, like GET, HEAD, OPTIONS, etc.
  * @return {Promise<OutgoingHttpHeaders>} A promise that resolves to an object containing the modified headers for the request.
  */
 export async function prepareHeadersForIngressRequest(
   request: CloudFrontRequest,
   variables: CustomerVariables,
-  isIngressCall: boolean
+  isSafeMethodCall: boolean
 ): Promise<OutgoingHttpHeaders> {
-  if (!isIngressCall) {
+  if (isSafeMethodCall) {
     return filterRequestHeaders(request, true)
   }
   const headers = filterRequestHeaders(request)

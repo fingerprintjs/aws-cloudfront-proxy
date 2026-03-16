@@ -114,7 +114,7 @@ describe('test fpjs-headers preparation', () => {
         },
       },
     }
-    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), true)
+    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), false)
     expect(headers['fpjs-proxy-client-ip']).toBe('1.1.1.1')
     expect(headers['fpjs-proxy-secret']).toBe('qwertyuio1356767')
     expect(headers['fpjs-proxy-forwarded-host']).toBe('foo.bar')
@@ -219,7 +219,7 @@ describe('test fpjs-headers preparation', () => {
         },
       },
     }
-    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), true)
+    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), false)
     expect(headers['fpjs-proxy-client-ip']).toBe('1.1.1.1')
     expect(headers.hasOwnProperty('fpjs-proxy-secret')).toBeFalsy()
     expect(headers['fpjs-proxy-forwarded-host']).toBe('foo.bar')
