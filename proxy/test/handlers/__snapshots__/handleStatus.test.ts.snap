@@ -12,7 +12,7 @@ exports[`Get status info returns correct response with empty non obfuscated vari
       "value": "result",
     },
     {
-      "envVarName": "fpjs_behavior_path_nest_level",
+      "envVarName": "fpjs_integration_path_depth",
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
@@ -69,7 +69,7 @@ exports[`Get status info returns correct response with empty pre shared secret 1
       "value": "result",
     },
     {
-      "envVarName": "fpjs_behavior_path_nest_level",
+      "envVarName": "fpjs_integration_path_depth",
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
@@ -126,7 +126,7 @@ exports[`Get status info returns correct status info 1`] = `
       "value": "result",
     },
     {
-      "envVarName": "fpjs_behavior_path_nest_level",
+      "envVarName": "fpjs_integration_path_depth",
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
