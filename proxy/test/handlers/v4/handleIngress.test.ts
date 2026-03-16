@@ -1,10 +1,7 @@
 import { handler } from '../../../app'
 import { mockEvent, mockRequest } from '../../aws'
 import * as utils from '../../../utils'
-import {
-  addTrafficMonitoringSearchParamsForProCDN,
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-} from '../../../utils'
+import { addTrafficMonitoringSearchParamsForIngressRequest } from '../../../utils'
 import https, { Agent } from 'https'
 import { EventEmitter } from 'events'
 import { ClientRequest, IncomingMessage } from 'http'
@@ -22,8 +19,7 @@ describe('Result Endpoint V4', () => {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForProCDN')
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForVisitorIdRequest')
+    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForIngressRequest')
     requestSpy = jest.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
@@ -98,7 +94,8 @@ describe('Result Endpoint V4', () => {
 
   test('Invalid query parameters, GET request', async () => {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
-    const queryStringWithUSRegion = '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo'
+    const queryStringWithUSRegion =
+      '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
     const request = mockRequest({ uri: requestUri, querystring: queryString, method: 'GET' })
     const event = mockEvent(request)
 
@@ -118,7 +115,11 @@ describe('Result Endpoint V4', () => {
 
     await handler(event)
 
-    expect(https.request).toHaveBeenCalledWith(`https://${origin}/${suffix}`, expect.anything(), expect.anything())
+    expect(https.request).toHaveBeenCalledWith(
+      `https://${origin}/${suffix}?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress`,
+      expect.anything(),
+      expect.anything()
+    )
   })
 
   test('Call without suffix', async () => {
@@ -162,7 +163,8 @@ describe('Result Endpoint V4', () => {
     expect(iiParam).toEqual('fingerprintjs-pro-cloudfront/__lambda_func_version__/ingress')
   })
 
-  test('No traffic monitoring on cache endpoint', async () => {
+  // No longer relevant, as now traffic monitoring is always included in the request. Leaving this for awareness.
+  test.skip('No traffic monitoring on cache endpoint', async () => {
     const event = mockEvent(
       mockRequest({
         uri: requestUri,
@@ -177,8 +179,7 @@ describe('Result Endpoint V4', () => {
 
     expect(iiParam).toBeFalsy()
 
-    expect(addTrafficMonitoringSearchParamsForVisitorIdRequest).toHaveBeenCalledTimes(0)
-    expect(addTrafficMonitoringSearchParamsForProCDN).toHaveBeenCalledTimes(0)
+    expect(addTrafficMonitoringSearchParamsForIngressRequest).toHaveBeenCalledTimes(0)
   })
 
   test('Headers with proxy secret', async () => {

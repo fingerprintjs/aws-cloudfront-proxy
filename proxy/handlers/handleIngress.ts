@@ -1,11 +1,10 @@
 import { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
 import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors'
 import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { prepareHeadersForIngressRequest } from '../utils'
+import { addTrafficMonitoringSearchParamsForIngressRequest, prepareHeadersForIngressRequest } from '../utils'
 import { getValidRegion, isMethodSafe } from '../utils/request'
-import { INGRESS_CDN_PATH, extractIngressPath, getV3AgentPath, getIngressAPIHost } from '../utils/paths'
+import { extractIngressPath, getIngressAPIHost, getV3AgentPath, INGRESS_CDN_PATH } from '../utils/paths'
 import { sendIngressRequest } from '../utils/transport'
-import { handleTrafficMonitoring } from '../utils/traffic'
 import { Region } from '../model'
 
 export type RequestType = 'agentV3' | 'ingressV3' | 'v4'
@@ -100,7 +99,7 @@ async function handleIngress(
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
-  handleTrafficMonitoring(requestUrl, requestPathSegments, incomingRequest.method)
+  addTrafficMonitoringSearchParamsForIngressRequest(requestUrl)
 
   return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }
