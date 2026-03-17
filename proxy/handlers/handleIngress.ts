@@ -99,7 +99,10 @@ async function handleIngress(
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
-  addTrafficMonitoringSearchParamsForIngressRequest(requestUrl)
+
+  if (incomingRequest.method === 'POST') {
+    addTrafficMonitoringSearchParamsForIngressRequest(requestUrl)
+  }
 
   return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }
