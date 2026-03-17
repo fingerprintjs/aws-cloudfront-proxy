@@ -32,7 +32,7 @@ async function getEnvInfo(customerVariables: CustomerVariables) {
       return {
         envVarName: variable,
         value: value.value,
-        isSet: Boolean(value.value),
+        isSet: value.value !== null && value.value !== undefined && value.value !== '',
         isInternal: internalVariables.has(variable),
         isOptional: optionalValues.includes(variable),
         resolvedBy: value.resolvedBy,
