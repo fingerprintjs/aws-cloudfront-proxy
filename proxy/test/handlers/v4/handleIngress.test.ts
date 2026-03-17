@@ -94,8 +94,7 @@ describe('Result Endpoint V4', () => {
 
   test('Invalid query parameters, GET request', async () => {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
-    const queryStringWithUSRegion =
-      '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
+    const queryStringWithUSRegion = '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo'
     const request = mockRequest({ uri: requestUri, querystring: queryString, method: 'GET' })
     const event = mockEvent(request)
 
@@ -115,11 +114,7 @@ describe('Result Endpoint V4', () => {
 
     await handler(event)
 
-    expect(https.request).toHaveBeenCalledWith(
-      `https://${origin}/${suffix}?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress`,
-      expect.anything(),
-      expect.anything()
-    )
+    expect(https.request).toHaveBeenCalledWith(`https://${origin}/${suffix}`, expect.anything(), expect.anything())
   })
 
   test('Call without suffix', async () => {
