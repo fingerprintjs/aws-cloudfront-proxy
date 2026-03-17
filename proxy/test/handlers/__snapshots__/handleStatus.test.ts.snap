@@ -5,14 +5,16 @@ exports[`Get status info returns correct response with empty non obfuscated vari
   "envInfo": [
     {
       "envVarName": "fpjs_get_result_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "result",
     },
     {
       "envVarName": "fpjs_integration_path_depth",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
@@ -21,6 +23,7 @@ exports[`Get status info returns correct response with empty non obfuscated vari
     },
     {
       "envVarName": "fpjs_pre_shared_secret",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": false,
       "isSet": true,
@@ -29,14 +32,16 @@ exports[`Get status info returns correct response with empty non obfuscated vari
     },
     {
       "envVarName": "fpjs_agent_download_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "download",
     },
     {
       "envVarName": "fpjs_cdn_url",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -45,6 +50,7 @@ exports[`Get status info returns correct response with empty non obfuscated vari
     },
     {
       "envVarName": "fpjs_ingress_base_host",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -62,14 +68,16 @@ exports[`Get status info returns correct response with empty pre shared secret 1
   "envInfo": [
     {
       "envVarName": "fpjs_get_result_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "result",
     },
     {
       "envVarName": "fpjs_integration_path_depth",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
@@ -78,6 +86,7 @@ exports[`Get status info returns correct response with empty pre shared secret 1
     },
     {
       "envVarName": "fpjs_pre_shared_secret",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": false,
       "isSet": false,
@@ -86,14 +95,16 @@ exports[`Get status info returns correct response with empty pre shared secret 1
     },
     {
       "envVarName": "fpjs_agent_download_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "download",
     },
     {
       "envVarName": "fpjs_cdn_url",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -102,6 +113,7 @@ exports[`Get status info returns correct response with empty pre shared secret 1
     },
     {
       "envVarName": "fpjs_ingress_base_host",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -119,14 +131,16 @@ exports[`Get status info returns correct status info 1`] = `
   "envInfo": [
     {
       "envVarName": "fpjs_get_result_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "result",
     },
     {
       "envVarName": "fpjs_integration_path_depth",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": true,
       "isSet": true,
@@ -135,6 +149,7 @@ exports[`Get status info returns correct status info 1`] = `
     },
     {
       "envVarName": "fpjs_pre_shared_secret",
+      "isForV3Only": false,
       "isInternal": false,
       "isOptional": false,
       "isSet": true,
@@ -143,14 +158,16 @@ exports[`Get status info returns correct status info 1`] = `
     },
     {
       "envVarName": "fpjs_agent_download_path",
+      "isForV3Only": true,
       "isInternal": false,
-      "isOptional": false,
+      "isOptional": true,
       "isSet": true,
       "resolvedBy": "test provider",
       "value": "download",
     },
     {
       "envVarName": "fpjs_cdn_url",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -159,6 +176,7 @@ exports[`Get status info returns correct status info 1`] = `
     },
     {
       "envVarName": "fpjs_ingress_base_host",
+      "isForV3Only": false,
       "isInternal": true,
       "isOptional": false,
       "isSet": true,
@@ -177,11 +195,13 @@ exports[`Handle status returns correct status info in html if all variables are 
         <title>CloudFront integration status</title>
         <meta charset="utf-8">
         <style nonce='hardcodedStyleNonce'>
-          body, .env-info {
+         .env-info {
             display: flex;
+            flex-direction: column;
           }
           
           body {
+            display: flex;
             flex-direction: column;
             align-items: center;
           }
@@ -189,18 +209,89 @@ exports[`Handle status returns correct status info in html if all variables are 
           body > * {
             margin-bottom: 1em;
           }
+          
+          .v3-icon {
+            font-size: 10px;
+            color: #999;
+          }
+          
+          .items {
+            display: flex;
+            flex-direction: column;
+            align-content: baseline;
+            gap: 2rem;
+            flex-wrap: wrap;
+          }
+          
+          .item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          
+          .item h3, p {
+            margin: 0;
+          }
+          
+          ul {
+            margin: 0;
+          }
+          
+          [data-tooltip] {
+            position: relative;
+            border-bottom: 1px dashed #000;
+            cursor: help
+          }
+          
+          [data-tooltip]::after {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            content: attr(data-tooltip);
+            left: 0;
+            top: calc(100% + 10px);
+            border-radius: 3px;
+            box-shadow: 0 0 5px 2px rgba(100, 100, 100, 0.6);
+            background-color: white;
+            z-index: 10;
+            padding: 8px;
+            width: 300px;
+            transform: translateY(-20px);
+            transition: all 150ms cubic-bezier(.25, .8, .25, 1);
+          }
+          
+          [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+            transition-duration: 300ms;
+          }
         </style>
       </head>
       <body>
         <h1>CloudFront integration status</h1>
-        <div>
-          Lambda function version: __lambda_func_version__
+        <div class="items">
+            <div class="item">
+              <h3>Lambda function version</h3> 
+              <p>__lambda_func_version__</p>
+              
+          </div>
+            <div class="item">
+              <h3>Variables</h3> 
+              <p>✅ All required environment variables are set:</p>
+              <ul class="env-info">
+        <li>
+        <strong>fpjs_integration_path_depth</strong> - Value is set
+    </li><li>
+        <strong>fpjs_pre_shared_secret</strong> - Value is set
+    </li><li>
+        <strong>fpjs_get_result_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - Value is set
+    </li><li>
+        <strong>fpjs_agent_download_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - Value is set
+    </li>
+      </ul>
+          </div>
         </div>
-        
-      <div>
-        ✅ All environment variables are set
-      </div>
-    
           <span>
             Please reach out our support via <a href="mailto:support@fingerprint.com">support@fingerprint.com</a> if you have any issues
           </span>
@@ -214,11 +305,13 @@ exports[`Handle status returns correct status info in html if some variables are
         <title>CloudFront integration status</title>
         <meta charset="utf-8">
         <style nonce='hardcodedStyleNonce'>
-          body, .env-info {
+         .env-info {
             display: flex;
+            flex-direction: column;
           }
           
           body {
+            display: flex;
             flex-direction: column;
             align-items: center;
           }
@@ -226,21 +319,89 @@ exports[`Handle status returns correct status info in html if some variables are
           body > * {
             margin-bottom: 1em;
           }
+          
+          .v3-icon {
+            font-size: 10px;
+            color: #999;
+          }
+          
+          .items {
+            display: flex;
+            flex-direction: column;
+            align-content: baseline;
+            gap: 2rem;
+            flex-wrap: wrap;
+          }
+          
+          .item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          
+          .item h3, p {
+            margin: 0;
+          }
+          
+          ul {
+            margin: 0;
+          }
+          
+          [data-tooltip] {
+            position: relative;
+            border-bottom: 1px dashed #000;
+            cursor: help
+          }
+          
+          [data-tooltip]::after {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            content: attr(data-tooltip);
+            left: 0;
+            top: calc(100% + 10px);
+            border-radius: 3px;
+            box-shadow: 0 0 5px 2px rgba(100, 100, 100, 0.6);
+            background-color: white;
+            z-index: 10;
+            padding: 8px;
+            width: 300px;
+            transform: translateY(-20px);
+            transition: all 150ms cubic-bezier(.25, .8, .25, 1);
+          }
+          
+          [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+            transition-duration: 300ms;
+          }
         </style>
       </head>
       <body>
         <h1>CloudFront integration status</h1>
-        <div>
-          Lambda function version: __lambda_func_version__
+        <div class="items">
+            <div class="item">
+              <h3>Lambda function version</h3> 
+              <p>__lambda_func_version__</p>
+              
+          </div>
+            <div class="item">
+              <h3>Variables</h3> 
+              <p>🚨 Some required environment variables are not set:</p>
+              <ul class="env-info">
+        <li>
+        <strong>fpjs_integration_path_depth</strong> - Value is set
+    </li><li>
+        <strong>fpjs_pre_shared_secret</strong> - ⚠️ Value is not defined 
+    </li><li>
+        <strong>fpjs_get_result_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - Value is set
+    </li><li>
+        <strong>fpjs_agent_download_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - Value is set
+    </li>
+      </ul>
+          </div>
         </div>
-        
-    <div class="env-info">
-      
-        <div class="env-info-item">
-            ⚠️ <strong>fpjs_pre_shared_secret </strong> is not defined
-        </div>
-    </div>
-  
           <span>
             Please reach out our support via <a href="mailto:support@fingerprint.com">support@fingerprint.com</a> if you have any issues
           </span>
@@ -254,11 +415,13 @@ exports[`Handle status returns correct status info in html if some variables are
         <title>CloudFront integration status</title>
         <meta charset="utf-8">
         <style nonce='hardcodedStyleNonce'>
-          body, .env-info {
+         .env-info {
             display: flex;
+            flex-direction: column;
           }
           
           body {
+            display: flex;
             flex-direction: column;
             align-items: center;
           }
@@ -266,27 +429,89 @@ exports[`Handle status returns correct status info in html if some variables are
           body > * {
             margin-bottom: 1em;
           }
+          
+          .v3-icon {
+            font-size: 10px;
+            color: #999;
+          }
+          
+          .items {
+            display: flex;
+            flex-direction: column;
+            align-content: baseline;
+            gap: 2rem;
+            flex-wrap: wrap;
+          }
+          
+          .item {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+          }
+          
+          .item h3, p {
+            margin: 0;
+          }
+          
+          ul {
+            margin: 0;
+          }
+          
+          [data-tooltip] {
+            position: relative;
+            border-bottom: 1px dashed #000;
+            cursor: help
+          }
+          
+          [data-tooltip]::after {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            content: attr(data-tooltip);
+            left: 0;
+            top: calc(100% + 10px);
+            border-radius: 3px;
+            box-shadow: 0 0 5px 2px rgba(100, 100, 100, 0.6);
+            background-color: white;
+            z-index: 10;
+            padding: 8px;
+            width: 300px;
+            transform: translateY(-20px);
+            transition: all 150ms cubic-bezier(.25, .8, .25, 1);
+          }
+          
+          [data-tooltip]:hover::after {
+            opacity: 1;
+            transform: translateY(0);
+            transition-duration: 300ms;
+          }
         </style>
       </head>
       <body>
         <h1>CloudFront integration status</h1>
-        <div>
-          Lambda function version: __lambda_func_version__
+        <div class="items">
+            <div class="item">
+              <h3>Lambda function version</h3> 
+              <p>__lambda_func_version__</p>
+              
+          </div>
+            <div class="item">
+              <h3>Variables</h3> 
+              <p>🚨 Some required environment variables are not set:</p>
+              <ul class="env-info">
+        <li>
+        <strong>fpjs_integration_path_depth</strong> - Value is set
+    </li><li>
+        <strong>fpjs_pre_shared_secret</strong> - ⚠️ Value is not defined 
+    </li><li>
+        <strong>fpjs_get_result_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined and uses default value: resultId
+    </li><li>
+        <strong>fpjs_agent_download_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined and uses default value: agent
+    </li>
+      </ul>
+          </div>
         </div>
-        
-    <div class="env-info">
-      
-        <div class="env-info-item">
-            ⚠️ <strong>fpjs_get_result_path </strong> is not defined and uses default value
-        </div>
-        <div class="env-info-item">
-            ⚠️ <strong>fpjs_pre_shared_secret </strong> is not defined
-        </div>
-        <div class="env-info-item">
-            ⚠️ <strong>fpjs_agent_download_path </strong> is not defined and uses default value
-        </div>
-    </div>
-  
           <span>
             Please reach out our support via <a href="mailto:support@fingerprint.com">support@fingerprint.com</a> if you have any issues
           </span>
