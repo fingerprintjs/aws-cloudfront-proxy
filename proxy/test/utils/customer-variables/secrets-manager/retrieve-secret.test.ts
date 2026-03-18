@@ -2,7 +2,6 @@ import { mockClient } from 'aws-sdk-client-mock'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { clearSecretsCache, retrieveSecret } from '../../../../utils/customer-variables/secrets-manager/retrieve-secret'
 import 'aws-sdk-client-mock-jest'
-import { afterEach } from 'node:test'
 
 const secretName = 'test'
 const mock = mockClient(SecretsManagerClient)
