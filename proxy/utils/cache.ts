@@ -27,9 +27,14 @@ export class TTLCache<K, V> {
   }
 
   set(key: K, value: V, customTtlMs?: number): void {
+    const ttlMsToUse =
+      typeof customTtlMs === 'number' && Number.isFinite(customTtlMs) && customTtlMs >= 0
+        ? customTtlMs
+        : this.ttlMs
+
     this.cache.set(key, {
       value,
-      expiresAt: Date.now() + (customTtlMs ?? this.ttlMs),
+      expiresAt: Date.now() + ttlMsToUse,
     })
   }
 
