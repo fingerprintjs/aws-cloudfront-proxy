@@ -236,7 +236,7 @@ export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefi
   const value = getHeaderValue(request, 'fpjs_proxy_secret_cache_ttl_ms')
 
   if (value) {
-    const parsedValue = parseInt(value)
+    const parsedValue = parseInt(value, 10)
     if (!Number.isNaN(parsedValue) && parsedValue >= 0 && Number.isFinite(parsedValue)) {
       return parsedValue
     }
