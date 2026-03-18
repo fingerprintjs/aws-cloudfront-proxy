@@ -1,37 +1,31 @@
 import { CustomerVariablesRecord } from '../types'
 import {
-  SecretsManagerClient,
   GetSecretValueCommand,
   GetSecretValueCommandOutput,
+  SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager'
 import { arrayBufferToString } from '../../buffer'
 import { validateSecret } from './validate-secret'
 import { normalizeSecret } from './normalize-secret'
-
-interface CacheEntry {
-  value: CustomerVariablesRecord | null
-}
+import { TTLCache } from '../../cache'
 
 /**
  * Global cache for customer variables fetched from Secrets Manager.
+ * By default, the cache is set to expire after 5 minutes.
  * */
-const cache = new Map<string, CacheEntry>()
+const cache = new TTLCache<string, CustomerVariablesRecord | null>(300_000)
 
 /**
  * Retrieves a secret from Secrets Manager and caches it or returns it from cache if it's still valid.
  * */
-export async function retrieveSecret(secretsManager: SecretsManagerClient, key: string) {
+export async function retrieveSecret(secretsManager: SecretsManagerClient, key: string, cacheTtlMs?: number) {
   if (cache.has(key)) {
-    const entry = cache.get(key)!
-
-    return entry.value
+    return cache.get(key)!
   }
 
   const result = await fetchSecret(secretsManager, key)
 
-  cache.set(key, {
-    value: result,
-  })
+  cache.set(key, result, cacheTtlMs)
 
   return result
 }

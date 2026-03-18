@@ -225,3 +225,22 @@ export function getHeaderValue(request: CloudFrontRequest, name: string): string
   }
   return headers[name][0].value
 }
+
+/**
+ * Retrieves the secret cache time-to-live (TTL) value in milliseconds from the request headers.
+ *
+ * @param {CloudFrontRequest} request - The CloudFront request object containing headers.
+ * @return {number|undefined} The parsed TTL value in milliseconds if present and valid; otherwise, undefined.
+ */
+export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefined {
+  const value = getHeaderValue(request, 'fpjs_proxy_secret_cache_ttl_ms')
+
+  if (value) {
+    const parsedValue = parseInt(value)
+    if (!isNaN(parsedValue)) {
+      return parsedValue
+    }
+  }
+
+  return undefined
+}
