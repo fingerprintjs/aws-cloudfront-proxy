@@ -237,7 +237,7 @@ export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefi
 
   if (value) {
     const parsedValue = parseInt(value)
-    if (!Number.isNaN(parsedValue) && parsedValue >= 0) {
+    if (!Number.isNaN(parsedValue) && parsedValue >= 0 && Number.isFinite(parsedValue)) {
       return parsedValue
     }
   }
