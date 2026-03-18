@@ -18,7 +18,7 @@ export class TTLCache<K, V> {
       return undefined
     }
 
-    if (Date.now() > item.expiresAt) {
+    if (Date.now() >= item.expiresAt) {
       this.cache.delete(key)
       return undefined
     }
