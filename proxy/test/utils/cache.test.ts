@@ -71,6 +71,17 @@ describe('TTLCache', () => {
     expect(cache.get('key2')).toBeUndefined()
   })
 
+  test('should fallback to default TTL if passed TTL is NaN', () => {
+    const cache = new TTLCache<string, string>(1000)
+
+    cache.set('key1', 'value1', NaN)
+    expect(cache.get('key1')).toBe('value1')
+
+    jest.advanceTimersByTime(1001)
+
+    expect(cache.get('key1')).toBeUndefined()
+  })
+
   test('should delete items', () => {
     const cache = new TTLCache<string, string>(1000)
     cache.set('key1', 'value1')
