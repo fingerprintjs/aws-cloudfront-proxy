@@ -19,8 +19,9 @@ const cache = new TTLCache<string, CustomerVariablesRecord | null>(300_000)
  * Retrieves a secret from Secrets Manager and caches it or returns it from cache if it's still valid.
  * */
 export async function retrieveSecret(secretsManager: SecretsManagerClient, key: string, cacheTtlMs?: number) {
-  if (cache.has(key)) {
-    return cache.get(key)!
+  const cached = cache.get(key)
+  if (cached !== undefined) {
+    return cached
   }
 
   const result = await fetchSecret(secretsManager, key)
