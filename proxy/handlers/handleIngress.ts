@@ -58,8 +58,8 @@ async function handleIngress(
   const useBehaviorPathNestLevel = requestType === 'v4'
   const behaviorPathNestLevel = useBehaviorPathNestLevel ? await getBehaviorPathNestLevel(customerVariables) : 0
 
-  const wardenBaseHost = await getFpIngressBaseHost(customerVariables)
-  if (!wardenBaseHost) {
+  const ingressBaseHost = await getFpIngressBaseHost(customerVariables)
+  if (!ingressBaseHost) {
     return {
       status: '500',
     }
@@ -95,7 +95,7 @@ async function handleIngress(
 
   const requestHeaders = await prepareHeadersForIngressRequest(incomingRequest, customerVariables, isIngressCall)
 
-  const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
+  const requestUrl = new URL(getIngressAPIHost(region, ingressBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
   handleTrafficMonitoring(requestUrl, requestPathSegments, incomingRequest.method)
