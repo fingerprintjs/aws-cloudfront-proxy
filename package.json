@@ -1,5 +1,5 @@
 {
-  "name": "@fingerprint/cloudfront-proxy",
+  "name": "@fingerprint/aws-cloudfront-proxy",
   "version": "2.1.1",
   "description": "Fingerprint Pro CloudFront lambda@edge function",
   "author": "FingerprintJS, Inc (https://fingerprint.com)",
