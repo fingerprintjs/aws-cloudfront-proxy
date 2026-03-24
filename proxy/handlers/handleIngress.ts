@@ -90,17 +90,14 @@ async function handleIngress(
   const requestPathSegments = extractIngressPath(suffix, behaviorPathNestLevel)
   const requestPath = requestPathSegments.join('/')
 
-  const requestHeaders = await prepareHeadersForIngressRequest(
-    incomingRequest,
-    customerVariables,
-    isMethodSafe(incomingRequest.method)
-  )
+  const isSafeMethodCall = isMethodSafe(incomingRequest.method)
+  const requestHeaders = await prepareHeadersForIngressRequest(incomingRequest, customerVariables, isSafeMethodCall)
 
   const requestUrl = new URL(getIngressAPIHost(region, wardenBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
 
-  if (incomingRequest.method === 'POST') {
+  if (!isSafeMethodCall) {
     addTrafficMonitoringSearchParamsForIngressRequest(requestUrl)
   }
 
