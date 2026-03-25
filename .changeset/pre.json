@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "rc",
+  "initialVersions": {
+    "@fingerprint/aws-cloudfront-proxy": "2.1.1",
+    "e2e-tests": "0.0.0",
+    "website": "0.0.0"
+  },
+  "changesets": []
+}
