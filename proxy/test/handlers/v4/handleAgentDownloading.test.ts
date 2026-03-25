@@ -68,9 +68,7 @@ describe('Download agent endpoint V4', () => {
 
     const [url] = requestSpy.mock.calls[0]
 
-    expect(url.toString()).toEqual(
-      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
-    )
+    expect(url.toString()).toEqual(`https://${origin}/web/v4/ujKG34hUYKLJKJ1F`)
   })
 
   test('Call with a custom query', async () => {
@@ -86,7 +84,7 @@ describe('Download agent endpoint V4', () => {
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress`
     )
   })
 

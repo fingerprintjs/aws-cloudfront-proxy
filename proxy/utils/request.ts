@@ -39,3 +39,7 @@ function getQueryParameter(request: CloudFrontRequest, key: string): string | un
   }
   return undefined
 }
+
+export function isMethodAuthorized(method: string) {
+  return method === 'POST'
+}

@@ -1,11 +1,10 @@
 import { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
 import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors'
 import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { prepareHeadersForIngressRequest } from '../utils'
-import { getValidRegion } from '../utils/request'
-import { INGRESS_CDN_PATH, extractIngressPath, getV3AgentPath, getIngressAPIHost } from '../utils/paths'
+import { addTrafficMonitoring, prepareHeadersForIngressRequest } from '../utils'
+import { getValidRegion, isMethodAuthorized } from '../utils/request'
+import { extractIngressPath, getIngressAPIHost, getV3AgentPath, INGRESS_CDN_PATH } from '../utils/paths'
 import { sendIngressRequest } from '../utils/transport'
-import { handleTrafficMonitoring } from '../utils/traffic'
 import { Region } from '../model'
 
 export type RequestType = 'agentV3' | 'ingressV3' | 'v4'
@@ -91,14 +90,20 @@ async function handleIngress(
   const requestPathSegments = extractIngressPath(suffix, behaviorPathNestLevel)
   const requestPath = requestPathSegments.join('/')
 
-  const isIngressCall = incomingRequest.method === 'POST'
-
-  const requestHeaders = await prepareHeadersForIngressRequest(incomingRequest, customerVariables, isIngressCall)
+  const isAuthorizedMethodCall = isMethodAuthorized(incomingRequest.method)
+  const requestHeaders = await prepareHeadersForIngressRequest(
+    incomingRequest,
+    customerVariables,
+    isAuthorizedMethodCall
+  )
 
   const requestUrl = new URL(getIngressAPIHost(region, ingressBaseHost))
   requestUrl.pathname = requestPath
   setupSearchParams(incomingRequest.querystring, requestUrl, region)
-  handleTrafficMonitoring(requestUrl, requestPathSegments, incomingRequest.method)
+
+  if (isAuthorizedMethodCall) {
+    addTrafficMonitoring(requestUrl)
+  }
 
   return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }

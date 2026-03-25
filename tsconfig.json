@@ -1,6 +1,7 @@
 {
   "extends": "@fingerprintjs/tsconfig-dx-team/tsconfig.json",
   "compilerOptions": {
+    "lib": ["es2023"],
     "outDir": "dist",
     "module": "es6",
     "moduleResolution": "node",
@@ -8,17 +9,8 @@
     "esModuleInterop": true,
     "noEmitOnError": true,
     "strict": true,
-    "types": [
-      "@types/aws-lambda",
-      "@types/jest",
-      "@types/node"
-    ]
+    "types": ["@types/aws-lambda", "@types/jest", "@types/node"]
   },
-  "files": [
-    "proxy/app.ts", "mgmt-lambda/app.ts"],
-  "exclude": [
-    "dist",
-    "node_modules",
-    "**/*.test.ts"
-  ]
+  "files": ["proxy/app.ts", "mgmt-lambda/app.ts"],
+  "exclude": ["dist", "node_modules", "**/*.test.ts"]
 }
