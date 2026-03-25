@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/17</span>
+                <span class='fraction'>18/18</span>
             </div>
         
             
@@ -122,8 +122,10 @@
 <a name='L57'></a><a href='#L57'>57</a>
 <a name='L58'></a><a href='#L58'>58</a>
 <a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -134,39 +136,41 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">7x</span>
-<span class="cline-any cline-yes">52x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">79x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">170x</span>
+<span class="cline-any cline-yes">303x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">170x</span>
-<span class="cline-any cline-yes">131x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">303x</span>
+<span class="cline-any cline-yes">236x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">67x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">67x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">67x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">170x</span>
-<span class="cline-any cline-yes">278x</span>
-<span class="cline-any cline-yes">278x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">277x</span>
-<span class="cline-any cline-yes">131x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">131x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">303x</span>
+<span class="cline-any cline-yes">538x</span>
+<span class="cline-any cline-yes">538x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">537x</span>
+<span class="cline-any cline-yes">236x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">236x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -178,14 +182,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">67x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CustomerVariableProvider, CustomerVariableType, CustomerVariableValue } from './types'
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CustomerVariableName, CustomerVariableProvider, CustomerVariableType, parseCustomerVariable } from './types'
 import { getDefaultCustomerVariable } from './defaults'
 &nbsp;
-export interface GetVariableResult {
-  value: CustomerVariableValue
+export interface GetVariableResult&lt;T extends CustomerVariableName&gt; {
+  value: CustomerVariableType&lt;T&gt;
   resolvedBy: string | null
 }
 &nbsp;
@@ -200,7 +204,7 @@ export class CustomerVariables {
    * Attempts to resolve customer variable using providers.
    * If no provider can resolve the variable, the default value is returned.
    * */
-  async getVariable(variable: CustomerVariableType): Promise&lt;GetVariableResult&gt; {
+  async getVariable&lt;T extends CustomerVariableName&gt;(variable: T): Promise&lt;GetVariableResult&lt;T&gt;&gt; {
     const providerResult = await this.getValueFromProviders(variable)
 &nbsp;
     if (providerResult) {
@@ -217,7 +221,9 @@ export class CustomerVariables {
     }
   }
 &nbsp;
-  private async getValueFromProviders(variable: CustomerVariableType): Promise&lt;GetVariableResult | null&gt; {
+  private async getValueFromProviders&lt;T extends CustomerVariableName&gt;(
+    variable: T
+  ): Promise&lt;GetVariableResult&lt;T&gt; | null&gt; {
     for (const provider of this.providers) {
       try {
         const result = await provider.getVariable(variable)
@@ -226,7 +232,7 @@ export class CustomerVariables {
           console.debug(`Resolved customer variable ${variable} with provider ${provider.name}`)
 &nbsp;
           return {
-            value: result,
+            value: parseCustomerVariable(variable, result),
             resolvedBy: provider.name,
           }
         }
@@ -247,7 +253,7 @@ export class CustomerVariables {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-24T15:43:10.602Z
+                at 2026-03-25T09:06:12.703Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

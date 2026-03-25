@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for proxy/handlers/handleResult.ts</title>
+    <title>Code coverage report for proxy/handlers/handleIngress.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">proxy/handlers</a> handleResult.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">proxy/handlers</a> handleIngress.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">76.74% </span>
+                <span class="strong">97.43% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>33/43</span>
+                <span class='fraction'>38/39</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">91.66% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>11/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">100% </span>
-                <span class="quiet">Branches</span>
+                <span class="quiet">Functions</span>
                 <span class='fraction'>6/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">76.92% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>10/13</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">78.04% </span>
+                <span class="strong">97.43% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>32/41</span>
+                <span class='fraction'>38/39</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -167,61 +167,24 @@
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a>
-<a name='L106'></a><a href='#L106'>106</a>
-<a name='L107'></a><a href='#L107'>107</a>
-<a name='L108'></a><a href='#L108'>108</a>
-<a name='L109'></a><a href='#L109'>109</a>
-<a name='L110'></a><a href='#L110'>110</a>
-<a name='L111'></a><a href='#L111'>111</a>
-<a name='L112'></a><a href='#L112'>112</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">52x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">48x</span>
-<span class="cline-any cline-yes">48x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">48x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L105'></a><a href='#L105'>105</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">174x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -229,172 +192,188 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">115x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">89x</span>
+<span class="cline-any cline-yes">89x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">89x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">19x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">16x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">14x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-yes">19x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { ResultOptions } from '../model'
-import { CloudFrontResultResponse } from 'aws-lambda'
-import https from 'https'
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
+import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors'
+import { CustomerVariables } from '../utils/customer-variables/customer-variables'
+import { prepareHeadersForIngressRequest } from '../utils'
+import { getValidRegion } from '../utils/request'
+import { INGRESS_CDN_PATH, extractIngressPath, getV3AgentPath, getIngressAPIHost } from '../utils/paths'
+import { sendIngressRequest } from '../utils/transport'
+import { handleTrafficMonitoring } from '../utils/traffic'
 import { Region } from '../model'
 &nbsp;
-import { updateResponseHeaders, addTrafficMonitoringSearchParamsForVisitorIdRequest } from '../utils'
+export type RequestType = 'agentV3' | 'ingressV3' | 'v4'
 &nbsp;
-export function handleResult(options: ResultOptions): Promise&lt;CloudFrontResultResponse&gt; {
-  return new Promise((resolve) =&gt; {
-    console.debug('Handling result:', { options })
+export function createIngressHandler(requestType: RequestType) {
+  return (
+    incomingRequest: CloudFrontRequest,
+    customerVariables: CustomerVariables,
+    pathMatches: RegExpMatchArray | undefined
+  ) =&gt; handleIngress(incomingRequest, customerVariables, pathMatches, requestType)
+}
 &nbsp;
-    const data: any[] = []
-&nbsp;
-    const url = new URL(getIngressAPIHost(options.region, options.fpIngressBaseHost) + options.suffix)
-    decodeURIComponent(options.querystring)
-      .split('&amp;')
-      .filter((it) =&gt; it.includes('='))
-      .forEach((it) =&gt; {
-        const kv = it.split('=')
-        if (kv[0] === 'region') {
-          kv[1] = options.region
-        }
-        url.searchParams.append(kv[0], kv[1])
-      })
-    if (options.method === 'POST') {
-      addTrafficMonitoringSearchParamsForVisitorIdRequest(url)
-    }
-&nbsp;
-    console.debug(`Performing request: ${url.toString()}`)
-&nbsp;
-    const request = https.request(
-      url,
-      {
-        method: options.method,
-        headers: options.headers,
-      },
-      (response) =&gt; {
-        response.on('data', (chunk) =&gt; data.push(chunk))
-&nbsp;
-        response.on('end', () =&gt; {
-          const payload = Buffer.concat(data)
-&nbsp;
-          console.debug('Response from Ingress API', {
-            statusCode: response.statusCode,
-            payload: payload.toString('utf-8'),
-          })
-&nbsp;
-          resolve({
-            status: response.statusCode ? response.statusCode.toString() : '500',
-            statusDescription: response.statusMessage,
-            headers: updateResponseHeaders(response.headers),
-            bodyEncoding: 'base64',
-            body: payload.toString('base64'),
-          })
-        })
+/**
+ * Processes a query string and appends the parameters to the URL's search params,
+ * replacing the value of the "region" parameter if found.
+ *
+ * @param {string} queryString - The query string containing key-value pairs to be processed.
+ * @param {URL} url - The URL object to which the search parameters will be appended.
+ * @param {Region} region - The region value to insert or replace in the query string.
+ */
+function setupSearchParams(queryString: string, url: URL, region: Region) {
+  decodeURIComponent(queryString)
+    .split('&amp;')
+    .filter((it) =&gt; it.includes('='))
+    .forEach((it) =&gt; {
+      const kv = it.split('=')
+      if (kv[0] === 'region') {
+        kv[1] = region
       }
-    )
-&nbsp;
-    request.write(Buffer.from(options.body, 'base64'))
-&nbsp;
-    request.on('error', (error) =&gt; {
-      console.error('unable to handle result', { error })
-      resolve({
-        status: '500',
-        statusDescription: 'Bad request',
-        headers: {},
-        bodyEncoding: 'text',
-        body: generateErrorResponse(error),
-      })
+      url.searchParams.append(kv[0], kv[1])
     })
-&nbsp;
-    request.end()
-  })
 }
 &nbsp;
-function generateErrorResponse(err: Error): string {
-  const body = {
-    v: '2',
-    error: {
-      code: 'Failed',
-      message: `An error occurred with Fingerprint Pro Lambda function. Reason ${err}`,
-    },
-    requestId: generateRequestId,
-    products: {},
+/**
+ * Handles an ingress request by preparing the request's path, headers, and forwarding it to the appropriate API destination.
+ *
+ * @param {CloudFrontRequest} incomingRequest - The incoming request object provided by CloudFront, containing details such as URI, method, and query string.
+ * @param {CustomerVariables} customerVariables - Configuration and settings specific to the customer, used to determine handling behavior.
+ * @param {RegExpMatchArray | undefined} pathMatches - A regular expression match array for the request path, used to extract specific components of the path.
+ * @param {RequestType} requestType - The type of request to handle, which governs behavior such as path handling and endpoint resolution.
+ * @return {Promise&lt;CloudFrontResultResponse&gt;} A Promise resolving to the resulting CloudFront response after forwarding the request to the target API endpoint.
+ */
+async function handleIngress(
+  incomingRequest: CloudFrontRequest,
+  customerVariables: CustomerVariables,
+  pathMatches: RegExpMatchArray | undefined,
+  requestType: RequestType
+): Promise&lt;CloudFrontResultResponse&gt; {
+  // In V4, we need to leverage the new behavior path nest level variable to figure out the path for the ingress request
+  const useBehaviorPathNestLevel = requestType === 'v4'
+  const behaviorPathNestLevel = useBehaviorPathNestLevel ? await getBehaviorPathNestLevel(customerVariables) : 0
+&nbsp;
+  const ingressBaseHost = await getFpIngressBaseHost(customerVariables)
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (!ingressBaseHost) {
+<span class="cstat-no" title="statement not covered" >    return {</span>
+      status: '500',
+    }
   }
-  return JSON.stringify(body)
-}
 &nbsp;
-function <span class="fstat-no" title="function not covered" >generateRequestId(</span>): string {
-  const uniqueId = <span class="cstat-no" title="statement not covered" >generateRequestUniqueId()</span>
-  const now = <span class="cstat-no" title="statement not covered" >new Date().getTime()</span>
-<span class="cstat-no" title="statement not covered" >  return `${now}.aws-${uniqueId}`</span>
-}
+  const requestUrlParams = new URLSearchParams(incomingRequest.querystring)
+  const region = getValidRegion(requestUrlParams.get('region'))
 &nbsp;
-function <span class="fstat-no" title="function not covered" >generateRandomString(</span>length: number): string {
-  let result = <span class="cstat-no" title="statement not covered" >''</span>
-  const characters = <span class="cstat-no" title="statement not covered" >'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'</span>
-<span class="cstat-no" title="statement not covered" >  for (let i = <span class="cstat-no" title="statement not covered" >0;</span> i &lt; length; i++) {</span>
-<span class="cstat-no" title="statement not covered" >    result += characters.charAt(Math.floor(Math.random() * characters.length))</span>
+  let suffix = ''
+&nbsp;
+  switch (requestType) {
+    // For V3 request, we need to prepend the INGRESS_CDN_PATH to the request path
+    case 'agentV3':
+      suffix = `${INGRESS_CDN_PATH}/${getV3AgentPath(requestUrlParams)}`
+      break
+&nbsp;
+    // For V4 request, we just use the path from incoming request and leverage the behavior path nest level
+    case 'v4':
+      suffix = incomingRequest.uri
+      break
+&nbsp;
+    default:
+      // For the rest, so the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
+      if (pathMatches &amp;&amp; pathMatches.length &gt;= 1) {
+        suffix = pathMatches[1] ?? ''
+      }
   }
-<span class="cstat-no" title="statement not covered" >  return result</span>
-}
 &nbsp;
-function <span class="fstat-no" title="function not covered" >generateRequestUniqueId(</span>): string {
-<span class="cstat-no" title="statement not covered" >  return generateRandomString(2)</span>
-}
+  const requestPathSegments = extractIngressPath(suffix, behaviorPathNestLevel)
+  const requestPath = requestPathSegments.join('/')
 &nbsp;
-function getIngressAPIHost(region: Region, baseHost: string): string {
-  const prefix = region === Region.us ? '' : `${region}.`
-  return `https://${prefix}${baseHost}`
+  const isIngressCall = incomingRequest.method === 'POST'
+&nbsp;
+  const requestHeaders = await prepareHeadersForIngressRequest(incomingRequest, customerVariables, isIngressCall)
+&nbsp;
+  const requestUrl = new URL(getIngressAPIHost(region, ingressBaseHost))
+  requestUrl.pathname = requestPath
+  setupSearchParams(incomingRequest.querystring, requestUrl, region)
+  handleTrafficMonitoring(requestUrl, requestPathSegments, incomingRequest.method)
+&nbsp;
+  return sendIngressRequest(incomingRequest, requestHeaders, requestUrl)
 }
 &nbsp;</pre></td></tr></table></pre>
 
@@ -403,7 +382,7 @@ function getIngressAPIHost(region: Region, baseHost: string): string {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-03-24T15:43:10.602Z
+                at 2026-03-25T09:06:12.703Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
