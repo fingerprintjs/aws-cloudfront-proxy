@@ -1,6 +1,6 @@
 import { filterRequestHeaders, getHost, prepareHeadersForIngressRequest, updateResponseHeaders } from './headers'
 import { getApiKey, getLoaderVersion, getRegion, getVersion } from './request'
-import { addTrafficMonitoringSearchParamsForIngressRequest } from './traffic'
+import { addTrafficMonitoring } from './traffic'
 import { getAgentUri, getResultUri, getStatusUri } from './customer-variables/selectors'
 import {
   addEndingTrailingSlashToRoute,
@@ -25,7 +25,7 @@ export {
   getLoaderVersion,
   getVersion,
   getRegion,
-  addTrafficMonitoringSearchParamsForIngressRequest,
+  addTrafficMonitoring,
   removeTrailingSlashesAndMultiSlashes,
   addTrailingWildcard,
   replaceDot,

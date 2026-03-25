@@ -1,7 +1,7 @@
 import { handler } from '../../../app'
 import { mockEvent, mockRequest } from '../../aws'
 import * as utils from '../../../utils'
-import { addTrafficMonitoringSearchParamsForIngressRequest } from '../../../utils'
+import { addTrafficMonitoring } from '../../../utils'
 import https, { Agent } from 'https'
 import { EventEmitter } from 'events'
 import { ClientRequest, IncomingMessage } from 'http'
@@ -174,7 +174,7 @@ describe('Result Endpoint V4', () => {
 
     expect(iiParam).toBeFalsy()
 
-    expect(addTrafficMonitoringSearchParamsForIngressRequest).toHaveBeenCalledTimes(0)
+    expect(addTrafficMonitoring).toHaveBeenCalledTimes(0)
   })
 
   test('Headers with proxy secret', async () => {

@@ -40,8 +40,6 @@ function getQueryParameter(request: CloudFrontRequest, key: string): string | un
   return undefined
 }
 
-const safeMethods = ['GET', 'HEAD', 'OPTIONS', 'TRACE']
-
-export function isMethodSafe(method: string) {
-  return safeMethods.includes(method)
+export function isMethodAuthorized(method: string) {
+  return method === 'POST'
 }
