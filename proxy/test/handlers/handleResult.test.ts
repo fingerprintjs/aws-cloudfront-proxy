@@ -18,7 +18,7 @@ describe('Result Endpoint', function () {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForIngressRequest')
+    jest.spyOn(utils, 'addTrafficMonitoring')
     requestSpy = jest.spyOn(https, 'request')
   })
 

@@ -19,7 +19,7 @@ describe('Result Endpoint V4', () => {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForIngressRequest')
+    jest.spyOn(utils, 'addTrafficMonitoring')
     requestSpy = jest.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
