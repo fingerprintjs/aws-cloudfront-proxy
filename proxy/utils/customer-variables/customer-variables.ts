@@ -1,8 +1,8 @@
-import { CustomerVariableProvider, CustomerVariableType, CustomerVariableValue } from './types'
+import { CustomerVariableName, CustomerVariableProvider, CustomerVariableType, parseCustomerVariable } from './types'
 import { getDefaultCustomerVariable } from './defaults'
 
-export interface GetVariableResult {
-  value: CustomerVariableValue
+export interface GetVariableResult<T extends CustomerVariableName> {
+  value: CustomerVariableType<T>
   resolvedBy: string | null
 }
 
@@ -17,7 +17,7 @@ export class CustomerVariables {
    * Attempts to resolve customer variable using providers.
    * If no provider can resolve the variable, the default value is returned.
    * */
-  async getVariable(variable: CustomerVariableType): Promise<GetVariableResult> {
+  async getVariable<T extends CustomerVariableName>(variable: T): Promise<GetVariableResult<T>> {
     const providerResult = await this.getValueFromProviders(variable)
 
     if (providerResult) {
@@ -34,7 +34,9 @@ export class CustomerVariables {
     }
   }
 
-  private async getValueFromProviders(variable: CustomerVariableType): Promise<GetVariableResult | null> {
+  private async getValueFromProviders<T extends CustomerVariableName>(
+    variable: T
+  ): Promise<GetVariableResult<T> | null> {
     for (const provider of this.providers) {
       try {
         const result = await provider.getVariable(variable)
@@ -43,7 +45,7 @@ export class CustomerVariables {
           console.debug(`Resolved customer variable ${variable} with provider ${provider.name}`)
 
           return {
-            value: result,
+            value: parseCustomerVariable(variable, result),
             resolvedBy: provider.name,
           }
         }

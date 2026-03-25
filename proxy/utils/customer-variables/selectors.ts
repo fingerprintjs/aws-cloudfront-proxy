@@ -1,7 +1,7 @@
 import { CustomerVariables, GetVariableResult } from './customer-variables'
-import { CustomerVariableType } from './types'
+import { CustomerVariableName } from './types'
 
-const extractVariable = (result: GetVariableResult) => result.value
+const extractVariable = <T extends CustomerVariableName>(result: GetVariableResult<T>) => result.value
 
 export const getAgentUri = async (variables: CustomerVariables) => `/${await getAgentDownloadPath(variables)}`
 
@@ -10,16 +10,19 @@ export const getResultUri = async (variables: CustomerVariables) => `/${await ge
 export const getStatusUri = () => `/status`
 
 export const getAgentDownloadPath = async (variables: CustomerVariables) =>
-  variables.getVariable(CustomerVariableType.AgentDownloadPath).then(extractVariable)
+  variables.getVariable(CustomerVariableName.AgentDownloadPath).then(extractVariable)
 
 export const getResultPath = async (variables: CustomerVariables) =>
-  variables.getVariable(CustomerVariableType.GetResultPath).then(extractVariable)
+  variables.getVariable(CustomerVariableName.GetResultPath).then(extractVariable)
 
 export const getPreSharedSecret = async (variables: CustomerVariables) =>
-  variables.getVariable(CustomerVariableType.PreSharedSecret).then(extractVariable)
+  variables.getVariable(CustomerVariableName.PreSharedSecret).then(extractVariable)
 
 export const getFpCdnUrl = async (variables: CustomerVariables) =>
-  variables.getVariable(CustomerVariableType.FpCdnUrl).then(extractVariable)
+  variables.getVariable(CustomerVariableName.FpCdnUrl).then(extractVariable)
 
 export const getFpIngressBaseHost = async (variables: CustomerVariables) =>
-  variables.getVariable(CustomerVariableType.FpIngressBaseHost).then(extractVariable)
+  variables.getVariable(CustomerVariableName.FpIngressBaseHost).then(extractVariable)
+
+export const getBehaviorPathNestLevel = async (variables: CustomerVariables) =>
+  variables.getVariable(CustomerVariableName.BehaviorPathNestLevel).then(extractVariable)

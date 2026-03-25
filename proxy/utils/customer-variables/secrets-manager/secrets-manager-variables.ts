@@ -1,4 +1,4 @@
-import { CustomerVariableProvider, CustomerVariableType, CustomerVariableValue } from '../types'
+import { CustomerVariableProvider, CustomerVariableName, CustomerVariableReturn } from '../types'
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import { CloudFrontRequest } from 'aws-lambda'
 import { getHeaderValue } from '../../headers'
@@ -33,10 +33,10 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
     }
   }
 
-  async getVariable(variable: CustomerVariableType): Promise<CustomerVariableValue> {
+  async getVariable(variable: CustomerVariableName): Promise<CustomerVariableReturn> {
     const secretsObject = await this.retrieveSecrets()
 
-    return secretsObject?.[variable] ?? null
+    return secretsObject?.[variable]?.toString() ?? null
   }
 
   private async retrieveSecrets() {

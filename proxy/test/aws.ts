@@ -6,15 +6,26 @@ export function toAwsResponse<T>(value: T) {
   }
 }
 
-export const mockRequest = (
-  uri: string,
+interface MockRequestParams {
+  uri: string
+  querystring?: string
+  method?: string
+  body?: CloudFrontRequest['body']
+  headers?: CloudFrontRequest['headers']
+}
+
+export const mockRequest = ({
+  uri,
   querystring = 'apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2',
-  method = 'POST'
-) => {
+  method = 'POST',
+  body,
+  headers = {},
+}: MockRequestParams) => {
   return {
     clientIp: '1.1.1.1',
     method: method,
     uri,
+    body,
     querystring,
     headers: {
       host: [
@@ -29,6 +40,7 @@ export const mockRequest = (
           value: '',
         },
       ],
+      ...headers,
     },
     origin: {
       s3: {
@@ -53,6 +65,12 @@ export const mockRequest = (
             {
               key: 'fpjs_get_result_path',
               value: 'result',
+            },
+          ],
+          fpjs_behavior_path_nest_level: [
+            {
+              key: 'fpjs_behavior_path_nest_level',
+              value: '1',
             },
           ],
         },

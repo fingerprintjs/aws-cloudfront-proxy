@@ -1,5 +1,5 @@
 import { getInMemoryCustomerVariables } from '../utils/customer-variables/in-memory-customer-variables'
-import { CustomerVariableType } from '../../utils/customer-variables/types'
+import { CustomerVariableName } from '../../utils/customer-variables/types'
 import { getStatusInfo, handleStatus } from '../../handlers/handleStatus'
 
 const styleNonce = 'hardcodedStyleNonce'
@@ -77,7 +77,7 @@ describe('Get status info', () => {
 
   it('returns correct response with empty pre shared secret', async () => {
     const { customerVariables, variables } = getInMemoryCustomerVariables()
-    variables[CustomerVariableType.PreSharedSecret] = null
+    variables[CustomerVariableName.PreSharedSecret] = null
 
     const result = await getStatusInfo(customerVariables, styleNonce)
 

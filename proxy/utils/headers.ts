@@ -5,7 +5,7 @@ import { updateCacheControlHeader } from './cache-control'
 import { CustomerVariables } from './customer-variables/customer-variables'
 import { getPreSharedSecret } from './customer-variables/selectors'
 
-const BLACKLISTED_HEADERS = new Set([
+export const BLACKLISTED_HEADERS = new Set([
   'age',
   'connection',
   'expect',
@@ -35,7 +35,7 @@ const BLACKLISTED_HEADERS = new Set([
   'strict-transport-security',
 ])
 
-const BLACKLISTED_HEADERS_PREFIXES = ['x-edge-', 'x-amz-cf-']
+export const BLACKLISTED_HEADERS_PREFIXES = ['x-edge-', 'x-amz-cf-']
 
 const READ_ONLY_RESPONSE_HEADERS = new Set([
   'accept-encoding',
@@ -50,9 +50,18 @@ const READ_ONLY_RESPONSE_HEADERS = new Set([
 
 const READ_ONLY_REQUEST_HEADERS = new Set(['content-length', 'host', 'transfer-encoding', 'via'])
 
-const CACHE_CONTROL_HEADER_NAME = 'cache-control'
+export const CACHE_CONTROL_HEADER_NAME = 'cache-control'
 
-export async function prepareHeadersForIngressAPI(
+/**
+ * Prepares the headers for an ingress request by filtering incoming request headers
+ * and appending necessary custom headers based on the provided parameters.
+ *
+ * @param {CloudFrontRequest} request - The incoming request object from CloudFront, containing headers and client-related information.
+ * @param {CustomerVariables} variables - The customer-specific variables required for fetching the pre-shared secret.
+ * @param {boolean} isIngressCall - A flag indicating whether the request is an ingress call.
+ * @return {Promise<OutgoingHttpHeaders>} A promise that resolves to an object containing the modified headers for the request.
+ */
+export async function prepareHeadersForIngressRequest(
   request: CloudFrontRequest,
   variables: CustomerVariables,
   isIngressCall: boolean
@@ -74,7 +83,15 @@ export async function prepareHeadersForIngressAPI(
 
 export const getHost = (request: CloudFrontRequest) => request.headers['host'][0].value
 
-export function filterRequestHeaders(request: CloudFrontRequest, dropCookies = false): OutgoingHttpHeaders {
+/**
+ * Filters request headers to allow only permitted headers for outgoing requests.
+ * Optionally drops all cookies or filters specific cookies based on a condition.
+ *
+ * @param {CloudFrontRequest} request - The original CloudFront request containing headers.
+ * @param {boolean} [dropCookies=false] - A flag to determine whether to remove all cookies from the headers.
+ * @return {OutgoingHttpHeaders} An object containing the filtered headers to be sent with the outgoing request.
+ */
+export function filterRequestHeaders(request: CloudFrontRequest, dropCookies: boolean = false): OutgoingHttpHeaders {
   return Object.entries(request.headers).reduce((result: { [key: string]: string }, [name, value]) => {
     const headerName = name.toLowerCase()
     if (dropCookies) {
@@ -97,10 +114,17 @@ export function filterRequestHeaders(request: CloudFrontRequest, dropCookies = f
   }, {})
 }
 
-export const updateResponseHeadersForAgentDownload = (headers: IncomingHttpHeaders) =>
-  updateResponseHeaders(headers, true)
-
-export function updateResponseHeaders(headers: IncomingHttpHeaders, overrideCacheControl = false): CloudFrontHeaders {
+/**
+ * Updates the response headers based on the provided headers object and an optional flag to override the Cache-Control header.
+ *
+ * @param {IncomingHttpHeaders} headers - The incoming HTTP headers from the request. These are processed to generate the response headers.
+ * @param {boolean} [overrideCacheControl=false] - A flag indicating whether to override the Cache-Control header if it exists. Defaults to `false`.
+ * @return {CloudFrontHeaders} The updated headers formatted as CloudFront-compatible response headers.
+ */
+export function updateResponseHeaders(
+  headers: IncomingHttpHeaders,
+  overrideCacheControl: boolean = false
+): CloudFrontHeaders {
   const resultHeaders: CloudFrontHeaders = {}
 
   for (const [key, value] of Object.entries(headers)) {
@@ -130,7 +154,15 @@ export function updateResponseHeaders(headers: IncomingHttpHeaders, overrideCach
   return resultHeaders
 }
 
-function isHeaderAllowedForRequest(headerName: string) {
+/**
+ * Determines whether a given header is allowed to be used in a request.
+ * Checks against a list of read-only headers, blacklisted headers,
+ * as well as headers with specific blacklisted prefixes.
+ *
+ * @param {string} headerName - The name of the header to check.
+ * @return {boolean} Returns true if the header is allowed, otherwise false.
+ */
+function isHeaderAllowedForRequest(headerName: string): boolean {
   if (READ_ONLY_REQUEST_HEADERS.has(headerName) || BLACKLISTED_HEADERS.has(headerName)) {
     return false
   }
@@ -142,7 +174,16 @@ function isHeaderAllowedForRequest(headerName: string) {
   return true
 }
 
-function isHeaderAllowedForResponse(headerName: string) {
+/**
+ * Determines whether a given header name is allowed to be included in the response.
+ *
+ * The method checks against a set of read-only or blacklisted headers, as well as headers
+ * that start with specific blacklisted prefixes, to decide if the header is permitted.
+ *
+ * @param {string} headerName - The name of the header to be checked.
+ * @return {boolean} Returns true if the header is allowed, otherwise false.
+ */
+export function isHeaderAllowedForResponse(headerName: string): boolean {
   if (READ_ONLY_RESPONSE_HEADERS.has(headerName) || BLACKLISTED_HEADERS.has(headerName)) {
     return false
   }
@@ -154,6 +195,12 @@ function isHeaderAllowedForResponse(headerName: string) {
   return true
 }
 
+/**
+ * Extracts the origin information from the CloudFront request headers.
+ *
+ * @param {Object} params - The parameters object.
+ * @param {CloudFrontRequest} params.origin - The origin information from the CloudFront request.
+ */
 export function getOriginForHeaders({ origin }: CloudFrontRequest) {
   if (origin?.s3) {
     return origin.s3
@@ -162,7 +209,14 @@ export function getOriginForHeaders({ origin }: CloudFrontRequest) {
   return origin?.custom
 }
 
-export function getHeaderValue(request: CloudFrontRequest, name: string) {
+/**
+ * Retrieves the value of a specified header from the custom headers of a CloudFront request.
+ *
+ * @param {CloudFrontRequest} request - The CloudFront request object containing the headers.
+ * @param {string} name - The name of the header to retrieve the value for.
+ * @return {string|null} The value of the specified header if it exists, or null if the header is not found.
+ */
+export function getHeaderValue(request: CloudFrontRequest, name: string): string | null {
   const origin = getOriginForHeaders(request)
   const headers = origin?.customHeaders
 

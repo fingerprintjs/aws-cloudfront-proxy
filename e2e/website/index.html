@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Fingerprint</title>
     <style>
         /* The full-height solution for IE 11 is taken from https://gist.github.com/palicko/26b327cd2198e52c25b13485b4dd02bc */
@@ -150,6 +150,16 @@
             text-decoration: underline;
         }
 
+        .settings {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        .settings input {
+            width: 100%
+        }
+
         @media (max-width: 768px), (max-height: 568px) {
             .content {
                 padding: 1em;
@@ -164,41 +174,60 @@
             }
         }
 
-        .form form {
+        .form, .content {
             display: flex;
             flex-direction: column;
-
-            > * {
-                margin-bottom: 0.5em;
-            }
+            gap: 1em
         }
     </style>
-  </head>
-  <body>
-  <div id="app" class="content">
+</head>
+<body>
+<div id="app" class="content">
     <form class="form">
-      <label>
-        Your API key:
-        <input id="apiKey" />
-      </label>
-      <label>
-        Endpoint
-        <input id="endpoint" />
-      </label>
-      <label>
-        Script url pattern
-        <input id="scriptUrlPattern" />
-      </label>
+        <fieldset class="settings">
+            <legend>Agent settings</legend>
+            <div>
+                <label>
+                    Your API key:
+                    <input id="apiKey"/>
+                </label>
+            </div>
+            <div>
+                <label>
+                    Endpoint
+                    <input id="endpoint"/>
+                </label>
+            </div>
+            <div>
+                <label>
+                    Script url pattern
+                    <input id="scriptUrlPattern"/>
+                </label>
+            </div>
+        </fieldset>
+        <div>
+            <fieldset>
+                <legend>Agent version</legend>
+                <label>
+                    <input type="radio" name="agentVersion" value="v3"/>
+                    v3
+                </label>
+                <label>
+                    <input type="radio" name="agentVersion" value="v4"/>
+                    v4
+                </label>
+            </fieldset>
+        </div>
     </form>
     <div class="buttons">
-      <button disabled id="getData">Get visitor data</button>
+        <button disabled id="getData">Get visitor data</button>
     </div>
     <div class="outputHolder">
-      <section class="output">
-        <div class="heading">Visitor data will appear here.</div>
-      </section>
+        <section class="output">
+            <div class="heading">Visitor data will appear here.</div>
+        </section>
     </div>
-  </div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+</div>
+<script type="module" src="/src/main.ts"></script>
+</body>
 </html>

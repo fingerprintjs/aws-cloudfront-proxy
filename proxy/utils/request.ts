@@ -13,6 +13,10 @@ export const getLoaderVersion = (request: CloudFrontRequest): string | undefined
 
 export const getRegion = (request: CloudFrontRequest): Region => {
   const value = getQueryParameter(request, 'region')
+  return getValidRegion(value)
+}
+
+export const getValidRegion = (value?: string | null): Region => {
   if (!value || !(value in Region)) {
     return Region.us
   }

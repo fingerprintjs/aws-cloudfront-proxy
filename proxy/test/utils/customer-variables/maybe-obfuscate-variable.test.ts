@@ -1,4 +1,4 @@
-import { CustomerVariableType } from '../../../utils/customer-variables/types'
+import { CustomerVariableName } from '../../../utils/customer-variables/types'
 import { maybeObfuscateVariable, OBFUSCATED_VALUE } from '../../../utils/customer-variables/maybe-obfuscate-variable'
 import { getInMemoryCustomerVariables } from './in-memory-customer-variables'
 
@@ -6,12 +6,12 @@ const { variables, customerVariables } = getInMemoryCustomerVariables()
 
 describe('maybe obfuscate variable', () => {
   it('should obfuscate pre shared secret', async () => {
-    const result = await maybeObfuscateVariable(customerVariables, CustomerVariableType.PreSharedSecret)
+    const result = await maybeObfuscateVariable(customerVariables, CustomerVariableName.PreSharedSecret)
 
     expect(result.value).toBe(OBFUSCATED_VALUE)
   })
 
-  it.each([CustomerVariableType.GetResultPath, CustomerVariableType.AgentDownloadPath])(
+  it.each([CustomerVariableName.GetResultPath, CustomerVariableName.AgentDownloadPath])(
     'should not obfuscate other variables',
     async (variable) => {
       const result = await maybeObfuscateVariable(customerVariables, variable)

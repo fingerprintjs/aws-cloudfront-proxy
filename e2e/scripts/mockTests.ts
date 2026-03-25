@@ -19,27 +19,25 @@ async function main() {
 
   const apiUrl = getEnv('API_URL')
   const behaviorPath = getEnv('FPJS_BEHAVIOR_PATH')
-  const agentPath = `${behaviorPath}/${getEnv('FPJS_AGENT_DOWNLOAD_PATH')}`
-  const resultPath = `${behaviorPath}/${getEnv('FPJS_GET_RESULT_PATH')}`
+  const agentPath = getEnv('FPJS_AGENT_DOWNLOAD_PATH')
+  const ingressPath = getEnv('FPJS_GET_RESULT_PATH')
 
   console.info('Agent download path:', agentPath)
-  console.info('Get result path:', resultPath)
+  console.info('Get result path:', ingressPath)
 
   for (const [name, url] of Object.entries(cloudfrontUrls)) {
     if (name === 'cloudfrontWithoutVariables') {
       continue
     }
-    console.info(`Running mock e2e tests for ${name}`, url)
 
-    const agentUrl = new URL(url)
-    agentUrl.pathname = agentPath
+    const integrationUrl = new URL(url)
+    integrationUrl.pathname = behaviorPath
 
-    const resultUrl = new URL(url)
-    resultUrl.pathname = resultPath
+    console.info(`Running mock e2e tests for ${name}`, integrationUrl.toString())
 
     try {
       execSync(
-        `npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="https://${apiUrl}" --cdn-proxy-url="${agentUrl.toString()}" --ingress-proxy-url="${resultUrl.toString()}" --traffic-name="fingerprintjs-pro-cloudfront" --integration-version="${version}"`,
+        `npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="https://${apiUrl}" --integration-url="${integrationUrl.toString()}" --cdn-path="${agentPath}" --ingress-path="${ingressPath}" --traffic-name="fingerprintjs-pro-cloudfront" --integration-version="${version}"`,
         {
           stdio: 'inherit',
         }

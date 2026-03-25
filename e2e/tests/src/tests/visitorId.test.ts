@@ -1,18 +1,8 @@
-import { expect, Page } from '@playwright/test'
+import { expect } from '@playwright/test'
 import { waitForCloudfront } from '../utils/cloudfront'
-import { isRequestIdValid } from '../utils/areVisitorIdAndRequestIdValid'
 import { cloudfrontTest as test } from '../cloudfrontTest'
 import { trackRequests } from '../utils/playwright'
-
-async function checkResponse(page: Page) {
-  const response = await page.waitForSelector('#response pre').then((element) => element.textContent())
-
-  expect(response).toBeTruthy()
-
-  const json = JSON.parse(response as string)
-
-  expect(isRequestIdValid(json.requestId)).toBeTruthy()
-}
+import { checkResponse } from '../utils/checkResponse'
 
 test.describe('visitorId', () => {
   test.beforeEach(async () => {
@@ -33,6 +23,7 @@ test.describe('visitorId', () => {
     await checkResponse(page)
 
     const requests = getRequests()
+    expect(requests.every((req) => req.url().includes(baseURL!.toString()))).toBe(true)
     expect(requests).toHaveLength(5)
 
     const [, , agentRequest, , apiRequest] = requests
@@ -42,7 +33,5 @@ test.describe('visitorId', () => {
 
     const apiRequestUrl = new URL(apiRequest.url())
     expect(apiRequestUrl.hostname).toBe(rootUrl.hostname)
-    expect(apiRequestUrl.searchParams.get('ii')).toContain(`fingerprintjs-pro-cloudfront/`)
-    expect(apiRequestUrl.searchParams.get('ii')).toContain(`/procdn`)
   })
 })

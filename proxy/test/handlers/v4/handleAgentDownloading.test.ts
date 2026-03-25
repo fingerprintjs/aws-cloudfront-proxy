@@ -1,9 +1,11 @@
 import https from 'https'
-import { mockEvent, mockRequest } from '../aws'
-import { handler } from '../../app'
 import { EventEmitter } from 'events'
+import { mockEvent, mockRequest } from '../../aws'
+import { handler } from '../../../app'
+import { generateErrorResponse } from '../../../utils/generateErrorResponse'
 
-describe('Download agent endpoint', () => {
+const requestUri = '/behavior/web/v4/ujKG34hUYKLJKJ1F'
+describe('Download agent endpoint V4', () => {
   const origin: string = '__ingress_api__'
 
   let requestSpy: jest.SpyInstance
@@ -19,6 +21,12 @@ describe('Download agent endpoint', () => {
 
   const agentScript =
     '/** FingerprintJS Pro - Copyright (c) FingerprintJS, Inc, 2022 (https://fingerprint.com) /** function hi() { console.log("hello world!!") }'
+
+  function addResponseHeader(key: string, value: string) {
+    Object.assign(mockHttpResponse.headers, {
+      [key]: value,
+    })
+  }
 
   beforeEach(() => {
     requestSpy = jest.spyOn(https, 'request')
@@ -51,61 +59,24 @@ describe('Download agent endpoint', () => {
     jest.clearAllMocks()
   })
 
-  test('Call with no params', async () => {
-    const event = mockEvent(
-      mockRequest({ uri: '/behavior/greiodsfkljlds', querystring: 'apiKey=ujKG34hUYKLJKJ1F', method: 'GET' })
-    )
+  test('Successful call', async () => {
+    const event = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
 
     await handler(event)
+
+    expect(requestSpy).toHaveBeenCalledTimes(1)
 
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/web/v3/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
-    )
-  })
-
-  test('Call with version', async () => {
-    const request = mockRequest({
-      uri: '/behavior/greiodsfkljlds',
-      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5',
-      method: 'GET',
-    })
-
-    const event = mockEvent(request)
-
-    await handler(event)
-
-    const [url] = requestSpy.mock.calls[0]
-
-    expect(url.toString()).toEqual(
-      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F?apiKey=ujKG34hUYKLJKJ1F&version=5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
-    )
-  })
-
-  test('Call with version and loaderVersion', async () => {
-    const request = mockRequest({
-      uri: '/behavior/greiodsfkljlds',
-      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5',
-      method: 'GET',
-    })
-
-    const event = mockEvent(request)
-
-    await handler(event)
-
-    const [url] = requestSpy.mock.calls[0]
-
-    expect(url.toString()).toEqual(
-      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Call with a custom query', async () => {
     const request = mockRequest({
-      uri: '/behavior/greiodsfkljlds',
-      querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue',
-      method: 'GET',
+      uri: requestUri,
+      querystring: 'someKey=someValue',
     })
 
     const event = mockEvent(request)
@@ -115,126 +86,115 @@ describe('Download agent endpoint', () => {
     const [url] = requestSpy.mock.calls[0]
 
     expect(url.toString()).toEqual(
-      `https://${origin}/web/v5/ujKG34hUYKLJKJ1F/loader_v3.6.5.js?apiKey=ujKG34hUYKLJKJ1F&version=5&loaderVersion=3.6.5&someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
+      `https://${origin}/web/v4/ujKG34hUYKLJKJ1F?someKey=someValue&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fprocdn`
     )
   })
 
   test('Browser cache set to an hour when original value is higher', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    Object.assign(mockHttpResponse.headers, {
-      'cache-control': 'public, max-age=3613',
-    })
+    addResponseHeader('cache-control', 'public, max-age=3613')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=60',
-        },
-      ],
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
+        },
+      ],
+      'cache-control': [
+        {
+          key: 'cache-control',
+          value: 'public, max-age=3600, s-maxage=60',
         },
       ],
     })
   })
 
   test('Browser cache is the same when original value is lower than an hour', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    Object.assign(mockHttpResponse.headers, {
-      'cache-control': 'public, max-age=100',
-    })
+    addResponseHeader('cache-control', 'public, max-age=100')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
       'cache-control': [
         {
           key: 'cache-control',
           value: 'public, max-age=100, s-maxage=60',
         },
       ],
-      'content-type': [
-        {
-          key: 'content-type',
-          value: 'text/javascript; charset=utf-8',
-        },
-      ],
     })
   })
 
   test('Proxy cache set to a minute when original value is higher', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    Object.assign(mockHttpResponse.headers, {
-      'cache-control': 'public, max-age=3613, s-maxage=575500',
-    })
+    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=575500')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
+      'content-type': [
+        {
+          key: 'content-type',
+          value: 'text/javascript; charset=utf-8',
+        },
+      ],
       'cache-control': [
         {
           key: 'cache-control',
           value: 'public, max-age=3600, s-maxage=60',
         },
       ],
-      'content-type': [
-        {
-          key: 'content-type',
-          value: 'text/javascript; charset=utf-8',
-        },
-      ],
     })
   })
 
   test('Proxy cache is the same when original value is lower than a minute', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    Object.assign(mockHttpResponse.headers, {
-      'cache-control': 'public, max-age=3613, s-maxage=10',
-    })
+    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=10')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=10',
-        },
-      ],
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
         },
       ],
+      'cache-control': [
+        {
+          key: 'cache-control',
+          value: 'public, max-age=3600, s-maxage=10',
+        },
+      ],
     })
   })
 
   test('Response headers are the same, but strict-transport-security is removed', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
-    Object.assign(mockHttpResponse.headers, {
-      'content-type': 'text/javascript; charset=utf-8',
-      'strict-transport-security': 'max-age=63072000',
-      'some-header': 'some-value',
-    })
+    addResponseHeader('strict-transport-security', 'max-age=63072000')
+    addResponseHeader('some-header', 'some-value')
 
     const event = mockEvent(request)
 
@@ -257,7 +217,7 @@ describe('Download agent endpoint', () => {
   })
 
   test('Req body and headers are the same, except cookies, which should be dropped', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     Object.assign(request.headers, {
       cookie: [
@@ -325,22 +285,13 @@ describe('Download agent endpoint', () => {
       return mockHttpRequest
     })
 
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
-    expect(response.body).toEqual(
-      JSON.stringify({
-        v: '2',
-        error: {
-          code: 'Failed',
-          message: 'An error occurred with Fingerprint Lambda function. Reason Error: Network error',
-        },
-        products: {},
-      })
-    )
+    expect(response.body).toEqual(generateErrorResponse(new Error('Network error')))
     expect(response.status).toEqual('500')
   })
 })

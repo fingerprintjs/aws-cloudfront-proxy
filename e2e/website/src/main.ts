@@ -1,29 +1,96 @@
-import * as fpjs from '@fingerprintjs/fingerprintjs-pro'
+import * as V3 from '@fingerprintjs/fingerprintjs-pro'
+import * as V4 from '@fingerprint/agent'
 
 type Text = string | { html: string }
+
+enum AgentVersion {
+  V3 = 'v3',
+  V4 = 'v4',
+}
+
+let agentVersion: AgentVersion = AgentVersion.V3
 
 const formFields = {
   apiKey: document.querySelector<HTMLInputElement>('#apiKey')!,
   endpoint: document.querySelector<HTMLInputElement>('#endpoint')!,
   scriptUrlPattern: document.querySelector<HTMLInputElement>('#scriptUrlPattern')!,
+  version: document.querySelectorAll<HTMLInputElement>('[name="agentVersion"]'),
 }
 
 function initForm() {
+  setupAgentVersion()
+
+  document.querySelector<HTMLInputElement>(`[name="agentVersion"][value="${agentVersion}"]`)?.click()
+
   formFields.apiKey.value = import.meta.env.VITE_API_KEY as string
   formFields.endpoint.value = import.meta.env.VITE_ENDPOINT as string
   formFields.scriptUrlPattern.value = import.meta.env.VITE_SCRIPT_URL_PATTERN as string
+
+  formFields.version.forEach((input) => {
+    input.addEventListener('change', () => {
+      agentVersion = input.value as unknown as AgentVersion
+      setupAgentVersion()
+    })
+  })
 }
 
-async function getVisitorData() {
-  const agent = await fpjs.load({
-    apiKey: formFields.apiKey.value,
-    endpoint: formFields.endpoint.value,
-    scriptUrlPattern: formFields.scriptUrlPattern.value || fpjs.defaultScriptUrlPattern,
-  })
+function setupAgentVersion() {
+  switch (agentVersion) {
+    case AgentVersion.V3:
+      formFields.scriptUrlPattern.disabled = false
+      break
 
-  return await agent.get({
-    extendedResult: true,
-  })
+    case AgentVersion.V4:
+      formFields.scriptUrlPattern.disabled = true
+      break
+  }
+}
+
+type VisitorData = {
+  visitorId: string
+  requestId: string
+}
+
+async function getVisitorData(): Promise<VisitorData> {
+  switch (agentVersion) {
+    case AgentVersion.V3: {
+      const agent = await V3.load({
+        apiKey: formFields.apiKey.value,
+        endpoint: formFields.endpoint.value,
+        scriptUrlPattern: formFields.scriptUrlPattern.value || V3.defaultScriptUrlPattern,
+      })
+
+      const result = await agent.get({
+        extendedResult: true,
+      })
+
+      return {
+        visitorId: result.visitorId,
+        requestId: result.requestId,
+      }
+    }
+
+    case AgentVersion.V4: {
+      const agent = V4.start({
+        endpoints: formFields.endpoint.value,
+        apiKey: formFields.apiKey.value,
+      })
+
+      console.debug('Got agent V4', agent)
+
+      const result = await agent.get()
+
+      console.info('V4 result', result)
+
+      return {
+        visitorId: result.visitor_id ?? '',
+        requestId: result.event_id,
+      }
+    }
+
+    default:
+      throw new Error(`Unknown agent version: ${agentVersion}`)
+  }
 }
 
 async function getAndPrintData() {
@@ -36,7 +103,7 @@ async function getAndPrintData() {
 
   try {
     const response = await getVisitorData()
-    const { confidence } = response
+    const { visitorId, requestId } = response
 
     console.log('Got response', response)
 
@@ -58,17 +125,18 @@ async function getAndPrintData() {
     })
     addOutputSection({
       output,
-      header: 'Confidence score:',
-      content: String(confidence.score),
-      id: 'confidence',
-      comment: confidence.comment
-        ? {
-            html: confidence.comment.replace(
-              /(upgrade\s+to\s+)?pro(\s+version)?(:\s+(https?:\/\/\S+))?/gi,
-              '<a href="$4" target="_blank">$&</a>'
-            ),
-          }
-        : '',
+      header: 'Visitor ID:',
+      content: visitorId,
+      id: 'visitorId',
+      comment: '',
+      size: 'big',
+    })
+    addOutputSection({
+      output,
+      header: 'Request ID:',
+      content: requestId,
+      id: 'requestId',
+      comment: '',
       size: 'big',
     })
     addOutputSection({ output, header: 'User agent:', content: navigator.userAgent, id: 'userAgent' })

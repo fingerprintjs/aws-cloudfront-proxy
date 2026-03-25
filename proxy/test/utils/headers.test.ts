@@ -1,10 +1,4 @@
-import {
-  filterRequestHeaders,
-  getHost,
-  prepareHeadersForIngressAPI,
-  updateResponseHeaders,
-  updateResponseHeadersForAgentDownload,
-} from '../../utils'
+import { filterRequestHeaders, getHost, prepareHeadersForIngressRequest, updateResponseHeaders } from '../../utils'
 import { CloudFrontHeaders, CloudFrontRequest } from 'aws-lambda'
 import { IncomingHttpHeaders } from 'http'
 import { CustomerVariables } from '../../utils/customer-variables/customer-variables'
@@ -120,7 +114,7 @@ describe('test fpjs-headers preparation', () => {
         },
       },
     }
-    const headers = await prepareHeadersForIngressAPI(req, getCustomerVariables(req), true)
+    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), true)
     expect(headers['fpjs-proxy-client-ip']).toBe('1.1.1.1')
     expect(headers['fpjs-proxy-secret']).toBe('qwertyuio1356767')
     expect(headers['fpjs-proxy-forwarded-host']).toBe('foo.bar')
@@ -225,7 +219,7 @@ describe('test fpjs-headers preparation', () => {
         },
       },
     }
-    const headers = await prepareHeadersForIngressAPI(req, getCustomerVariables(req), true)
+    const headers = await prepareHeadersForIngressRequest(req, getCustomerVariables(req), true)
     expect(headers['fpjs-proxy-client-ip']).toBe('1.1.1.1')
     expect(headers.hasOwnProperty('fpjs-proxy-secret')).toBeFalsy()
     expect(headers['fpjs-proxy-forwarded-host']).toBe('foo.bar')
@@ -490,7 +484,7 @@ describe('updateResponseHeaders', () => {
   })
 })
 
-describe('updateResponseHeadersForAgentDownload', () => {
+describe('updateResponseHeader for agent download', () => {
   test('test', () => {
     const headers: IncomingHttpHeaders = {
       'access-control-allow-credentials': 'true',
@@ -512,7 +506,7 @@ describe('updateResponseHeadersForAgentDownload', () => {
       'x-edge-xxx': 'ery8u',
       'strict-transport-security': 'max-age=1000',
     }
-    const cfHeaders: CloudFrontHeaders = updateResponseHeadersForAgentDownload(headers)
+    const cfHeaders: CloudFrontHeaders = updateResponseHeaders(headers, true)
     expect(cfHeaders.hasOwnProperty('custom-header-1')).toBe(true)
     expect(cfHeaders.hasOwnProperty('content-length')).toBe(false)
     expect(cfHeaders.hasOwnProperty('x-amz-cf-id')).toBe(false)
@@ -540,7 +534,7 @@ describe('updateResponseHeadersForAgentDownload', () => {
       vary: 'Accept-Encoding',
       'custom-header-1': 'gdfddfd',
     }
-    const cfHeaders: CloudFrontHeaders = updateResponseHeadersForAgentDownload(headers)
+    const cfHeaders: CloudFrontHeaders = updateResponseHeaders(headers, true)
     expect(cfHeaders.hasOwnProperty('custom-header-1')).toBe(true)
     expect(cfHeaders.hasOwnProperty('content-length')).toBe(false)
     expect(cfHeaders['cache-control'][0].value).toBe('no-cache, max-age=3600, s-maxage=60')

@@ -1,8 +1,8 @@
-import { CustomerVariablesRecord, CustomerVariableType, CustomerVariableValue } from '../types'
+import { CustomerVariablesRecord, CustomerVariableName, CustomerVariableReturn } from '../types'
 
-const allowedKeys = Object.values(CustomerVariableType)
+const allowedKeys = Object.values(CustomerVariableName)
 
-function assertIsCustomerVariableValue(value: unknown, key: string): asserts value is CustomerVariableValue {
+function assertIsCustomerVariableValue(value: unknown, key: string): asserts value is CustomerVariableReturn {
   if (typeof value !== 'string' && value !== null && value !== undefined) {
     throw new TypeError(`Secrets Manager secret contains an invalid value ${key}: ${value}`)
   }
@@ -13,10 +13,10 @@ export function validateSecret(obj: unknown): asserts obj is CustomerVariablesRe
     throw new TypeError('Secrets Manager secret is not an object')
   }
 
-  const secret = obj as Record<CustomerVariableType, CustomerVariableValue>
+  const secret = obj as Record<CustomerVariableName, CustomerVariableReturn>
 
   for (const [key, value] of Object.entries(secret)) {
-    if (!allowedKeys.includes(key as CustomerVariableType)) {
+    if (!allowedKeys.includes(key as CustomerVariableName)) {
       console.warn(`Secrets Manager secret contains an invalid key: ${key}`)
       continue
     }
