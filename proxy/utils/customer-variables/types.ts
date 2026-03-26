@@ -1,6 +1,6 @@
 export enum CustomerVariableName {
   GetResultPath = 'fpjs_get_result_path',
-  BehaviorPathNestLevel = 'fpjs_behavior_path_nest_level',
+  BehaviorPathNestLevel = 'fpjs_integration_path_depth',
   PreSharedSecret = 'fpjs_pre_shared_secret',
   AgentDownloadPath = 'fpjs_agent_download_path',
   FpCdnUrl = 'fpjs_cdn_url',

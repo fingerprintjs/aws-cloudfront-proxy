@@ -1,5 +1,5 @@
 ---
-'@fingerprint/cloudfront-proxy': minor
+'@fingerprint/aws-cloudfront-proxy': minor
 ---
 
 Add support for API V4

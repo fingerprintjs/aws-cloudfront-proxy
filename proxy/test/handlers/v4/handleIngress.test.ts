@@ -1,10 +1,7 @@
 import { handler } from '../../../app'
 import { mockEvent, mockRequest } from '../../aws'
 import * as utils from '../../../utils'
-import {
-  addTrafficMonitoringSearchParamsForProCDN,
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-} from '../../../utils'
+import { addTrafficMonitoring } from '../../../utils'
 import https, { Agent } from 'https'
 import { EventEmitter } from 'events'
 import { ClientRequest, IncomingMessage } from 'http'
@@ -22,8 +19,7 @@ describe('Result Endpoint V4', () => {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForProCDN')
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForVisitorIdRequest')
+    jest.spyOn(utils, 'addTrafficMonitoring')
     requestSpy = jest.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
@@ -162,7 +158,8 @@ describe('Result Endpoint V4', () => {
     expect(iiParam).toEqual('fingerprintjs-pro-cloudfront/__lambda_func_version__/ingress')
   })
 
-  test('No traffic monitoring on cache endpoint', async () => {
+  // No longer relevant, as now traffic monitoring is always included in the request. Leaving this for awareness.
+  test.skip('No traffic monitoring on cache endpoint', async () => {
     const event = mockEvent(
       mockRequest({
         uri: requestUri,
@@ -177,8 +174,7 @@ describe('Result Endpoint V4', () => {
 
     expect(iiParam).toBeFalsy()
 
-    expect(addTrafficMonitoringSearchParamsForVisitorIdRequest).toHaveBeenCalledTimes(0)
-    expect(addTrafficMonitoringSearchParamsForProCDN).toHaveBeenCalledTimes(0)
+    expect(addTrafficMonitoring).toHaveBeenCalledTimes(0)
   })
 
   test('Headers with proxy secret', async () => {

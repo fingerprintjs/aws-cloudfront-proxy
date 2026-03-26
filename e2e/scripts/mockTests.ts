@@ -36,8 +36,22 @@ async function main() {
     console.info(`Running mock e2e tests for ${name}`, integrationUrl.toString())
 
     try {
+      const args = {
+        'api-url': `https://${apiUrl}`,
+        'integration-url': integrationUrl.toString(),
+        'cdn-path': agentPath,
+        'ingress-path': ingressPath,
+        'traffic-name': 'fingerprintjs-pro-cloudfront',
+        'integration-version': version,
+        'enable-new-tests': 'true',
+      }
+
+      const argsString = Object.entries(args)
+        .map(([key, value]) => `--${key}="${value}"`)
+        .join(' ')
+
       execSync(
-        `npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- --api-url="https://${apiUrl}" --integration-url="${integrationUrl.toString()}" --cdn-path="${agentPath}" --ingress-path="${ingressPath}" --traffic-name="fingerprintjs-pro-cloudfront" --integration-version="${version}"`,
+        `npm exec -y "git+https://github.com/fingerprintjs/dx-team-mock-for-proxy-integrations-e2e-tests.git" -- ${argsString}`,
         {
           stdio: 'inherit',
         }

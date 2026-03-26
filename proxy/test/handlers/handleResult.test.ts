@@ -4,10 +4,7 @@ import { Socket } from 'net'
 import { EventEmitter } from 'events'
 import { mockEvent, mockRequest } from '../aws'
 import * as utils from '../../utils'
-import {
-  addTrafficMonitoringSearchParamsForProCDN,
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-} from '../../utils'
+import { addTrafficMonitoring } from '../../utils'
 import { handler } from '../../app'
 
 describe('Result Endpoint', function () {
@@ -21,8 +18,7 @@ describe('Result Endpoint', function () {
   let requestSpy: jest.SpyInstance
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForProCDN')
-    jest.spyOn(utils, 'addTrafficMonitoringSearchParamsForVisitorIdRequest')
+    jest.spyOn(utils, 'addTrafficMonitoring')
     requestSpy = jest.spyOn(https, 'request')
   })
 
@@ -168,7 +164,8 @@ describe('Result Endpoint', function () {
     expect(iiParam).toEqual('fingerprintjs-pro-cloudfront/__lambda_func_version__/ingress')
   })
 
-  test('No traffic monitoring on cache endpoint', async () => {
+  // No longer relevant, as now traffic monitoring is always included in the request. Leaving this for awareness.
+  test.skip('No traffic monitoring on cache endpoint', async () => {
     const event = mockEvent(
       mockRequest({
         uri: '/behavior/result',
@@ -183,8 +180,7 @@ describe('Result Endpoint', function () {
 
     expect(iiParam).toBeFalsy()
 
-    expect(addTrafficMonitoringSearchParamsForVisitorIdRequest).toHaveBeenCalledTimes(0)
-    expect(addTrafficMonitoringSearchParamsForProCDN).toHaveBeenCalledTimes(0)
+    expect(addTrafficMonitoring).toHaveBeenCalledTimes(0)
   })
 
   test('Headers with proxy secret', async () => {

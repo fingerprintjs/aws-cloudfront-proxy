@@ -67,9 +67,9 @@ export const mockRequest = ({
               value: 'result',
             },
           ],
-          fpjs_behavior_path_nest_level: [
+          fpjs_integration_path_depth: [
             {
-              key: 'fpjs_behavior_path_nest_level',
+              key: 'fpjs_integration_path_depth',
               value: '1',
             },
           ],

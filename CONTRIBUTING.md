@@ -7,9 +7,8 @@ We prefer using [pnpm](https://pnpm.io/) for installing dependencies and running
 
 For proposing changes, use the standard [pull request approach](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request). It's recommended to discuss fixes or new functionality in the Issues, first.
 
-* The `main` and `rc` branches are locked for the push action.
-* Releases are created from the `main` branch. If you have CloudFront Integration set up, it is running code from the `main` branch. Pull requests into the `main` branch are not accepted.
-* The `rc` branch functions as a candidate for the next release. Create your pull requests into this branch. The code in `rc` must always pass the tests. 
+* The `main` branches are locked for the push action.
+* Releases are created from the `main` branch. If you have CloudFront Integration set up, it is running code from the `main` branch.
 
 
 ### How to build
@@ -54,10 +53,19 @@ These tests run automatically on every pull request via the [terraform-e2e-tests
 
 ### How to release a new version
 
-Every PR should target `rc` branch first. Upon merge, if there are relevant changes a new release candidate is created.
-When that happens, an automated PR is created to `main` branch, and E2E tests run against it. If the tests pass, the PR can be merged and the release is created.
+We use [changesets](https://github.com/changesets/changesets) for handling release notes. If there are relevant changes, please add them to changeset via `pnpm exec changeset`. You need to run `pnpm install` before doing so.
 
-The integration is automatically released on every push to the main branch if there are relevant changes. The workflow must be approved by one of the maintainers, first.
+Every change requires a pre-release first:
+```shell
+pnpm exec changeset pre enter rc
+```
+
+When the PR is merged, the pre-release is created and E2E tests run against it. Once the tests pass, a stable release can be created:
+```shell
+pnpm exec changeset pre exit
+```
+
+The integration is automatically released on tag creation. The workflow must be approved by one of the maintainers, first.
 
 ### How to keep your integration up-to-date
 
@@ -73,4 +81,3 @@ To achieve this, you can add your custom *host* (not URL) values to the **AWS Se
 FPJS_CDN_URL: your.cdn.net
 FPJS_INGRESS_BASE_HOST: your.api.net
 ```
-

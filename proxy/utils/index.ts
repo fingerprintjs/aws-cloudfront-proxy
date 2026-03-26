@@ -1,17 +1,14 @@
-import { filterRequestHeaders, updateResponseHeaders, prepareHeadersForIngressRequest, getHost } from './headers'
-import { getApiKey, getLoaderVersion, getVersion, getRegion } from './request'
-import {
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-  addTrafficMonitoringSearchParamsForProCDN,
-} from './traffic'
+import { filterRequestHeaders, getHost, prepareHeadersForIngressRequest, updateResponseHeaders } from './headers'
+import { getApiKey, getLoaderVersion, getRegion, getVersion } from './request'
+import { addTrafficMonitoring } from './traffic'
 import { getAgentUri, getResultUri, getStatusUri } from './customer-variables/selectors'
 import {
-  removeTrailingSlashesAndMultiSlashes,
-  addTrailingWildcard,
-  replaceDot,
-  createRoute,
-  addPathnameMatchBeforeRoute,
   addEndingTrailingSlashToRoute,
+  addPathnameMatchBeforeRoute,
+  addTrailingWildcard,
+  createRoute,
+  removeTrailingSlashesAndMultiSlashes,
+  replaceDot,
 } from './routing'
 import { setLogLevel } from './log'
 import { generateRandom } from './string'
@@ -28,8 +25,7 @@ export {
   getLoaderVersion,
   getVersion,
   getRegion,
-  addTrafficMonitoringSearchParamsForVisitorIdRequest,
-  addTrafficMonitoringSearchParamsForProCDN,
+  addTrafficMonitoring,
   removeTrailingSlashesAndMultiSlashes,
   addTrailingWildcard,
   replaceDot,

@@ -12,6 +12,6 @@ test.describe('Status check', () => {
       waitUntil: 'networkidle',
     })
 
-    await expect(page.waitForSelector('text="✅ All environment variables are set"')).resolves.not.toThrow()
+    await expect(page.waitForSelector('text="✅ All required environment variables are set:"')).resolves.not.toThrow()
   })
 })
