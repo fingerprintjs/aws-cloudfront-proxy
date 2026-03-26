@@ -9,9 +9,14 @@ const client = new SecretsManagerClient({})
 
 describe('retrieve secret', () => {
   beforeEach(() => {
+    jest.useFakeTimers()
     clearSecretsCache()
 
     mock.reset()
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it('caches result even if it is null', async () => {
@@ -25,6 +30,26 @@ describe('retrieve secret', () => {
     await retrieveSecret(client, secretName)
 
     expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+  })
+
+  it('refetches secret after cache expires', async () => {
+    mock
+      .on(GetSecretValueCommand, {
+        SecretId: secretName,
+      })
+      .resolves({})
+
+    await retrieveSecret(client, secretName)
+    await retrieveSecret(client, secretName)
+
+    expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+
+    jest.advanceTimersByTime(500_001)
+
+    await retrieveSecret(client, secretName)
+    await retrieveSecret(client, secretName)
+
+    expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 2)
   })
 
   it('caches result even if it secrets manager throws', async () => {

@@ -4,6 +4,7 @@ import { filterCookie } from './cookie'
 import { updateCacheControlHeader } from './cache-control'
 import { CustomerVariables } from './customer-variables/customer-variables'
 import { getPreSharedSecret } from './customer-variables/selectors'
+import { TTLCache } from './cache'
 
 export const BLACKLISTED_HEADERS = new Set([
   'age',
@@ -224,4 +225,23 @@ export function getHeaderValue(request: CloudFrontRequest, name: string): string
     return null
   }
   return headers[name][0].value
+}
+
+/**
+ * Retrieves the secret cache time-to-live (TTL) value in milliseconds from the request headers.
+ *
+ * @param {CloudFrontRequest} request - The CloudFront request object containing headers.
+ * @return {number|undefined} The parsed TTL value in milliseconds if present and valid; otherwise, undefined.
+ */
+export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefined {
+  const value = getHeaderValue(request, 'fpjs_proxy_secret_cache_ttl_ms')
+
+  if (value) {
+    const parsedValue = parseInt(value, 10)
+    if (TTLCache.isValidTTL(parsedValue)) {
+      return parsedValue
+    }
+  }
+
+  return undefined
 }

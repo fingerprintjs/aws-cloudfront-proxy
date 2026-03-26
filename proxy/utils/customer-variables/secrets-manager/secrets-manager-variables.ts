@@ -18,7 +18,10 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
 
   private readonly secretsManager?: SecretsManagerClient
 
-  constructor(private readonly request: CloudFrontRequest) {
+  constructor(
+    private readonly request: CloudFrontRequest,
+    private readonly cacheTtlMs?: number
+  ) {
     this.readSecretsInfoFromHeaders()
 
     if (SecretsManagerVariables.isValidSecretInfo(this.secretsInfo)) {
@@ -45,7 +48,7 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
     }
 
     try {
-      return await retrieveSecret(this.secretsManager, this.secretsInfo!.secretName!)
+      return await retrieveSecret(this.secretsManager, this.secretsInfo!.secretName!, this.cacheTtlMs)
     } catch (error) {
       console.error('Error retrieving secret from secrets manager', {
         error,

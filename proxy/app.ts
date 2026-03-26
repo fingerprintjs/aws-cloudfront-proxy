@@ -8,6 +8,7 @@ import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
 import { createIngressHandler } from './handlers/handleIngress'
 import { handleStatus } from './handlers/handleStatus'
 import { V4_INGRESS_PATH } from './utils/paths'
+import { getSecretCacheTtlMs } from './utils/headers'
 
 export type Route = {
   pathPattern: RegExp
@@ -57,7 +58,7 @@ export const handler = async (event: CloudFrontRequestEvent): Promise<CloudFront
   setLogLevel(request)
 
   const customerVariables = new CustomerVariables([
-    new SecretsManagerVariables(request),
+    new SecretsManagerVariables(request, getSecretCacheTtlMs(request)),
     new HeaderCustomerVariables(request),
   ])
 
