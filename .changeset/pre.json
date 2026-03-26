@@ -6,5 +6,8 @@
     "e2e-tests": "0.0.0",
     "website": "0.0.0"
   },
-  "changesets": []
+  "changesets": [
+    "cold-needles-warn",
+    "cuddly-tires-tan"
+  ]
 }
