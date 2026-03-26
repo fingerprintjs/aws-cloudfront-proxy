@@ -15,7 +15,6 @@ jobs:
   e2e-tests:
     name: Run E2E tests on release artifact
     runs-on: ubuntu-latest
-    needs: upload-assets
     outputs:
       lambda_sha: ${{ steps.sha.outputs.lambda_sha }}
       mgmt_lambda_sha: ${{ steps.sha.outputs.mgmt_lambda_sha }}
