@@ -1,3 +1,9 @@
+## 2.2.0-rc.1
+
+### Patch Changes
+
+- Remove invalid dependency from publish workflow ([fe7b2aa](https://github.com/fingerprintjs/cloudfront-proxy/commit/fe7b2aa1042b97b7091d88cb00337f2715a5f1bb))
+
 ## 2.2.0-rc.0
 
 ### Minor Changes
