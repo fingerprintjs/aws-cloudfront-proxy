@@ -1,5 +1,3 @@
-## [2.1.1](https://github.com/fingerprintjs/fingerprint-pro-cloudfront-integration/compare/v2.1.0...v2.1.1) (2025-07-01)
-
 ## 2.2.0-rc.0
 
 ### Minor Changes
@@ -10,6 +8,8 @@
 ### Bug Fixes
 
 - bundle AWS SDKs inside Lambda functions to avoid runtime issues ([95f8d78](https://github.com/fingerprintjs/fingerprint-pro-cloudfront-integration/commit/95f8d78a74a3d622ac69c29cb72ecd2531bf8ba2))
+
+## [2.1.1](https://github.com/fingerprintjs/fingerprint-pro-cloudfront-integration/compare/v2.1.0...v2.1.1) (2025-07-01)
 
 ## [2.1.1-rc.1](https://github.com/fingerprintjs/fingerprint-pro-cloudfront-integration/compare/v2.1.0...v2.1.1-rc.1) (2025-06-30)
 
