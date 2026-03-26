@@ -7,9 +7,12 @@ export class TTLCache<K, V> {
   private cache: Map<K, CacheItem<V>>
   private readonly ttlMs: number
 
+  // Default TTL is 5 minutes
+  private static readonly DEFAULT_TTL_MS = 300_000
+
   constructor(ttlMs: number) {
     this.cache = new Map()
-    this.ttlMs = ttlMs
+    this.ttlMs = TTLCache.isValidTTL(ttlMs) ? ttlMs : TTLCache.DEFAULT_TTL_MS
   }
 
   get(key: K): V | undefined {
@@ -27,8 +30,7 @@ export class TTLCache<K, V> {
   }
 
   set(key: K, value: V, customTtlMs?: number): void {
-    const ttlMsToUse =
-      typeof customTtlMs === 'number' && Number.isFinite(customTtlMs) && customTtlMs >= 0 ? customTtlMs : this.ttlMs
+    const ttlMsToUse = TTLCache.isValidTTL(customTtlMs) ? customTtlMs : this.ttlMs
 
     this.cache.set(key, {
       value,
@@ -46,5 +48,9 @@ export class TTLCache<K, V> {
 
   clear(): void {
     this.cache.clear()
+  }
+
+  static isValidTTL(value?: number): value is number {
+    return typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value) && value >= 0
   }
 }

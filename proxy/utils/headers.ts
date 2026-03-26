@@ -4,6 +4,7 @@ import { filterCookie } from './cookie'
 import { updateCacheControlHeader } from './cache-control'
 import { CustomerVariables } from './customer-variables/customer-variables'
 import { getPreSharedSecret } from './customer-variables/selectors'
+import { TTLCache } from './cache'
 
 export const BLACKLISTED_HEADERS = new Set([
   'age',
@@ -237,7 +238,7 @@ export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefi
 
   if (value) {
     const parsedValue = parseInt(value, 10)
-    if (!Number.isNaN(parsedValue) && parsedValue >= 0 && Number.isFinite(parsedValue)) {
+    if (TTLCache.isValidTTL(parsedValue)) {
       return parsedValue
     }
   }
