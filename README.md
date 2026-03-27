@@ -7,8 +7,8 @@
    </picture>
   </a>
 <p align="center">
-<a href="https://github.com/fingerprintjs/aws-cloudfront-proxy"><img src="https://img.shields.io/github/v/release/fingerprintjs/fingerprint-pro-cloudfront-integration" alt="Current version"></a>
-<a href="https://fingerprintjs.github.io/fingerprint-pro-cloudfront-integration/coverage"><img src="https://fingerprintjs.github.io/fingerprint-pro-cloudfront-integration/coverage/badges.svg" alt="coverage"></a>
+<a href="https://github.com/fingerprintjs/aws-cloudfront-proxy"><img src="https://img.shields.io/github/v/release/fingerprintjs/aws-cloudfront-proxy" alt="Current version"></a>
+<a href="https://fingerprintjs.github.io/aws-cloudfront-proxy/coverage"><img src="https://fingerprintjs.github.io/aws-cloudfront-proxy/coverage/badges.svg" alt="coverage"></a>
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/:license-mit-blue.svg" alt="MIT license"></a>
 <a href="https://discord.gg/39EpE2neBg"><img src="https://img.shields.io/discord/852099967190433792?style=logo&label=Discord&logo=Discord&logoColor=white" alt="Discord server"></a>
 </p>
