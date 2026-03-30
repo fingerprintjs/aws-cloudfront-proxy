@@ -5,19 +5,19 @@ import { PlaywrightTestConfig } from '@playwright/test'
 export type CloudfrontUrls = {
   cloudfrontWithHeadersUrl: string
   cloudfrontWithSecretsUrl: string
-  cloudfrontWithSecretsUrlV4: string
+  cloudfrontWithSecretsV4Url: string
 }
 
 export const testMatches = {
   cloudfrontWithHeadersUrl: '**/*.test.ts',
   cloudfrontWithSecretsUrl: '**/*.test.ts',
-  cloudfrontWithSecretsUrlV4: ['statusCheck.test.ts', 'v4/**/*.test.ts'],
+  cloudfrontWithSecretsV4Url: ['statusCheck.test.ts', 'v4/**/*.test.ts'],
 } satisfies Record<keyof CloudfrontUrls, PlaywrightTestConfig['testMatch']>
 
 export const urlTypeCustomerVariableSourceMap: Record<keyof CloudfrontUrls, string> = {
   cloudfrontWithHeadersUrl: 'HeaderCustomerVariables',
   cloudfrontWithSecretsUrl: 'SecretsManagerVariables',
-  cloudfrontWithSecretsUrlV4: 'SecretsManagerVariables',
+  cloudfrontWithSecretsV4Url: 'SecretsManagerVariables',
 }
 
 let cache: CloudfrontUrls | undefined
@@ -26,18 +26,18 @@ function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
   return {
     cloudfrontWithHeadersUrl: process.env.CLOUDFRONT_WITH_HEADERS_URL,
     cloudfrontWithSecretsUrl: process.env.CLOUDFRONT_WITH_SECRETS_URL,
-    cloudfrontWithSecretsUrlV4: process.env.CLOUDFRONT_WITH_SECRETS_URL_V4,
+    cloudfrontWithSecretsV4Url: process.env.CLOUDFRONT_WITH_SECRETS_V4_URL,
   }
 }
 
 export function getCloudfrontUrls(): CloudfrontUrls {
   if (!cache) {
     const fromEnv = getCloudfrontUrlsFromEnv()
-    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl && fromEnv.cloudfrontWithSecretsUrlV4) {
+    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl && fromEnv.cloudfrontWithSecretsV4Url) {
       cache = {
         cloudfrontWithHeadersUrl: `https://${fromEnv.cloudfrontWithHeadersUrl}`,
         cloudfrontWithSecretsUrl: `https://${fromEnv.cloudfrontWithSecretsUrl}`,
-        cloudfrontWithSecretsUrlV4: `https://${fromEnv.cloudfrontWithSecretsUrlV4}`,
+        cloudfrontWithSecretsV4Url: `https://${fromEnv.cloudfrontWithSecretsV4Url}`,
       }
       console.info('Using cloudfront urls from env', cache)
     } else {
@@ -46,7 +46,7 @@ export function getCloudfrontUrls(): CloudfrontUrls {
       cache = {
         cloudfrontWithHeadersUrl: `https://${contents.cloudfront_with_headers_url.value}`,
         cloudfrontWithSecretsUrl: `https://${contents.cloudfront_with_secret_url.value}`,
-        cloudfrontWithSecretsUrlV4: `https://${contents.cloudfront_with_secret_url_v4_only.value}`,
+        cloudfrontWithSecretsV4Url: `https://${contents.cloudfront_with_secret_url_v4_only.value}`,
       }
 
       console.info('Using cloudfront urls from terraform output', cache)
