@@ -8,14 +8,14 @@ Parameters:
     Default: ""
     Type: String
   FpjsGetResultPath:
-    AllowedPattern: ^([a-zA-Z0-9\-])+$
-    Description: request path used to send identification requests (aka FPJS_GET_RESULT_PATH)
-    Default: "result"
+    AllowedPattern: ^$|^([a-zA-Z0-9\-])+$
+    Description: (Optional) request path used to send V3 identification requests (aka FPJS_GET_RESULT_PATH)
+    Default: ""
     Type: String
   FpjsAgentDownloadPath:
-    AllowedPattern: ^([a-zA-Z0-9\-])+$
-    Description: request path used to send ProCDN requests (aka FPJS_AGENT_DOWNLOAD_PATH)
-    Default: "agent"
+    AllowedPattern: ^$|^([a-zA-Z0-9\-])+$
+    Description: (Optional) request path used to send V3 ProCDN requests (aka FPJS_AGENT_DOWNLOAD_PATH)
+    Default: ""
     Type: String
   FpjsPreSharedSecret:
     AllowedPattern: ^([a-zA-Z0-9\-])+$
