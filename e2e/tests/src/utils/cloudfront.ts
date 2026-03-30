@@ -33,7 +33,7 @@ function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
 export function getCloudfrontUrls(): CloudfrontUrls {
   if (!cache) {
     const fromEnv = getCloudfrontUrlsFromEnv()
-    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl) {
+    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl && fromEnv.cloudfrontWithSecretsUrlV4) {
       cache = {
         cloudfrontWithHeadersUrl: `https://${fromEnv.cloudfrontWithHeadersUrl}`,
         cloudfrontWithSecretsUrl: `https://${fromEnv.cloudfrontWithSecretsUrl}`,
