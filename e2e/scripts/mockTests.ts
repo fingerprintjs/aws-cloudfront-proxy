@@ -17,6 +17,8 @@ async function main() {
 
   const cloudfrontUrls = getCloudfrontUrls()
 
+  const isV4Only = process.env.V4_ONLY === 'true'
+
   const apiUrl = getEnv('API_URL')
   const behaviorPath = getEnv('FPJS_BEHAVIOR_PATH')
   const agentPath = getEnv('FPJS_AGENT_DOWNLOAD_PATH')
@@ -25,7 +27,10 @@ async function main() {
   console.info('Agent download path:', agentPath)
   console.info('Get result path:', ingressPath)
 
-  for (const [name, url] of Object.entries(cloudfrontUrls)) {
+  const cloudfrontUrlsArray = Object.entries(cloudfrontUrls).filter(
+    ([name]) => !isV4Only || name === 'cloudfrontWithSecretsUrlV4'
+  )
+  for (const [name, url] of cloudfrontUrlsArray) {
     if (name === 'cloudfrontWithoutVariables') {
       continue
     }
@@ -44,6 +49,9 @@ async function main() {
         'traffic-name': 'fingerprintjs-pro-cloudfront',
         'integration-version': version,
         'enable-new-tests': 'true',
+      }
+      if (isV4Only) {
+        args['include'] = 'v4'
       }
 
       const argsString = Object.entries(args)
