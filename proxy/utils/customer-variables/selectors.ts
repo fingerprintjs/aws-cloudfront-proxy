@@ -3,9 +3,17 @@ import { CustomerVariableName } from './types'
 
 const extractVariable = <T extends CustomerVariableName>(result: GetVariableResult<T>) => result.value
 
-export const getAgentUri = async (variables: CustomerVariables) => `/${await getAgentDownloadPath(variables)}`
+export const getAgentUri = async (variables: CustomerVariables) => {
+  const agentDownloadPath = await getAgentDownloadPath(variables)
 
-export const getResultUri = async (variables: CustomerVariables) => `/${await getResultPath(variables)}(/.*)?`
+  return agentDownloadPath ? `/${agentDownloadPath}` : null
+}
+
+export const getResultUri = async (variables: CustomerVariables) => {
+  const resultPath = await getResultPath(variables)
+
+  return resultPath ? `/${resultPath}(/.*)?` : null
+}
 
 export const getStatusUri = () => `/status`
 

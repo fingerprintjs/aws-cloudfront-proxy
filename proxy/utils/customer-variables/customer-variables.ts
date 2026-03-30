@@ -34,6 +34,12 @@ export class CustomerVariables {
     }
   }
 
+  async hasVariable(variable: CustomerVariableName): Promise<boolean> {
+    const result = await this.getVariable(variable)
+
+    return result.value !== null
+  }
+
   private async getValueFromProviders<T extends CustomerVariableName>(
     variable: T
   ): Promise<GetVariableResult<T> | null> {

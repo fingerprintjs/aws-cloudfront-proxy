@@ -21,21 +21,28 @@ export type Route = {
 
 async function createRoutes(customerVariables: CustomerVariables): Promise<Route[]> {
   const routes: Route[] = []
-  const downloadScriptRoute: Route = {
-    pathPattern: createRoute(await getAgentUri(customerVariables)),
-    handler: createIngressHandler('agentV3'),
+
+  const agentUri = await getAgentUri(customerVariables)
+  if (agentUri) {
+    routes.push({
+      pathPattern: createRoute(agentUri),
+      handler: createIngressHandler('agentV3'),
+    })
   }
-  const ingressAPIRoute: Route = {
-    pathPattern: createRoute(await getResultUri(customerVariables)),
-    handler: createIngressHandler('ingressV3'),
+
+  const resultUri = await getResultUri(customerVariables)
+  if (resultUri) {
+    routes.push({
+      pathPattern: createRoute(resultUri),
+      handler: createIngressHandler('ingressV3'),
+    })
   }
+
   const statusRoute: Route = {
     pathPattern: createRoute(getStatusUri()),
     handler: (request, env) => handleStatusPage(request, env),
   }
 
-  routes.push(downloadScriptRoute)
-  routes.push(ingressAPIRoute)
   routes.push(statusRoute)
   // For V4, proxy all remaining routes through Warden (CDN + Ingress)
   routes.push({
