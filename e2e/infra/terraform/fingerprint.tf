@@ -7,3 +7,11 @@ module "fingerprint_cloudfront_integration" {
   fetch_lambda_from_s3     = false
   local_lambda_path        = "../../../lambda_latest.zip"
 }
+
+module "fingerprint_cloudfront_integration_v4_only" {
+  source = "fingerprintjs/fingerprint-cloudfront-proxy-integration/aws"
+
+  fpjs_shared_secret       = var.fpjs_shared_secret
+  fetch_lambda_from_s3     = false
+  local_lambda_path        = "../../../lambda_latest.zip"
+}

@@ -1,7 +1,7 @@
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
 import { getProjectName } from './src/project'
-import { CloudfrontUrls, getCloudfrontUrls } from './src/utils/cloudfront'
+import { CloudfrontUrls, getCloudfrontUrls, testMatches } from './src/utils/cloudfront'
 
 /**
  * Read environment variables from file.
@@ -46,13 +46,19 @@ const config: PlaywrightTestConfig = {
   },
 
   /* Configure projects for major browsers */
-  projects: cloudfrontUrls.map(([name, url]) => ({
-    name: getProjectName('chromium', name as keyof CloudfrontUrls),
-    use: {
-      ...devices['Desktop Chrome'],
-      baseURL: url,
-    },
-  })),
+  projects: cloudfrontUrls.map(([name, url]) => {
+    const projectName = name as keyof CloudfrontUrls
+    const testMatch = testMatches[projectName]
+
+    return {
+      name: getProjectName('chromium', projectName),
+      testMatch,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL: url,
+      },
+    }
+  }),
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',

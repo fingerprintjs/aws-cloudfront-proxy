@@ -9,6 +9,7 @@ export type TerraformOutputValue = {
 export type TerraformOutput = {
   cloudfront_with_headers_url: TerraformOutputValue
   cloudfront_with_secret_url: TerraformOutputValue
+  cloudfront_with_secret_url_v4_only: TerraformOutputValue
 }
 
 const FILE_NAME = 'infra.json'

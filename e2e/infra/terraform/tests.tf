@@ -7,6 +7,7 @@ resource "null_resource" "tests" {
     environment = {
       CLOUDFRONT_WITH_HEADERS_URL = aws_cloudfront_distribution.with_headers.domain_name
       CLOUDFRONT_WITH_SECRETS_URL = aws_cloudfront_distribution.with_secret.domain_name
+      CLOUDFRONT_WITH_SECRETS_URL_V4 = aws_cloudfront_distribution.with_secret_v4_only.domain_name
     }
   }
   triggers = {
@@ -16,11 +17,17 @@ resource "null_resource" "tests" {
 
   # Make sure that we run this after cloudfront is ready
   depends_on = [
-    aws_cloudfront_distribution.with_headers, aws_cloudfront_distribution.with_secret,
-    null_resource.invalidate_with_headers_cache, null_resource.invalidate_with_secret_cache
+    aws_cloudfront_distribution.with_headers, 
+    aws_cloudfront_distribution.with_secret,
+    aws_cloudfront_distribution.with_secret_v4_only,
+    
+    null_resource.invalidate_with_headers_cache, 
+    null_resource.invalidate_with_secret_cache,
+    null_resource.invalidate_with_secret_cache_v4_only
   ]
 }
 
+// TODO Separate mock-warden tests for v4 only with a separate flag
 resource "null_resource" "mock-warden-tests" {
   count = var.run_mock_warden_tests ? 1 : 0
 
@@ -44,7 +51,9 @@ resource "null_resource" "mock-warden-tests" {
 
   # Make sure that we run this after cloudfront is ready
   depends_on = [
-    aws_cloudfront_distribution.with_headers, aws_cloudfront_distribution.with_secret,
-    null_resource.invalidate_with_headers_cache, null_resource.invalidate_with_secret_cache
+    aws_cloudfront_distribution.with_headers, 
+    aws_cloudfront_distribution.with_secret,
+    null_resource.invalidate_with_headers_cache, 
+    null_resource.invalidate_with_secret_cache
   ]
 }
