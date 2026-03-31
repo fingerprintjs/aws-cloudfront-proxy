@@ -51,7 +51,7 @@ async function main() {
         'enable-new-tests': 'true',
       }
       if (isV4Only) {
-        args['include'] = 'v4'
+        args['include'] = ['v4 agent', 'v4 browser cache', 'v4 ingress'].join(',')
       }
 
       const argsString = Object.entries(args)
