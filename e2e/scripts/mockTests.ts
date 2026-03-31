@@ -28,7 +28,7 @@ async function main() {
   console.info('Get result path:', ingressPath)
 
   const cloudfrontUrlsArray = Object.entries(cloudfrontUrls).filter(
-    ([name]) => !isV4Only || name === 'cloudfrontWithSecretsUrlV4'
+    ([name]) => !isV4Only || name === 'cloudfrontWithSecretsV4Url'
   )
   for (const [name, url] of cloudfrontUrlsArray) {
     if (name === 'cloudfrontWithoutVariables') {
@@ -49,13 +49,19 @@ async function main() {
         'traffic-name': 'fingerprintjs-pro-cloudfront',
         'integration-version': version,
         'enable-new-tests': 'true',
-      }
+      } as Record<string, string | string[]>
       if (isV4Only) {
-        args['include'] = ['v4 agent', 'v4 browser cache', 'v4 ingress'].join(',')
+        args['include'] = ['v4 agent', 'v4 browser cache', 'v4 ingress']
       }
 
       const argsString = Object.entries(args)
-        .map(([key, value]) => `--${key}="${value}"`)
+        .flatMap(([key, value]) => {
+          if (typeof value === 'string') {
+            return `--${key}="${value}"`
+          }
+
+          return value.map((v) => `--${key}="${v}"`)
+        })
         .join(' ')
 
       execSync(
