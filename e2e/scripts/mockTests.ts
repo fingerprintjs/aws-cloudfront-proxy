@@ -1,5 +1,5 @@
 import { execSync } from 'child_process'
-import { getCloudfrontUrls } from '../tests/src/utils/cloudfront'
+import { CloudfrontUrls, getCloudfrontUrls } from '../tests/src/utils/cloudfront'
 import { version } from '../../package.json'
 
 function getEnv(name: string) {
@@ -11,6 +11,9 @@ function getEnv(name: string) {
 
   return value
 }
+
+const v3Urls: Array<keyof CloudfrontUrls> = ['cloudfrontWithHeadersUrl', 'cloudfrontWithSecretsUrl']
+const v4Urls: Array<keyof CloudfrontUrls> = ['cloudfrontWithSecretsV4Url']
 
 async function main() {
   let hasError = false
@@ -27,8 +30,8 @@ async function main() {
   console.info('Agent download path:', agentPath)
   console.info('Get result path:', ingressPath)
 
-  const cloudfrontUrlsArray = Object.entries(cloudfrontUrls).filter(
-    ([name]) => !isV4Only || name === 'cloudfrontWithSecretsV4Url'
+  const cloudfrontUrlsArray = Object.entries(cloudfrontUrls).filter(([name]) =>
+    isV4Only ? v4Urls.includes(name as keyof CloudfrontUrls) : v3Urls.includes(name as keyof CloudfrontUrls)
   )
   for (const [name, url] of cloudfrontUrlsArray) {
     if (name === 'cloudfrontWithoutVariables') {
