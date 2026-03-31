@@ -32,8 +32,7 @@
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.989.0",
     "@aws-sdk/client-lambda": "^3.989.0",
-    "@aws-sdk/client-secrets-manager": "^3.989.0",
-    "ts-node": "^10.9.2"
+    "@aws-sdk/client-secrets-manager": "^3.989.0"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.832.0",
@@ -70,7 +69,8 @@
     "rollup-plugin-license": "^3.6.0",
     "ts-jest": "^29.4.0",
     "tslib": "^2.8.1",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "ts-node": "^10.9.2"
   },
   "lint-staged": {
     "*.ts": "pnpm run lint:fix",
