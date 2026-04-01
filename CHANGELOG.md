@@ -1,3 +1,9 @@
+## 2.2.0-rc.2
+
+### Minor Changes
+
+- Skip creation of V3-related routes if related variables are empty ([dc29d6c](https://github.com/fingerprintjs/cloudfront-proxy/commit/dc29d6c6f95c76d010bbaedcc21f59f4d1bf035d))
+
 ## 2.2.0-rc.1
 
 ### Patch Changes
