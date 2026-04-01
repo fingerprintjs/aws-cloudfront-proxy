@@ -1,6 +1,6 @@
 module "fingerprint_cloudfront_integration" {
   source = "fingerprintjs/fingerprint-cloudfront-proxy-integration/aws"
-  version = "1.2.0-rc.0"
+  version = "2.0.0-rc.1"
 
   fpjs_agent_download_path = var.fpjs_agent_download_path
   fpjs_get_result_path     = var.fpjs_get_result_path
@@ -11,7 +11,7 @@ module "fingerprint_cloudfront_integration" {
 
 module "fingerprint_cloudfront_integration_v4_only" {
   source = "fingerprintjs/fingerprint-cloudfront-proxy-integration/aws"
-  version = "1.2.0-rc.0"
+  version = "2.0.0-rc.1"
 
   fpjs_shared_secret       = var.fpjs_shared_secret
   fetch_lambda_from_s3     = false
