@@ -505,9 +505,9 @@ exports[`Handle status returns correct status info in html if some variables are
     </li><li>
         <strong>fpjs_pre_shared_secret</strong> - ⚠️ Value is not defined 
     </li><li>
-        <strong>fpjs_get_result_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined and uses default value: resultId
+        <strong>fpjs_get_result_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined 
     </li><li>
-        <strong>fpjs_agent_download_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined and uses default value: agent
+        <strong>fpjs_agent_download_path <span data-tooltip="This variable is relevant only for V3 version of the JS Agent and can be ignored in later versions." class="v3-icon">V3 only</span></strong> - ⚠️ Value is not defined 
     </li>
       </ul>
           </div>

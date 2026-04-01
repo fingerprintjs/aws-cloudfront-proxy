@@ -1,9 +1,9 @@
 import { CustomerVariableName, CustomerVariablesRecord, CustomerVariableType } from './types'
 
 const defaultCustomerVariables = {
-  [CustomerVariableName.GetResultPath]: 'resultId',
+  [CustomerVariableName.GetResultPath]: null,
   [CustomerVariableName.PreSharedSecret]: null,
-  [CustomerVariableName.AgentDownloadPath]: 'agent',
+  [CustomerVariableName.AgentDownloadPath]: null,
   [CustomerVariableName.FpCdnUrl]: '__FPCDN__',
   [CustomerVariableName.FpIngressBaseHost]: '__INGRESS_API__',
   [CustomerVariableName.BehaviorPathNestLevel]: 1,

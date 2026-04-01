@@ -129,8 +129,8 @@ describe('customer variables selectors', () => {
 
       const customerVariables = getHeaderCustomerVariables(req)
 
-      expect(await getAgentUri(customerVariables)).toBe('/agent')
-      expect(await getResultUri(customerVariables)).toBe('/resultId(/.*)?')
+      expect(await getAgentUri(customerVariables)).toBeNull()
+      expect(await getResultUri(customerVariables)).toBeNull()
       expect(getStatusUri()).toBe('/status')
     })
   })
