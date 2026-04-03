@@ -1,3 +1,5 @@
+import { isNonNegativeInteger } from './validation'
+
 interface CacheItem<T> {
   value: T
   expiresAt: number
@@ -51,6 +53,6 @@ export class TTLCache<K, V> {
   }
 
   static isValidTTL(value?: number): value is number {
-    return typeof value === 'number' && !Number.isNaN(value) && Number.isFinite(value) && value >= 0
+    return isNonNegativeInteger(value)
   }
 }

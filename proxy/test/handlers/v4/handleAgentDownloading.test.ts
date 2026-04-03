@@ -3,6 +3,7 @@ import { EventEmitter } from 'events'
 import { mockEvent, mockRequest } from '../../aws'
 import { handler } from '../../../app'
 import { generateErrorResponse } from '../../../utils/generateErrorResponse'
+import { CustomerVariableName } from '../../../utils/customer-variables/types'
 
 const requestUri = '/behavior/web/v4/ujKG34hUYKLJKJ1F'
 describe('Download agent endpoint V4', () => {
@@ -61,6 +62,25 @@ describe('Download agent endpoint V4', () => {
 
   test('Successful call', async () => {
     const event = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
+
+    await handler(event)
+
+    expect(requestSpy).toHaveBeenCalledTimes(1)
+
+    const [url] = requestSpy.mock.calls[0]
+
+    expect(url.toString()).toEqual(`https://${origin}/web/v4/ujKG34hUYKLJKJ1F`)
+  })
+
+  test('Successful call with nested behavior path', async () => {
+    const event = mockEvent(mockRequest({ uri: `/nested${requestUri}`, querystring: '', method: 'GET' }))
+
+    event.Records[0].cf.request.origin!.s3!.customHeaders[CustomerVariableName.BehaviorPathNestLevel] = [
+      {
+        key: CustomerVariableName.BehaviorPathNestLevel,
+        value: '2',
+      },
+    ]
 
     await handler(event)
 
