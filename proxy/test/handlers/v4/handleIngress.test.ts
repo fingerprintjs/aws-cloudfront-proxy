@@ -171,6 +171,46 @@ describe('Result Endpoint V4', () => {
     )
   })
 
+  test('Call with integration served under root path', async () => {
+    const event = mockEvent(
+      mockRequest({
+        uri: '/',
+        querystring: '',
+      })
+    )
+    event.Records[0].cf.request.origin!.s3!.customHeaders[CustomerVariableName.BehaviorPathNestLevel] = [
+      {
+        key: CustomerVariableName.BehaviorPathNestLevel,
+        value: '0',
+      },
+    ]
+    await handler(event)
+
+    expect(https.request).toHaveBeenCalledWith(`https://${origin}/${queryString}`, expect.anything(), expect.anything())
+  })
+
+  test('Call suffix and with integration served under root path', async () => {
+    const event = mockEvent(
+      mockRequest({
+        uri: '/with/suffix',
+        querystring: '',
+      })
+    )
+    event.Records[0].cf.request.origin!.s3!.customHeaders[CustomerVariableName.BehaviorPathNestLevel] = [
+      {
+        key: CustomerVariableName.BehaviorPathNestLevel,
+        value: '0',
+      },
+    ]
+    await handler(event)
+
+    expect(https.request).toHaveBeenCalledWith(
+      `https://${origin}/with/suffix${queryString}`,
+      expect.anything(),
+      expect.anything()
+    )
+  })
+
   test.each([NaN, -1, 'test', ' 1', Infinity, -Infinity])(
     'Call with suffix and invalid nested path level variable: %s',
     async (value) => {
