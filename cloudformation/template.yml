@@ -200,6 +200,9 @@ Resources:
             OriginCustomHeaders:
               - HeaderName: FPJS_SECRET_NAME
                 HeaderValue: !Ref FingerprintIntegrationSettingsSecret
+                
+              - HeaderName: FPJS_INTEGRATION_PATH_DEPTH
+                HeaderValue: '0'
             CustomOriginConfig:
               HTTPPort: 80
               HTTPSPort: 443

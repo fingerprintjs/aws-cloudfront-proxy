@@ -1,3 +1,5 @@
+import { isNonNegativeInteger } from '../validation'
+
 export enum CustomerVariableName {
   GetResultPath = 'fpjs_get_result_path',
   BehaviorPathNestLevel = 'fpjs_integration_path_depth',
@@ -12,16 +14,23 @@ export const internalVariables: Set<CustomerVariableName> = new Set<CustomerVari
   CustomerVariableName.FpIngressBaseHost,
 ])
 
+type ParserValidator<T> = (value: T) => boolean
+
 const stringParser = (value: string) => value
 
-const intParser = (fallbackValue: number) => (value: string) => {
+const intParser = (fallbackValue: number, validation: ParserValidator<number>) => (value: string) => {
   const parsed = parseInt(value)
-  return isNaN(parsed) ? fallbackValue : parsed
+
+  if (validation(parsed)) {
+    return parsed
+  }
+
+  return fallbackValue
 }
 
 export const customerVariableParsers = {
   [CustomerVariableName.GetResultPath]: stringParser,
-  [CustomerVariableName.BehaviorPathNestLevel]: intParser(1),
+  [CustomerVariableName.BehaviorPathNestLevel]: intParser(1, isNonNegativeInteger),
   [CustomerVariableName.PreSharedSecret]: stringParser,
   [CustomerVariableName.AgentDownloadPath]: stringParser,
   [CustomerVariableName.FpCdnUrl]: stringParser,
