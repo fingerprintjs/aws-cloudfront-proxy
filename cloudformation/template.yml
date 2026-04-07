@@ -338,7 +338,7 @@ Resources:
       AuthType: NONE
       TargetFunctionArn: !GetAtt FingerprintProMgmtLambda.Arn
 
-  MgmtFunctionInvokePermission:
+  MgmtFunctionInvokeUrlPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
       - FingerprintProMgmtLambda
@@ -347,7 +347,15 @@ Resources:
       FunctionName: !Ref FingerprintProMgmtLambda
       FunctionUrlAuthType: NONE
       Principal: "*"
-
+  
+  MgmtFunctionInvokePermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - FingerprintProMgmtLambda
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref FingerprintProMgmtLambda
+      Principal: "*"
 
 Outputs:
   LambdaFunctionName:
