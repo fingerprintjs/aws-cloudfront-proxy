@@ -1,3 +1,23 @@
+## 2.2.0
+
+### Minor Changes
+
+- Add support for API V4.
+
+  Docs:
+
+  - [CloudFront JavaScript Agent V4 Migration Guide](https://docs.fingerprint.com/docs/cloudfront-integration-migration-to-js-agent-v4)
+  - [CloudFront Terraform guide](https://docs.fingerprint.com/docs/aws-cloudfront-integration-via-terraform) ([ff1b644](https://github.com/fingerprintjs/cloudfront-proxy/commit/ff1b644674836fcb5b5de2303d94b084f8f1e31f))
+
+- Introduce TTL for secret caching ([fd2eef5](https://github.com/fingerprintjs/cloudfront-proxy/commit/fd2eef5f0351b457b60407129d857c2cd54953a4))
+- Add FPJS_INTEGRATION_PATH_DEPTH header to CloudFormation template ([7b93386](https://github.com/fingerprintjs/cloudfront-proxy/commit/7b93386e4f7cf8ea16920fac4aaa9774376de85e))
+- Add `lambda:InvokeFunction` to the management function.
+
+  Starting from October 2025, AWS requires new function URLs to have this permissions alongside the `lambda:InvokeFunctionUrl`.
+  See https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html to learn more. ([79c008f](https://github.com/fingerprintjs/cloudfront-proxy/commit/79c008fab0ac9edf8d6140121b017e8d1de09ed7))
+
+- Skip creation of V3-related routes if related variables are empty ([dc29d6c](https://github.com/fingerprintjs/cloudfront-proxy/commit/dc29d6c6f95c76d010bbaedcc21f59f4d1bf035d))
+
 ## 2.2.0-rc.2
 
 ### Minor Changes
