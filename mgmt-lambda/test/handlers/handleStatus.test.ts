@@ -2,7 +2,6 @@ import { mockClient } from 'aws-sdk-client-mock'
 import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda'
 import type { DeploymentSettings } from '../../model/DeploymentSettings'
 import { handleStatus } from '../../handlers/statusHandler'
-import 'aws-sdk-client-mock-jest'
 import { CloudFrontClient, GetDistributionCommand } from '@aws-sdk/client-cloudfront'
 import { IntegrationStatus } from '../../model/IntegrationStatus'
 
@@ -18,7 +17,7 @@ const options: DeploymentSettings = {
 
 describe('Handle mgmt-status', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
   })
 

@@ -4,8 +4,8 @@ const defaultCustomerVariables = {
   [CustomerVariableName.GetResultPath]: null,
   [CustomerVariableName.PreSharedSecret]: null,
   [CustomerVariableName.AgentDownloadPath]: null,
-  [CustomerVariableName.FpCdnUrl]: '__FPCDN__',
-  [CustomerVariableName.FpIngressBaseHost]: '__INGRESS_API__',
+  [CustomerVariableName.FpCdnUrl]: __FPCDN__,
+  [CustomerVariableName.FpIngressBaseHost]: __INGRESS_API__,
   [CustomerVariableName.BehaviorPathNestLevel]: 1,
 } satisfies CustomerVariablesRecord
 

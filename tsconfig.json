@@ -2,15 +2,14 @@
   "extends": "@fingerprintjs/tsconfig-dx-team/tsconfig.json",
   "compilerOptions": {
     "lib": ["es2023"],
-    "outDir": "dist",
-    "module": "es6",
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "target": "es2020",
     "esModuleInterop": true,
-    "noEmitOnError": true,
+    "noEmit": true,
     "strict": true,
-    "types": ["@types/aws-lambda", "@types/jest", "@types/node"]
+    "types": ["@types/aws-lambda", "@types/node", "vitest/globals"]
   },
-  "files": ["proxy/app.ts", "mgmt-lambda/app.ts"],
-  "exclude": ["dist", "node_modules", "**/*.test.ts"]
+  "include": ["proxy/**/*.ts", "mgmt-lambda/**/*.ts", "vite.config.ts", "vitest.config.ts", "vite-env.d.ts"],
+  "exclude": ["dist", "node_modules"]
 }

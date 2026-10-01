@@ -12,7 +12,6 @@ import {
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
 import { handler } from '../app'
-import 'aws-sdk-client-mock-jest'
 import {
   AccessDenied,
   CloudFrontClient,
@@ -306,7 +305,7 @@ const createInvalidation: CreateInvalidationCommandInput = {
 
 describe('Basic test', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
     secretMock.reset()
     cloudFrontMock.reset()
@@ -437,7 +436,7 @@ describe('Basic test', () => {
 
 describe('Check environment', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
     secretMock.reset()
     cloudFrontMock.reset()
@@ -506,7 +505,7 @@ describe('Check environment', () => {
 
 describe('Update endpoint', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
     secretMock.reset()
     cloudFrontMock.reset()

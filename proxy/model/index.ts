@@ -1,5 +1,6 @@
-import { AgentOptions } from './AgentOptions'
-import { ResultOptions } from './ResultOptions'
+import type { AgentOptions } from './AgentOptions'
+import type { ResultOptions } from './ResultOptions'
 import { Region } from './Region'
 
-export { AgentOptions, ResultOptions, Region }
+export type { AgentOptions, ResultOptions }
+export { Region }

@@ -6,7 +6,6 @@ import {
   APIGatewayProxyEventHeaders,
 } from 'aws-lambda'
 import { getAuthSettings, retrieveAuthToken } from '../auth'
-import 'aws-sdk-client-mock-jest'
 
 const secretMock = mockClient(SecretsManagerClient)
 const secretManagerClient = new SecretsManagerClient({})
@@ -15,7 +14,7 @@ describe('auth test', () => {
   const OLD_ENV = process.env
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     secretMock.reset()
     process.env = { ...OLD_ENV }
   })

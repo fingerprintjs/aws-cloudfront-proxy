@@ -1,7 +1,6 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { clearSecretsCache, retrieveSecret } from '../../../../utils/customer-variables/secrets-manager/retrieve-secret'
-import 'aws-sdk-client-mock-jest'
 
 const secretName = 'test'
 const mock = mockClient(SecretsManagerClient)
@@ -9,14 +8,14 @@ const client = new SecretsManagerClient({})
 
 describe('retrieve secret', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
     clearSecretsCache()
 
     mock.reset()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   it('caches result even if it is null', async () => {
@@ -44,7 +43,7 @@ describe('retrieve secret', () => {
 
     expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
 
-    jest.advanceTimersByTime(500_001)
+    vi.advanceTimersByTime(500_001)
 
     await retrieveSecret(client, secretName)
     await retrieveSecret(client, secretName)

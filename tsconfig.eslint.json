@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "strict": true,
     "resolveJsonModule": true,
-    "types": ["@types/aws-lambda", "@types/jest", "@types/node"]
+    "types": ["@types/aws-lambda", "@types/node", "vitest/globals"]
   },
   "include": [
     "*.js",
@@ -19,6 +19,7 @@
     "*.ts",
     "proxy/**/*.ts",
     "mgmt-lambda/**/*.ts",
+    "build-utils/**/*.ts",
     "scripts/**/*.{js,mjs,ts}",
     "e2e/**/*.ts"
   ],

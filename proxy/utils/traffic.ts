@@ -1,5 +1,5 @@
 // This is replaced during build with the actual lambda version
-const LAMBDA_FUNC_VERSION = '__lambda_func_version__'
+const LAMBDA_FUNC_VERSION = __lambda_func_version__
 const PARAM_NAME = 'ii'
 
 /**

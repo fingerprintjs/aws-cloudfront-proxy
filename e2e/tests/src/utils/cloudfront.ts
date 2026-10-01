@@ -22,7 +22,7 @@ export const urlTypeCustomerVariableSourceMap: Record<keyof CloudfrontUrls, stri
 
 let cache: CloudfrontUrls | undefined
 
-function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
+function getCloudfrontUrlsFromEnv(): { [K in keyof CloudfrontUrls]: string | undefined } {
   return {
     cloudfrontWithHeadersUrl: process.env.CLOUDFRONT_WITH_HEADERS_URL,
     cloudfrontWithSecretsUrl: process.env.CLOUDFRONT_WITH_SECRETS_URL,

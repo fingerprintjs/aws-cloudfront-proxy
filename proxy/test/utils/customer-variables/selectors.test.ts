@@ -7,7 +7,6 @@ import { CustomerVariablesRecord, CustomerVariableName } from '../../../utils/cu
 import { clearSecretsCache } from '../../../utils/customer-variables/secrets-manager/retrieve-secret'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
 import { getAgentDownloadPath } from '../../../utils/customer-variables/selectors'
 
 describe('customer variables selectors', () => {

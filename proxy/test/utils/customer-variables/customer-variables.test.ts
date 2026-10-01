@@ -4,7 +4,7 @@ import { CustomerVariables } from '../../../utils/customer-variables/customer-va
 describe('customer variables', () => {
   const mockProvider = {
     name: 'Mock',
-    getVariable: jest.fn(),
+    getVariable: vi.fn(),
   } satisfies CustomerVariableProvider
 
   beforeEach(() => {

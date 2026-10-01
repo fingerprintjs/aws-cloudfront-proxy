@@ -21,7 +21,6 @@ import {
 } from '@aws-sdk/client-cloudfront'
 import { handleUpdate } from '../../handlers/updateHandler'
 import type { DeploymentSettings } from '../../model/DeploymentSettings'
-import 'aws-sdk-client-mock-jest'
 import { ErrorCode } from '../../exceptions'
 
 const lambdaMock = mockClient(LambdaClient)
@@ -201,7 +200,7 @@ const createInvalidation: CreateInvalidationCommandInput = {
 
 describe('Handle mgmt-update', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
     cloudFrontMock.reset()
   })

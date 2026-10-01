@@ -196,7 +196,7 @@ function renderHtml({ version, envInfo, styleNonce }: StatusInfo) {
 
 export async function getStatusInfo(customerVariables: CustomerVariables, styleNonce: string): Promise<StatusInfo> {
   return {
-    version: '__lambda_func_version__',
+    version: __lambda_func_version__,
     envInfo: await getEnvInfo(customerVariables),
     styleNonce,
   }
