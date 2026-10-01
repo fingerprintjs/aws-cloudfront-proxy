@@ -46,6 +46,10 @@ resource "aws_cloudfront_distribution" "with_secret" {
       name  = "FPJS_SECRET_NAME"
       value = module.fingerprint_cloudfront_integration.fpjs_secret_manager_arn
     }
+    custom_header {
+      name  = "fpjs_debug"
+      value = "true"
+    }
   }
 
   ordered_cache_behavior {
@@ -90,7 +94,7 @@ resource "aws_cloudfront_distribution" "with_headers" {
       }
     }
   }
-  
+
   depends_on = [
     aws_s3_bucket_policy.website_bucket_policy
   ]
@@ -128,6 +132,11 @@ resource "aws_cloudfront_distribution" "with_headers" {
     custom_header {
       name  = "fpjs_agent_download_path"
       value = var.fpjs_agent_download_path
+    }
+
+    custom_header {
+      name  = "fpjs_debug"
+      value = "true"
     }
   }
 
