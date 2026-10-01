@@ -32,6 +32,8 @@ This [improves](https://docs.fingerprint.com/docs/cloudfront-proxy-integration-v
 ## Requirements
 
 - AWS Account
+- The Lambda functions must be created in the `us-east-1` region, which is required for Lambda@Edge.
+- The `nodejs24.x` Lambda runtime.
 
 > [!IMPORTANT]  
 > The AWS CloudFront Proxy Integration is accessible and exclusively supported for customers on the Enterprise Plan. Other customers are encouraged to use [Custom subdomain setup](https://docs.fingerprint.com/docs/custom-subdomain-setup) or [Cloudflare Proxy Integration](https://docs.fingerprint.com/docs/cloudflare-integration).

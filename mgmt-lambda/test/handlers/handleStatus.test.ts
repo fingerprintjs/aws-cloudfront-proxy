@@ -31,7 +31,7 @@ describe('Handle mgmt-status', () => {
         Configuration: {
           FunctionName: 'fingerprint-pro-lambda-function',
           FunctionArn: 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function',
-          Runtime: 'nodejs16.x',
+          Runtime: 'nodejs24.x',
           Role: 'arn:aws:iam::1234567890:role/fingerprint-pro-lambda-role-12345',
           Handler: 'fingerprintjs-pro-cloudfront-lambda-function.handler',
           CodeSize: 216954,
