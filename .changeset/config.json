@@ -3,7 +3,7 @@
   "changelog": [
     "@fingerprintjs/changesets-changelog-format",
     {
-      "repo": "fingerprintjs/fingerprint-pro-cloudfront-integration"
+      "repo": "fingerprintjs/cloudfront-proxy"
     }
   ],
   "commit": false,
