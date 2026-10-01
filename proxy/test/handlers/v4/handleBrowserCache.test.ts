@@ -30,7 +30,7 @@ describe('Browser caching endpoint V4', () => {
   test('cache-control header is returned as is', async () => {
     const reqEvent = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
-    expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
+    expect(response.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {

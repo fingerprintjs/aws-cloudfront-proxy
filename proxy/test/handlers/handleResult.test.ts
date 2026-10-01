@@ -60,7 +60,6 @@ describe('Result Endpoint', function () {
     const queryStringWithUSRegion =
       '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
     const request = mockRequest({ uri: '/behavior/result', querystring: queryString })
-    request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
     await handler(event)
@@ -91,7 +90,6 @@ describe('Result Endpoint', function () {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
     const queryStringWithUSRegion = '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo'
     const request = mockRequest({ uri: '/behavior/result', querystring: queryString, method: 'GET' })
-    request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
     await handler(event)
@@ -426,7 +424,7 @@ describe('Browser caching endpoint', () => {
   test('cache-control header is returned as is', async () => {
     const reqEvent = mockEvent(mockRequest({ uri: '/behavior/result/some/suffix', querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
-    expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
+    expect(response.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {

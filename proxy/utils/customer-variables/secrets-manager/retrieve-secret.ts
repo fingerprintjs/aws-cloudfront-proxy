@@ -35,7 +35,7 @@ function convertSecretToString(result: GetSecretValueCommandOutput): string {
   if (result.SecretBinary) {
     return arrayBufferToString(result.SecretBinary)
   } else {
-    return result.SecretString || ''
+    return result.SecretString ?? ''
   }
 }
 

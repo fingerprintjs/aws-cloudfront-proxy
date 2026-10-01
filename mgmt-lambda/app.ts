@@ -23,20 +23,20 @@ export async function handler(
     const authSettings = await getAuthSettings(secretManagerClient)
     const authToken = retrieveAuthToken(event)
     if (!authToken || !authSettings.token) {
-      return handleNoAuthentication()
+      return await handleNoAuthentication()
     }
     if (authToken !== authSettings.token) {
-      return handleNoAuthentication()
+      return await handleNoAuthentication()
     }
   } catch (error) {
-    return handleWrongConfiguration(error)
+    return await handleWrongConfiguration(error)
   }
 
   let deploymentSettings: DeploymentSettings
   try {
     deploymentSettings = loadDeploymentSettings()
   } catch (error) {
-    return handleWrongConfiguration(error)
+    return await handleWrongConfiguration(error)
   }
 
   const method = event.requestContext.http.method
@@ -48,7 +48,7 @@ export async function handler(
   if (path === 'update' && method === 'POST') {
     try {
       return await handleUpdate(lambdaClient, cloudFrontClient, deploymentSettings)
-    } catch (e: any) {
+    } catch (e) {
       console.error(e)
       return handleError(e)
     }
@@ -61,15 +61,15 @@ export async function handler(
 
 function loadDeploymentSettings(): DeploymentSettings {
   const missedVariables = []
-  const cfDistributionId = process.env.CFDistributionId || ''
+  const cfDistributionId = process.env.CFDistributionId ?? ''
   if (cfDistributionId === '') {
     missedVariables.push('CFDistributionId')
   }
-  const lambdaFunctionName = process.env.LambdaFunctionName || ''
+  const lambdaFunctionName = process.env.LambdaFunctionName ?? ''
   if (lambdaFunctionName === '') {
     missedVariables.push('LambdaFunctionName')
   }
-  const lambdaFunctionArn = process.env.LambdaFunctionArn || ''
+  const lambdaFunctionArn = process.env.LambdaFunctionArn ?? ''
   if (lambdaFunctionArn === '') {
     missedVariables.push('LambdaFunctionArn')
   }

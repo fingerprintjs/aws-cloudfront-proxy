@@ -33,7 +33,11 @@ function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
 export function getCloudfrontUrls(): CloudfrontUrls {
   if (!cache) {
     const fromEnv = getCloudfrontUrlsFromEnv()
-    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl && fromEnv.cloudfrontWithSecretsV4Url) {
+    if (
+      fromEnv.cloudfrontWithHeadersUrl !== undefined &&
+      fromEnv.cloudfrontWithSecretsUrl !== undefined &&
+      fromEnv.cloudfrontWithSecretsV4Url !== undefined
+    ) {
       cache = {
         cloudfrontWithHeadersUrl: `https://${fromEnv.cloudfrontWithHeadersUrl}`,
         cloudfrontWithSecretsUrl: `https://${fromEnv.cloudfrontWithSecretsUrl}`,
@@ -74,20 +78,18 @@ export async function waitForCloudfront(waitMs = 1000) {
   })
 
   await Promise.all(
-    urls.map((url) => {
-      return new Promise<void>(async (resolve) => {
-        const response = await fetch(url).catch((error) => {
-          console.error(`Failed to get response from ${url}`, error)
+    urls.map(async (url) => {
+      const response = await fetch(url).catch((error: unknown) => {
+        console.error(`Failed to get response from ${url}`, error)
 
-          return null
-        })
-
-        if (response?.ok) {
-          return resolve()
-        }
-
-        await wait(waitMs)
+        return null
       })
+
+      if (response?.ok === true) {
+        return
+      }
+
+      await wait(waitMs)
     })
   )
 }

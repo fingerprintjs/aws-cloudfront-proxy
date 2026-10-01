@@ -89,7 +89,7 @@ async function getVisitorData(): Promise<VisitorData> {
     }
 
     default:
-      throw new Error(`Unknown agent version: ${agentVersion}`)
+      throw new Error('Unknown agent version')
   }
 }
 
@@ -158,14 +158,14 @@ async function getAndPrintData() {
   }
 }
 
-async function startPlayground() {
+function startPlayground() {
   const getDataButton = document.querySelector('#getData')
   if (getDataButton instanceof HTMLButtonElement) {
     getDataButton.disabled = false
-    getDataButton.addEventListener('click', async (event) => {
+    getDataButton.addEventListener('click', (event) => {
       event.preventDefault()
 
-      await getAndPrintData()
+      void getAndPrintData()
     })
   }
 }
@@ -201,7 +201,7 @@ function addOutputSection({
   }
   container.appendChild(contentElement)
 
-  if (comment) {
+  if (comment !== undefined && comment !== '') {
     const commentElement = document.createElement('div')
     commentElement.appendChild(textToDOM(comment))
     commentElement.classList.add('comment')

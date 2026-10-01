@@ -38,6 +38,8 @@ export const customerVariableParsers = {
 }
 
 export function parseCustomerVariable<T extends CustomerVariableName>(variable: T, value: string) {
+  // TS can't narrow the return type of a dynamically-indexed lookup across a union-keyed record.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   return customerVariableParsers[variable](value) as CustomerVariableType<T>
 }
 

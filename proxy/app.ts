@@ -23,7 +23,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   const routes: Route[] = []
 
   const agentUri = await getAgentUri(customerVariables)
-  if (agentUri) {
+  if (agentUri !== null) {
     routes.push({
       pathPattern: createRoute(agentUri),
       handler: createIngressHandler('agentV3'),
@@ -31,7 +31,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   }
 
   const resultUri = await getResultUri(customerVariables)
-  if (resultUri) {
+  if (resultUri !== null) {
     routes.push({
       pathPattern: createRoute(resultUri),
       handler: createIngressHandler('ingressV3'),
@@ -91,9 +91,9 @@ export function handleRequestWithRoutes(
 }
 
 function handleNoMatch(): Promise<CloudFrontResultResponse> {
-  return new Promise((resolve) =>
+  return new Promise((resolve) => {
     resolve({
       status: '404',
     })
-  )
+  })
 }

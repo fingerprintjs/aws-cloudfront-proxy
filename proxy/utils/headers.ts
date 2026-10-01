@@ -74,7 +74,7 @@ export async function prepareHeadersForIngressRequest(
 
   headers['fpjs-proxy-client-ip'] = request.clientIp
   const preSharedSecret = await getPreSharedSecret(variables)
-  if (preSharedSecret) {
+  if (preSharedSecret !== null && preSharedSecret !== '') {
     headers['fpjs-proxy-secret'] = preSharedSecret
   }
   headers['fpjs-proxy-forwarded-host'] = getHost(request)
@@ -135,14 +135,14 @@ export function updateResponseHeaders(
       continue
     }
 
-    if (overrideCacheControl && key == CACHE_CONTROL_HEADER_NAME && typeof value === 'string') {
+    if (overrideCacheControl && key === CACHE_CONTROL_HEADER_NAME && typeof value === 'string') {
       resultHeaders[CACHE_CONTROL_HEADER_NAME] = [
         {
           key: CACHE_CONTROL_HEADER_NAME,
           value: updateCacheControlHeader(value),
         },
       ]
-    } else if (value) {
+    } else if (value !== undefined) {
       resultHeaders[key] = [
         {
           key: key,
@@ -236,7 +236,7 @@ export function getHeaderValue(request: CloudFrontRequest, name: string): string
 export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefined {
   const value = getHeaderValue(request, 'fpjs_proxy_secret_cache_ttl_ms')
 
-  if (value) {
+  if (value !== null) {
     const parsedValue = parseInt(value, 10)
     if (TTLCache.isValidTTL(parsedValue)) {
       return parsedValue

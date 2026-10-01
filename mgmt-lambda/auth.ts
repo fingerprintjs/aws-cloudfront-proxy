@@ -7,7 +7,7 @@ const EMPTY_TOKEN = ''
 
 export async function getAuthSettings(secretManagerClient: SecretsManagerClient): Promise<AuthSettings> {
   const secretName = process.env.SettingsSecretName
-  if (!secretName) {
+  if (secretName === undefined || secretName === '') {
     throw new Error('Unable to retrieve secret. Error: environment variable SettingsSecretName not found')
   }
 
@@ -19,14 +19,17 @@ export async function getAuthSettings(secretManagerClient: SecretsManagerClient)
     const response: GetSecretValueResponse = await secretManagerClient.send(command)
 
     if (response.SecretBinary) {
-      return JSON.parse(Buffer.from(response.SecretBinary).toString('utf8'))
+      // Secrets Manager payload isn't schema-validated at runtime; trust its shape here.
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return JSON.parse(Buffer.from(response.SecretBinary).toString('utf8')) as AuthSettings
     }
-    if (response.SecretString) {
-      return JSON.parse(response.SecretString)
+    if (response.SecretString !== undefined && response.SecretString !== '') {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      return JSON.parse(response.SecretString) as AuthSettings
     }
     throw new Error('secret is empty')
-  } catch (error: any) {
-    throw new Error(`Unable to retrieve secret. ${error}`)
+  } catch (error) {
+    throw new Error(`Unable to retrieve secret. ${String(error)}`)
   }
 }
 
@@ -34,13 +37,16 @@ export function retrieveAuthToken(
   event: APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>
 ): string {
   const authorization = event.headers['authorization']
-  if (!authorization) {
+  if (authorization === undefined || authorization === '') {
     return EMPTY_TOKEN
   }
 
   const [type, token] = authorization.split(' ')
-  if (type == MGMT_TOKEN_SCHEME) {
-    return token || EMPTY_TOKEN
+  if (type === MGMT_TOKEN_SCHEME) {
+    // Without a space in the header, destructuring leaves token undefined at runtime even though
+    // TS's array indexing (without noUncheckedIndexedAccess) assumes it's always string.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    return token ?? EMPTY_TOKEN
   }
   return EMPTY_TOKEN
 }

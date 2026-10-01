@@ -1,0 +1,26 @@
+{
+  "extends": "@fingerprintjs/tsconfig-dx-team/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2020",
+    "esModuleInterop": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "types": ["@types/aws-lambda", "@types/jest", "@types/node"]
+  },
+  "include": [
+    "*.js",
+    "*.mjs",
+    "*.cjs",
+    "*.ts",
+    "proxy/**/*.ts",
+    "mgmt-lambda/**/*.ts",
+    "scripts/**/*.{js,mjs,ts}",
+    "e2e/**/*.ts"
+  ],
+  "exclude": ["dist", "node_modules", "**/node_modules"]
+}

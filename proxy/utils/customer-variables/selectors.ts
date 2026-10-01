@@ -6,13 +6,13 @@ const extractVariable = <T extends CustomerVariableName>(result: GetVariableResu
 export const getAgentUri = async (variables: CustomerVariables) => {
   const agentDownloadPath = await getAgentDownloadPath(variables)
 
-  return agentDownloadPath ? `/${agentDownloadPath}` : null
+  return agentDownloadPath !== null && agentDownloadPath !== '' ? `/${agentDownloadPath}` : null
 }
 
 export const getResultUri = async (variables: CustomerVariables) => {
   const resultPath = await getResultPath(variables)
 
-  return resultPath ? `/${resultPath}(/.*)?` : null
+  return resultPath !== null && resultPath !== '' ? `/${resultPath}(/.*)?` : null
 }
 
 export const getStatusUri = () => `/status`

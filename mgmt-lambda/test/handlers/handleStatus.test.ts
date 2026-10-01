@@ -159,21 +159,22 @@ describe('Handle mgmt-status', () => {
       FunctionName: options.LambdaFunctionName,
     })
     expect(lambdaMock).toHaveReceivedCommandTimes(GetFunctionCommand, 1)
-  }),
-    it('error while communicating with AWS', async () => {
-      lambdaMock
-        .on(GetFunctionCommand, {
-          FunctionName: options.LambdaFunctionName,
-        })
-        .rejects()
+  })
 
-      cloudFrontMock
-        .on(GetDistributionCommand, {
-          Id: options.CFDistributionId,
-        })
-        .rejects()
+  it('error while communicating with AWS', async () => {
+    lambdaMock
+      .on(GetFunctionCommand, {
+        FunctionName: options.LambdaFunctionName,
+      })
+      .rejects()
 
-      const status = await handleStatus(lambdaClient, cloudFrontClient, options)
-      expect(status.statusCode).toBe(200)
-    })
+    cloudFrontMock
+      .on(GetDistributionCommand, {
+        Id: options.CFDistributionId,
+      })
+      .rejects()
+
+    const status = await handleStatus(lambdaClient, cloudFrontClient, options)
+    expect(status.statusCode).toBe(200)
+  })
 })

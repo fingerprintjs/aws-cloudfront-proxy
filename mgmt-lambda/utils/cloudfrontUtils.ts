@@ -3,14 +3,14 @@ import { defaults } from '../DefaultSettings'
 import { LambdaFunctionAssociation } from '@aws-sdk/client-cloudfront'
 
 export function getFPCDNOrigins(distributionConfig: DistributionConfig | undefined): Origin[] {
-  return distributionConfig?.Origins?.Items?.filter((it) => it.DomainName === defaults.FP_CDN_URL) || []
+  return distributionConfig?.Origins?.Items?.filter((it) => it.DomainName === defaults.FP_CDN_URL) ?? []
 }
 
 export function doesCacheBehaviorUseOrigins(
   cacheBehavior: DefaultCacheBehavior | CacheBehavior | undefined,
   origins: Origin[]
 ): boolean {
-  return origins?.some((origin) => origin.Id === cacheBehavior?.TargetOriginId) || false
+  return origins.some((origin) => origin.Id === cacheBehavior?.TargetOriginId)
 }
 
 export function getCacheBehaviorLambdaFunctionAssociations(
@@ -19,7 +19,7 @@ export function getCacheBehaviorLambdaFunctionAssociations(
 ): LambdaFunctionAssociation[] {
   return (
     cacheBehavior?.LambdaFunctionAssociations?.Items?.filter(
-      (it) => it && it.EventType === EventType.origin_request && it.LambdaFunctionARN?.includes(`${functionName}:`)
-    ) || []
+      (it) => it.EventType === EventType.origin_request && it.LambdaFunctionARN?.includes(`${functionName}:`) === true
+    ) ?? []
   )
 }

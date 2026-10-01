@@ -7,7 +7,7 @@ export class HeaderCustomerVariables implements CustomerVariableProvider {
 
   constructor(private readonly request: CloudFrontRequest) {}
 
-  async getVariable(variable: CustomerVariableName): Promise<string | null> {
-    return getHeaderValue(this.request, variable)
+  getVariable(variable: CustomerVariableName): Promise<string | null> {
+    return Promise.resolve(getHeaderValue(this.request, variable))
   }
 }

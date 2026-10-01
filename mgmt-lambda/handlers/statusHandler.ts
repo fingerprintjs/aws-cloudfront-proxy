@@ -80,7 +80,7 @@ async function getCloudFrontDistributionInformation(
       cacheBehaviorsWithFingerprintFunction += lambdaAssocList.length
     }
 
-    for (const cacheBehavior of result.Distribution?.DistributionConfig?.CacheBehaviors?.Items || []) {
+    for (const cacheBehavior of result.Distribution?.DistributionConfig?.CacheBehaviors?.Items ?? []) {
       if (!doesCacheBehaviorUseOrigins(cacheBehavior, fpCDNOrigins)) {
         continue
       }

@@ -55,10 +55,12 @@ async function handleIngress(
 ): Promise<CloudFrontResultResponse> {
   // In V4, we need to leverage the new behavior path nest level variable to figure out the path for the ingress request
   const useBehaviorPathNestLevel = requestType === 'v4'
-  const behaviorPathNestLevel = useBehaviorPathNestLevel ? await getBehaviorPathNestLevel(customerVariables) : 0
+  const behaviorPathNestLevel = useBehaviorPathNestLevel
+    ? ((await getBehaviorPathNestLevel(customerVariables)) ?? 0)
+    : 0
 
   const ingressBaseHost = await getFpIngressBaseHost(customerVariables)
-  if (!ingressBaseHost) {
+  if (ingressBaseHost === null || ingressBaseHost === '') {
     return {
       status: '500',
     }
@@ -80,9 +82,12 @@ async function handleIngress(
       suffix = incomingRequest.uri
       break
 
-    default:
-      // For the rest, so the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
+    // For the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
+    case 'ingressV3':
       if (pathMatches && pathMatches.length >= 1) {
+        // Without an optional capture group match, pathMatches[1] is undefined at runtime even
+        // though TS's array indexing (without noUncheckedIndexedAccess) assumes it's always string.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         suffix = pathMatches[1] ?? ''
       }
   }

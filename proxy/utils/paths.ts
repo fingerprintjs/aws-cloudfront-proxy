@@ -20,7 +20,7 @@ export function getV3AgentPath(params: URLSearchParams): string {
   const loaderVersion = params.get('loaderVersion')
   const version = params.get('version') ?? '3'
 
-  const lv: string = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
+  const lv: string = loaderVersion !== null && loaderVersion !== '' ? `/loader_v${loaderVersion}.js` : ''
   return `/v${version}/${apiKey}${lv}`
 }
 

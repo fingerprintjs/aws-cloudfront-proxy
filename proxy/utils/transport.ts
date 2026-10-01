@@ -33,7 +33,7 @@ function sendHttpRequest(
         response.setEncoding('binary')
       }
 
-      response.on('data', (data) => {
+      response.on('data', (data: Buffer | string) => {
         const encoding = isBinary ? 'binary' : undefined
         const chunk = Buffer.isBuffer(data) ? data : Buffer.from(data, encoding)
 
@@ -54,7 +54,7 @@ function sendHttpRequest(
 
     request.on('error', reject)
 
-    if (data) {
+    if (data !== undefined && data !== '') {
       request.write(Buffer.from(data, 'base64'))
     }
     request.end()
@@ -109,7 +109,7 @@ export async function sendIngressRequest(
       statusDescription: 'Bad request',
       headers: {},
       bodyEncoding: 'text',
-      body: generateErrorResponse(error as Error),
+      body: generateErrorResponse(error instanceof Error ? error : new Error(String(error))),
     }
   }
 }

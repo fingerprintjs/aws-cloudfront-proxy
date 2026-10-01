@@ -5,7 +5,7 @@ export const getApiKey = (request: CloudFrontRequest): string | undefined => get
 
 export const getVersion = (request: CloudFrontRequest): string => {
   const version = getQueryParameter(request, 'version')
-  return version === undefined ? '3' : version
+  return version ?? '3'
 }
 
 export const getLoaderVersion = (request: CloudFrontRequest): string | undefined =>
@@ -17,22 +17,26 @@ export const getRegion = (request: CloudFrontRequest): Region => {
 }
 
 export const getValidRegion = (value?: string | null): Region => {
-  if (!value || !(value in Region)) {
+  if (value === undefined || value === null || value === '' || !isRegion(value)) {
     return Region.us
   }
 
-  return value as Region
+  return value
+}
+
+function isRegion(value: string): value is Region {
+  return Object.values<string>(Region).includes(value)
 }
 
 function getQueryParameter(request: CloudFrontRequest, key: string): string | undefined {
   const params = request.querystring.split('&')
 
-  console.debug(`Attempting to extract ${key} from ${params}. Query string: ${request.querystring}`)
+  console.debug(`Attempting to extract ${key} from ${params.join(', ')}. Query string: ${request.querystring}`)
 
   for (let i = 0; i < params.length; i++) {
     const kv = params[i].split('=')
     if (kv[0] === key) {
-      console.debug(`Found ${key} in ${params}: ${kv[1]}`)
+      console.debug(`Found ${key} in ${params.join(', ')}: ${kv[1]}`)
 
       return kv[1]
     }

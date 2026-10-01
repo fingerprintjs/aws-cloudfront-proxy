@@ -9,8 +9,12 @@ const defaultCustomerVariables = {
   [CustomerVariableName.BehaviorPathNestLevel]: 1,
 } satisfies CustomerVariablesRecord
 
-export function getDefaultCustomerVariable<T extends CustomerVariableName>(variable: T): CustomerVariableType<T> {
-  return defaultCustomerVariables[variable] as CustomerVariableType<T>
+export function getDefaultCustomerVariable<T extends CustomerVariableName>(
+  variable: T
+): CustomerVariableType<T> | null {
+  // TS can't narrow the return type of a dynamically-indexed lookup across a union-keyed record.
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return defaultCustomerVariables[variable] as CustomerVariableType<T> | null
 }
 
 export const DEFAULT_REGION = 'us-east-1'
