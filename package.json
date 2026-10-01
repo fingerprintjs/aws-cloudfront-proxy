@@ -5,6 +5,7 @@
   "author": "FingerprintJS, Inc (https://fingerprint.com)",
   "license": "MIT",
   "private": true,
+  "main": "dist/fingerprintjs-pro-cloudflare-lambda-function.js",
   "scripts": {
     "prepare": "husky",
     "build": "rimraf dist && NODE_OPTIONS=\"--max_old_space_size=4098\" rollup -c rollup.config.js --bundleConfigAsCjs && cp cloudformation/template.yml dist/template.yml",
