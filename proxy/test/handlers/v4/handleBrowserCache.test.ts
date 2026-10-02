@@ -1,5 +1,6 @@
-import { handler } from '../../../app'
-import { mockEvent, mockRequest } from '../../aws'
+import type { MockInstance } from 'vitest'
+import { handler } from '../../../app.ts'
+import { mockEvent, mockRequest } from '../../aws.ts'
 import { ClientRequest, IncomingMessage } from 'http'
 import https, { Agent } from 'https'
 import { Socket } from 'net'
@@ -7,11 +8,11 @@ import { Socket } from 'net'
 describe('Browser caching endpoint V4', () => {
   const requestUri = '/behavior/some/suffix'
 
-  let requestSpy: jest.MockInstance<ClientRequest, any>
+  let requestSpy: MockInstance<(...args: any[]) => any>
   const cacheControlValue = 'max-age=31536000, immutable, private'
 
   beforeEach(() => {
-    requestSpy = jest.spyOn(https, 'request')
+    requestSpy = vi.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
       options.agent = new Agent()
@@ -24,13 +25,13 @@ describe('Browser caching endpoint V4', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('cache-control header is returned as is', async () => {
     const reqEvent = mockEvent(mockRequest({ uri: requestUri, querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
-    expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
+    expect(response.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {

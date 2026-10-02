@@ -1,5 +1,6 @@
-import { AgentOptions } from './AgentOptions'
-import { ResultOptions } from './ResultOptions'
-import { Region } from './Region'
+import type { AgentOptions } from './AgentOptions.ts'
+import type { ResultOptions } from './ResultOptions.ts'
+import { Region } from './Region.ts'
 
-export { AgentOptions, ResultOptions, Region }
+export type { AgentOptions, ResultOptions }
+export { Region }

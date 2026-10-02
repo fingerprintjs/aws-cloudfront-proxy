@@ -1,18 +1,23 @@
-import {
+import type {
   APIGatewayEventRequestContextV2,
   APIGatewayProxyEventV2WithRequestContext,
   APIGatewayProxyResult,
 } from 'aws-lambda'
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
-import { getAuthSettings, retrieveAuthToken } from './auth'
-import type { DeploymentSettings } from './model/DeploymentSettings'
-import { handleError, handleNoAuthentication, handleNotFound, handleWrongConfiguration } from './handlers/errorHandlers'
-import { defaults } from './DefaultSettings'
-import { handleStatus } from './handlers/statusHandler'
-import { handleUpdate } from './handlers/updateHandler'
+import { getAuthSettings, retrieveAuthToken } from './auth.ts'
+import type { DeploymentSettings } from './model/DeploymentSettings.ts'
+import {
+  handleError,
+  handleNoAuthentication,
+  handleNotFound,
+  handleWrongConfiguration,
+} from './handlers/errorHandlers.ts'
+import { defaults } from './DefaultSettings.ts'
+import { handleStatus } from './handlers/statusHandler.ts'
+import { handleUpdate } from './handlers/updateHandler.ts'
 import { LambdaClient } from '@aws-sdk/client-lambda'
 import { CloudFrontClient } from '@aws-sdk/client-cloudfront'
-import { removeLeadingAndTrailingSlashes } from './routing'
+import { removeLeadingAndTrailingSlashes } from './routing.ts'
 
 export async function handler(
   event: APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>
@@ -23,20 +28,20 @@ export async function handler(
     const authSettings = await getAuthSettings(secretManagerClient)
     const authToken = retrieveAuthToken(event)
     if (!authToken || !authSettings.token) {
-      return handleNoAuthentication()
+      return await handleNoAuthentication()
     }
     if (authToken !== authSettings.token) {
-      return handleNoAuthentication()
+      return await handleNoAuthentication()
     }
   } catch (error) {
-    return handleWrongConfiguration(error)
+    return await handleWrongConfiguration(error)
   }
 
   let deploymentSettings: DeploymentSettings
   try {
     deploymentSettings = loadDeploymentSettings()
   } catch (error) {
-    return handleWrongConfiguration(error)
+    return await handleWrongConfiguration(error)
   }
 
   const method = event.requestContext.http.method
@@ -48,7 +53,7 @@ export async function handler(
   if (path === 'update' && method === 'POST') {
     try {
       return await handleUpdate(lambdaClient, cloudFrontClient, deploymentSettings)
-    } catch (e: any) {
+    } catch (e) {
       console.error(e)
       return handleError(e)
     }
@@ -61,15 +66,15 @@ export async function handler(
 
 function loadDeploymentSettings(): DeploymentSettings {
   const missedVariables = []
-  const cfDistributionId = process.env.CFDistributionId || ''
+  const cfDistributionId = process.env.CFDistributionId ?? ''
   if (cfDistributionId === '') {
     missedVariables.push('CFDistributionId')
   }
-  const lambdaFunctionName = process.env.LambdaFunctionName || ''
+  const lambdaFunctionName = process.env.LambdaFunctionName ?? ''
   if (lambdaFunctionName === '') {
     missedVariables.push('LambdaFunctionName')
   }
-  const lambdaFunctionArn = process.env.LambdaFunctionArn || ''
+  const lambdaFunctionArn = process.env.LambdaFunctionArn ?? ''
   if (lambdaFunctionArn === '') {
     missedVariables.push('LambdaFunctionArn')
   }

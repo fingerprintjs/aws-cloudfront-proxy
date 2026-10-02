@@ -65,7 +65,7 @@ When the PR is merged, the pre-release is created and E2E tests run against it. 
 pnpm exec changeset pre exit
 ```
 
-The integration is automatically released on tag creation. The workflow must be approved by one of the maintainers, first.
+The integration is automatically released when a GitHub release is published. The workflow must be approved by one of the maintainers, first.
 
 ### How to keep your integration up-to-date
 

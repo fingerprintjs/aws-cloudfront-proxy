@@ -1,11 +1,13 @@
 import { execSync } from 'child_process'
-import { CloudfrontUrls, getCloudfrontUrls } from '../tests/src/utils/cloudfront'
-import { version } from '../../package.json'
+import { type CloudfrontUrls, getCloudfrontUrls } from '../tests/src/utils/cloudfront.ts'
+import packageJson from '../../package.json' with { type: 'json' }
+
+const version = packageJson.version
 
 function getEnv(name: string) {
   const value = process.env[name]
 
-  if (!value) {
+  if (value === undefined || value === '') {
     throw new Error(`${name} is not set`)
   }
 
@@ -15,7 +17,7 @@ function getEnv(name: string) {
 const v3Urls: Array<keyof CloudfrontUrls> = ['cloudfrontWithHeadersUrl', 'cloudfrontWithSecretsUrl']
 const v4Urls: Array<keyof CloudfrontUrls> = ['cloudfrontWithSecretsV4Url']
 
-async function main() {
+function main(): void {
   let hasError = false
 
   const cloudfrontUrls = getCloudfrontUrls()
@@ -85,7 +87,9 @@ async function main() {
   }
 }
 
-main().catch((error) => {
+try {
+  main()
+} catch (error) {
   console.error(error)
   process.exit(1)
-})
+}
