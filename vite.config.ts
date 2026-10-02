@@ -10,7 +10,7 @@ const outputDirectory = 'dist'
 // Lambda@Edge needs two independent, fully self-contained bundles (no shared chunk between
 // them, no node_modules at runtime). Building them as a Rolldown multi-entry graph would let the
 // two share a common vendor chunk; running `vite build` twice - once per BUILD_TARGET - keeps
-// each build isolated, same as the two independent Rollup configs this replaces.
+// each build isolated.
 const entries = {
   proxy: { input: 'proxy/app.ts', name: 'fingerprintjs-pro-cloudfront-lambda-function' },
   mgmt: { input: 'mgmt-lambda/app.ts', name: 'fingerprintjs-pro-cloudfront-mgmt-lambda-function' },
