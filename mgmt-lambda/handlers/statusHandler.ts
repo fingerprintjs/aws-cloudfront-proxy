@@ -1,17 +1,19 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
-import type { DeploymentSettings } from '../model/DeploymentSettings'
-import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda'
-import { CloudFrontClient, GetDistributionCommand } from '@aws-sdk/client-cloudfront'
+import type { APIGatewayProxyResult } from 'aws-lambda'
+import type { DeploymentSettings } from '../model/DeploymentSettings.ts'
+import type { LambdaClient } from '@aws-sdk/client-lambda'
+import { GetFunctionCommand } from '@aws-sdk/client-lambda'
+import type { CloudFrontClient } from '@aws-sdk/client-cloudfront'
+import { GetDistributionCommand } from '@aws-sdk/client-cloudfront'
 import type {
   IntegrationStatus,
   LambdaFunctionInformation,
   CloudFrontDistributionInformation,
-} from '../model/IntegrationStatus'
+} from '../model/IntegrationStatus.ts'
 import {
   doesCacheBehaviorUseOrigins,
   getCacheBehaviorLambdaFunctionAssociations,
   getFPCDNOrigins,
-} from '../utils/cloudfrontUtils'
+} from '../utils/cloudfrontUtils.ts'
 
 export async function handleStatus(
   lambdaClient: LambdaClient,

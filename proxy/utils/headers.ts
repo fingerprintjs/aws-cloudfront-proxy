@@ -1,10 +1,10 @@
-import { CloudFrontHeaders, CloudFrontRequest } from 'aws-lambda'
-import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
-import { filterCookie } from './cookie'
-import { updateCacheControlHeader } from './cache-control'
-import { CustomerVariables } from './customer-variables/customer-variables'
-import { getPreSharedSecret } from './customer-variables/selectors'
-import { TTLCache } from './cache'
+import type { CloudFrontHeaders, CloudFrontRequest } from 'aws-lambda'
+import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
+import { filterCookie } from './cookie.ts'
+import { updateCacheControlHeader } from './cache-control.ts'
+import type { CustomerVariables } from './customer-variables/customer-variables.ts'
+import { getPreSharedSecret } from './customer-variables/selectors.ts'
+import { TTLCache } from './cache.ts'
 
 export const BLACKLISTED_HEADERS = new Set([
   'age',

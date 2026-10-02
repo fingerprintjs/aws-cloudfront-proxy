@@ -1,4 +1,4 @@
-import { Region } from '../model'
+import { Region } from '../model/index.ts'
 
 // In V4, the ingress path is the root path
 export const V4_INGRESS_PATH = '/.*'

@@ -1,4 +1,4 @@
-import { TTLCache } from '../../utils/cache'
+import { TTLCache } from '../../utils/cache.ts'
 
 describe('TTLCache', () => {
   beforeEach(() => {

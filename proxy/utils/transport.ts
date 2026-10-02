@@ -1,9 +1,10 @@
-import https, { RequestOptions } from 'https'
-import { updateResponseHeaders } from './index'
-import { generateErrorResponse } from './generateErrorResponse'
-import { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
-import { IncomingMessage, OutgoingHttpHeaders } from 'http'
-import { CloudFrontResultResponse } from 'aws-lambda'
+import type { RequestOptions } from 'https'
+import https from 'https'
+import { updateResponseHeaders } from './index.ts'
+import { generateErrorResponse } from './generateErrorResponse.ts'
+import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
+import type { IncomingMessage, OutgoingHttpHeaders } from 'http'
+import type { CloudFrontResultResponse } from 'aws-lambda'
 
 type SendHttpRequestResult = {
   response: IncomingMessage

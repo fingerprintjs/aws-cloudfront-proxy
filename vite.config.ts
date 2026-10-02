@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import dotenv from 'dotenv'
 import packageJson from './package.json' with { type: 'json' }
-import { getLicenseBanner } from './build-utils/license'
+import { getLicenseBanner } from './build-utils/license.ts'
 
 dotenv.config()
 

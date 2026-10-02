@@ -1,4 +1,4 @@
-import { isNonNegativeInteger } from '../validation'
+import { isNonNegativeInteger } from '../validation.ts'
 
 export enum CustomerVariableName {
   GetResultPath = 'fpjs_get_result_path',

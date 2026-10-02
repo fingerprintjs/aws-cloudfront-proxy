@@ -1,5 +1,6 @@
-import { CustomerVariableName, CustomerVariableProvider } from '../../../utils/customer-variables/types'
-import { CustomerVariables } from '../../../utils/customer-variables/customer-variables'
+import type { CustomerVariableProvider } from '../../../utils/customer-variables/types.ts'
+import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
+import { CustomerVariables } from '../../../utils/customer-variables/customer-variables.ts'
 
 export function getInMemoryCustomerVariables() {
   const variables = {

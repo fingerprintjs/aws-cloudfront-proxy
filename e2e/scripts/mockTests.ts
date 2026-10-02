@@ -1,6 +1,8 @@
 import { execSync } from 'child_process'
-import { CloudfrontUrls, getCloudfrontUrls } from '../tests/src/utils/cloudfront'
-import { version } from '../../package.json'
+import { type CloudfrontUrls, getCloudfrontUrls } from '../tests/src/utils/cloudfront.ts'
+import packageJson from '../../package.json' with { type: 'json' }
+
+const version = packageJson.version
 
 function getEnv(name: string) {
   const value = process.env[name]

@@ -1,8 +1,8 @@
 import { expect } from '@playwright/test'
-import { waitForCloudfront } from '../../utils/cloudfront'
-import { cloudfrontTest as test } from '../../cloudfrontTest'
-import { trackRequests } from '../../utils/playwright'
-import { checkResponse } from '../../utils/checkResponse'
+import { waitForCloudfront } from '../../utils/cloudfront.ts'
+import { cloudfrontTest as test } from '../../cloudfrontTest.ts'
+import { trackRequests } from '../../utils/playwright.ts'
+import { checkResponse } from '../../utils/checkResponse.ts'
 
 test.describe('[v4] visitorId', () => {
   test.beforeEach(async () => {

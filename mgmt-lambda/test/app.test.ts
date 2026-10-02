@@ -1,30 +1,31 @@
 import { mockClient } from 'aws-sdk-client-mock'
+import type { GetFunctionResponse, ListVersionsByFunctionResponse } from '@aws-sdk/client-lambda'
 import {
   GetFunctionCommand,
-  GetFunctionResponse,
   LambdaClient,
   ListVersionsByFunctionCommand,
-  ListVersionsByFunctionResponse,
   ResourceNotFoundException,
   State,
   UpdateFunctionCodeCommand,
 } from '@aws-sdk/client-lambda'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
-import { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
-import { handler } from '../app'
+import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
+import { handler } from '../app.ts'
+import type {
+  CreateInvalidationCommandInput,
+  GetDistributionConfigResult,
+  GetDistributionResult,
+  UpdateDistributionCommandInput,
+} from '@aws-sdk/client-cloudfront'
 import {
   AccessDenied,
   CloudFrontClient,
   CreateInvalidationCommand,
-  CreateInvalidationCommandInput,
   GetDistributionCommand,
   GetDistributionConfigCommand,
-  GetDistributionConfigResult,
-  GetDistributionResult,
   UpdateDistributionCommand,
-  UpdateDistributionCommandInput,
 } from '@aws-sdk/client-cloudfront'
-import { ErrorCode } from '../exceptions'
+import { ErrorCode } from '../exceptions.ts'
 
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)

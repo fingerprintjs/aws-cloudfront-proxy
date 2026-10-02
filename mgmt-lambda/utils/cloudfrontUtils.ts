@@ -1,6 +1,7 @@
-import { CacheBehavior, DefaultCacheBehavior, DistributionConfig, EventType, Origin } from '@aws-sdk/client-cloudfront'
-import { defaults } from '../DefaultSettings'
-import { LambdaFunctionAssociation } from '@aws-sdk/client-cloudfront'
+import type { CacheBehavior, DefaultCacheBehavior, DistributionConfig, Origin } from '@aws-sdk/client-cloudfront'
+import { EventType } from '@aws-sdk/client-cloudfront'
+import { defaults } from '../DefaultSettings.ts'
+import type { LambdaFunctionAssociation } from '@aws-sdk/client-cloudfront'
 
 export function getFPCDNOrigins(distributionConfig: DistributionConfig | undefined): Origin[] {
   return distributionConfig?.Origins?.Items?.filter((it) => it.DomainName === defaults.FP_CDN_URL) ?? []

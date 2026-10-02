@@ -1,7 +1,7 @@
-import { Mock, MockInstance } from 'vitest'
+import type { Mock, MockInstance } from 'vitest'
 import https from 'https'
-import { mockEvent, mockRequest } from '../aws'
-import { handler } from '../../app'
+import { mockEvent, mockRequest } from '../aws.ts'
+import { handler } from '../../app.ts'
 import { EventEmitter } from 'events'
 
 describe('Download agent endpoint', () => {

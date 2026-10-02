@@ -1,5 +1,5 @@
-import { CustomerVariables } from './customer-variables'
-import { CustomerVariableName } from './types'
+import type { CustomerVariables } from './customer-variables.ts'
+import { CustomerVariableName } from './types.ts'
 
 export const OBFUSCATED_VALUE = '********'
 

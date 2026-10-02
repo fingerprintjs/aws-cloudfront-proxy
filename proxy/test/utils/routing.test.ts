@@ -5,7 +5,7 @@ import {
   createRoute,
   addPathnameMatchBeforeRoute,
   addEndingTrailingSlashToRoute,
-} from '../../utils'
+} from '../../utils/index.ts'
 
 describe('removeTrailingSlashesAndMultiSlashes', () => {
   it('returns /path for /path', () => {

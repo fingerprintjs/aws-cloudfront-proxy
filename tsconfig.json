@@ -4,6 +4,7 @@
     "lib": ["es2023"],
     "module": "esnext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
     "target": "es2020",
     "esModuleInterop": true,
     "noEmit": true,

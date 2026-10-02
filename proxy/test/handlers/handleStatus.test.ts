@@ -1,6 +1,6 @@
-import { getInMemoryCustomerVariables } from '../utils/customer-variables/in-memory-customer-variables'
-import { CustomerVariableName } from '../../utils/customer-variables/types'
-import { getStatusInfo, handleStatus } from '../../handlers/handleStatus'
+import { getInMemoryCustomerVariables } from '../utils/customer-variables/in-memory-customer-variables.ts'
+import { CustomerVariableName } from '../../utils/customer-variables/types.ts'
+import { getStatusInfo, handleStatus } from '../../handlers/handleStatus.ts'
 
 const styleNonce = 'hardcodedStyleNonce'
 

@@ -3,8 +3,7 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   define: {
     // The real substitution only happens in the Vite build (see vite.config.ts). Under test,
-    // keep each global as its own placeholder text, unsubstituted - matching the old Jest setup
-    // (no replace step ran during `jest`), which several snapshots/assertions pin on.
+    // keep each global as its own placeholder text, unsubstituted
     __FPCDN__: JSON.stringify('__FPCDN__'),
     __INGRESS_API__: JSON.stringify('__INGRESS_API__'),
     __lambda_func_version__: JSON.stringify('__lambda_func_version__'),

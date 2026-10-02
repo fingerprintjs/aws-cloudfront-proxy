@@ -1,6 +1,6 @@
-import { wait } from './wait'
-import { readTerraformOutput } from './terraform'
-import { PlaywrightTestConfig } from '@playwright/test'
+import { wait } from './wait.ts'
+import { readTerraformOutput } from './terraform.ts'
+import type { PlaywrightTestConfig } from '@playwright/test'
 
 export type CloudfrontUrls = {
   cloudfrontWithHeadersUrl: string

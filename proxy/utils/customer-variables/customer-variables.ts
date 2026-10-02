@@ -1,5 +1,6 @@
-import { CustomerVariableName, CustomerVariableProvider, CustomerVariableType, parseCustomerVariable } from './types'
-import { getDefaultCustomerVariable } from './defaults'
+import type { CustomerVariableName, CustomerVariableProvider, CustomerVariableType } from './types.ts'
+import { parseCustomerVariable } from './types.ts'
+import { getDefaultCustomerVariable } from './defaults.ts'
 
 export interface GetVariableResult<T extends CustomerVariableName> {
   // The customer variable's own type can never be null, but unset variables fall back to

@@ -1,7 +1,7 @@
-import { CloudFrontResultResponse } from 'aws-lambda'
-import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types'
-import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable'
+import type { CloudFrontResultResponse } from 'aws-lambda'
+import type { CustomerVariables } from '../utils/customer-variables/customer-variables.ts'
+import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types.ts'
+import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable.ts'
 
 export interface EnvVarInfo {
   envVarName: string

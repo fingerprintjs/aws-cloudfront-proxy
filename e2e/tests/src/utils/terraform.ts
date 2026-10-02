@@ -1,5 +1,8 @@
 import * as path from 'path'
 import * as fs from 'fs'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 export type TerraformOutputValue = {
   sensitive: boolean

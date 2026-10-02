@@ -1,12 +1,12 @@
-import { MockInstance } from 'vitest'
+import type { MockInstance } from 'vitest'
 import https, { Agent } from 'https'
 import { ClientRequest, IncomingMessage } from 'http'
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
-import { mockEvent, mockRequest } from '../aws'
-import * as utils from '../../utils'
-import { addTrafficMonitoring } from '../../utils'
-import { handler } from '../../app'
+import { mockEvent, mockRequest } from '../aws.ts'
+import * as utils from '../../utils/index.ts'
+import { addTrafficMonitoring } from '../../utils/index.ts'
+import { handler } from '../../app.ts'
 
 describe('Result Endpoint', function () {
   const origin: string = '__ingress_api__'

@@ -1,5 +1,5 @@
-import { validateSecret } from '../../../../utils/customer-variables/secrets-manager/validate-secret'
-import { CustomerVariableName } from '../../../../utils/customer-variables/types'
+import { validateSecret } from '../../../../utils/customer-variables/secrets-manager/validate-secret.ts'
+import { CustomerVariableName } from '../../../../utils/customer-variables/types.ts'
 
 describe('Validate secret', () => {
   it.each(['not_a_secret', null])('throws if secret is not an object', (value) => {

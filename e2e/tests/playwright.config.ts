@@ -1,7 +1,8 @@
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
-import { getProjectName } from './src/project'
-import { CloudfrontUrls, getCloudfrontUrls, testMatches } from './src/utils/cloudfront'
+import { getProjectName } from './src/project.ts'
+import type { CloudfrontUrls } from './src/utils/cloudfront.ts'
+import { getCloudfrontUrls, testMatches } from './src/utils/cloudfront.ts'
 
 /**
  * Read environment variables from file.

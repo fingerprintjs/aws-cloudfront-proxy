@@ -1,30 +1,26 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
-import type { DeploymentSettings } from '../model/DeploymentSettings'
-import { defaults } from '../DefaultSettings'
-import {
+import type { APIGatewayProxyResult } from 'aws-lambda'
+import type { DeploymentSettings } from '../model/DeploymentSettings.ts'
+import { defaults } from '../DefaultSettings.ts'
+import type {
   CloudFrontClient,
-  CreateInvalidationCommand,
   CreateInvalidationCommandInput,
-  GetDistributionConfigCommand,
   GetDistributionConfigCommandOutput,
-  UpdateDistributionCommand,
   UpdateDistributionCommandInput,
 } from '@aws-sdk/client-cloudfront'
 import {
-  GetFunctionCommand,
-  FunctionConfiguration,
-  LambdaClient,
-  ListVersionsByFunctionCommand,
-  UpdateFunctionCodeCommand,
-  UpdateFunctionCodeCommandOutput,
-} from '@aws-sdk/client-lambda'
-import { ApiException, ErrorCode } from '../exceptions'
-import { delay } from '../utils/delay'
+  CreateInvalidationCommand,
+  GetDistributionConfigCommand,
+  UpdateDistributionCommand,
+} from '@aws-sdk/client-cloudfront'
+import type { FunctionConfiguration, LambdaClient, UpdateFunctionCodeCommandOutput } from '@aws-sdk/client-lambda'
+import { GetFunctionCommand, ListVersionsByFunctionCommand, UpdateFunctionCodeCommand } from '@aws-sdk/client-lambda'
+import { ApiException, ErrorCode } from '../exceptions.ts'
+import { delay } from '../utils/delay.ts'
 import {
   doesCacheBehaviorUseOrigins,
   getCacheBehaviorLambdaFunctionAssociations,
   getFPCDNOrigins,
-} from '../utils/cloudfrontUtils'
+} from '../utils/cloudfrontUtils.ts'
 
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_COUNT = 5
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_DELAY = 3000 // Milliseconds

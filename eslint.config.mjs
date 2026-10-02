@@ -23,6 +23,15 @@ const config = [
     rules: {
       // Numbers and booleans interpolated into template literals are safe to use.
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true, allowBoolean: true }],
+      // Node's native type-stripping (used for e2e/scripts/mockTests.ts) can only erase an import
+      // it can see is type-only from the `import type` keyword, not from cross-file type info.
+      '@typescript-eslint/consistent-type-imports': 'error',
+      'import/extensions': [
+        'error',
+        {
+          ts: 'always',
+        },
+      ],
     },
   },
 

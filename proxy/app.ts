@@ -1,14 +1,14 @@
-import { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
+import type { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
 
-import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils'
-import { CustomerVariables } from './utils/customer-variables/customer-variables'
-import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables'
-import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables'
+import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils/index.ts'
+import { CustomerVariables } from './utils/customer-variables/customer-variables.ts'
+import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables.ts'
+import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
-import { createIngressHandler } from './handlers/handleIngress'
-import { handleStatus } from './handlers/handleStatus'
-import { V4_INGRESS_PATH } from './utils/paths'
-import { getSecretCacheTtlMs } from './utils/headers'
+import { createIngressHandler } from './handlers/handleIngress.ts'
+import { handleStatus } from './handlers/handleStatus.ts'
+import { V4_INGRESS_PATH } from './utils/paths.ts'
+import { getSecretCacheTtlMs } from './utils/headers.ts'
 
 export type Route = {
   pathPattern: RegExp

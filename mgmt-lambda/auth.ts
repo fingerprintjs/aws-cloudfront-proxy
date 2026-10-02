@@ -1,6 +1,7 @@
-import { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
-import type { AuthSettings } from './model/AuthSettings'
-import { SecretsManagerClient, GetSecretValueCommand, GetSecretValueResponse } from '@aws-sdk/client-secrets-manager'
+import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
+import type { AuthSettings } from './model/AuthSettings.ts'
+import type { SecretsManagerClient, GetSecretValueResponse } from '@aws-sdk/client-secrets-manager'
+import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 
 const MGMT_TOKEN_SCHEME = 'mgmt-token'
 const EMPTY_TOKEN = ''
