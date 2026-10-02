@@ -5,6 +5,7 @@ import { updateCacheControlHeader } from './cache-control.ts'
 import type { CustomerVariables } from './customer-variables/customer-variables.ts'
 import { getPreSharedSecret } from './customer-variables/selectors.ts'
 import { TTLCache } from './cache.ts'
+import { isTruthy } from './is-truthy.ts'
 
 export const BLACKLISTED_HEADERS = new Set([
   'age',
@@ -74,7 +75,7 @@ export async function prepareHeadersForIngressRequest(
 
   headers['fpjs-proxy-client-ip'] = request.clientIp
   const preSharedSecret = await getPreSharedSecret(variables)
-  if (preSharedSecret !== null && preSharedSecret !== '') {
+  if (isTruthy(preSharedSecret)) {
     headers['fpjs-proxy-secret'] = preSharedSecret
   }
   headers['fpjs-proxy-forwarded-host'] = getHost(request)
@@ -236,7 +237,7 @@ export function getHeaderValue(request: CloudFrontRequest, name: string): string
 export function getSecretCacheTtlMs(request: CloudFrontRequest): number | undefined {
   const value = getHeaderValue(request, 'fpjs_proxy_secret_cache_ttl_ms')
 
-  if (value !== null) {
+  if (isTruthy(value)) {
     const parsedValue = parseInt(value, 10)
     if (TTLCache.isValidTTL(parsedValue)) {
       return parsedValue

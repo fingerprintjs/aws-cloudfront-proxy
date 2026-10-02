@@ -1,6 +1,7 @@
 import type { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
 
 import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils/index.ts'
+import { isTruthy } from './utils/is-truthy.ts'
 import { CustomerVariables } from './utils/customer-variables/customer-variables.ts'
 import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables.ts'
 import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
@@ -23,7 +24,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   const routes: Route[] = []
 
   const agentUri = await getAgentUri(customerVariables)
-  if (agentUri !== null) {
+  if (isTruthy(agentUri)) {
     routes.push({
       pathPattern: createRoute(agentUri),
       handler: createIngressHandler('agentV3'),
@@ -31,7 +32,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   }
 
   const resultUri = await getResultUri(customerVariables)
-  if (resultUri !== null) {
+  if (isTruthy(resultUri)) {
     routes.push({
       pathPattern: createRoute(resultUri),
       handler: createIngressHandler('ingressV3'),

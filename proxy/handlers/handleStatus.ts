@@ -2,6 +2,7 @@ import type { CloudFrontResultResponse } from 'aws-lambda'
 import type { CustomerVariables } from '../utils/customer-variables/customer-variables.ts'
 import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types.ts'
 import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable.ts'
+import { isTruthy } from '../utils/is-truthy.ts'
 
 export interface EnvVarInfo {
   envVarName: string
@@ -54,7 +55,7 @@ function renderItemRow({ title, description, children = '' }: ItemRow) {
   return `
           <div class="item">
               <h3>${title}</h3> 
-              ${description !== undefined && description !== '' ? `<p>${description}</p>` : ''}
+              ${isTruthy(description) ? `<p>${description}</p>` : ''}
               ${children}
           </div>
 `.trim()
@@ -65,7 +66,7 @@ const v3Icon = `<span data-tooltip="This variable is relevant only for V3 versio
 function renderEnvInfoRow(info: EnvVarInfo) {
   let description = ''
 
-  if (info.isSet && info.resolvedBy !== null && info.resolvedBy !== '') {
+  if (info.isSet && isTruthy(info.resolvedBy)) {
     description = `Value is set`
   } else {
     description = `⚠️ Value is not defined ${info.value !== null && info.value !== '' ? `and uses default value: ${info.value}` : ''}`
@@ -81,7 +82,7 @@ function renderEnvInfoRow(info: EnvVarInfo) {
 function renderEnvInfo(envInfo: EnvVarInfo[]) {
   const isAllCustomerDefinedVariablesSet = envInfo
     .filter((info) => !info.isInternal && !info.isOptional)
-    .every((info) => info.isSet && info.resolvedBy !== null && info.resolvedBy !== '')
+    .every((info) => info.isSet && isTruthy(info.resolvedBy))
 
   return renderItemRow({
     title: 'Variables',

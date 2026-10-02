@@ -5,6 +5,7 @@ import { generateErrorResponse } from './generateErrorResponse.ts'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
 import type { IncomingMessage, OutgoingHttpHeaders } from 'http'
 import type { CloudFrontResultResponse } from 'aws-lambda'
+import { isTruthy } from './is-truthy.ts'
 
 type SendHttpRequestResult = {
   response: IncomingMessage
@@ -55,7 +56,7 @@ function sendHttpRequest(
 
     request.on('error', reject)
 
-    if (data !== undefined && data !== '') {
+    if (isTruthy(data)) {
       request.write(Buffer.from(data, 'base64'))
     }
     request.end()

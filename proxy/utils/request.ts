@@ -1,5 +1,6 @@
 import type { CloudFrontRequest } from 'aws-lambda'
 import { Region } from '../model/index.ts'
+import { isTruthy } from './is-truthy.ts'
 
 export const getApiKey = (request: CloudFrontRequest): string | undefined => getQueryParameter(request, 'apiKey')
 
@@ -17,7 +18,7 @@ export const getRegion = (request: CloudFrontRequest): Region => {
 }
 
 export const getValidRegion = (value?: string | null): Region => {
-  if (value === undefined || value === null || value === '' || !isRegion(value)) {
+  if (!isTruthy(value) || !isRegion(value)) {
     return Region.us
   }
 

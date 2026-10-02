@@ -5,6 +5,7 @@ import { addTrafficMonitoring, prepareHeadersForIngressRequest } from '../utils/
 import { getValidRegion, isMethodAuthorized } from '../utils/request.ts'
 import { extractIngressPath, getIngressAPIHost, getV3AgentPath, INGRESS_CDN_PATH } from '../utils/paths.ts'
 import { sendIngressRequest } from '../utils/transport.ts'
+import { isTruthy } from '../utils/is-truthy.ts'
 import type { Region } from '../model/index.ts'
 
 export type RequestType = 'agentV3' | 'ingressV3' | 'v4'
@@ -60,7 +61,7 @@ async function handleIngress(
     : 0
 
   const ingressBaseHost = await getFpIngressBaseHost(customerVariables)
-  if (ingressBaseHost === null || ingressBaseHost === '') {
+  if (!isTruthy(ingressBaseHost)) {
     return {
       status: '500',
     }

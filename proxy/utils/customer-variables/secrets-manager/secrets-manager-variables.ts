@@ -5,6 +5,7 @@ import { getHeaderValue } from '../../headers.ts'
 import { retrieveSecret } from './retrieve-secret.ts'
 import type { NonNullableObject } from '../../types.ts'
 import { DEFAULT_REGION, SECRET_NAME_HEADER_KEY } from '../defaults.ts'
+import { isTruthy } from '../../is-truthy.ts'
 
 interface SecretsInfo {
   secretName: string | null
@@ -77,12 +78,6 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
   }
 
   private static isValidSecretInfo(secretsInfo?: SecretsInfo): secretsInfo is NonNullableObject<SecretsInfo> {
-    return (
-      secretsInfo !== undefined &&
-      secretsInfo.secretRegion !== null &&
-      secretsInfo.secretRegion !== '' &&
-      secretsInfo.secretName !== null &&
-      secretsInfo.secretName !== ''
-    )
+    return secretsInfo !== undefined && isTruthy(secretsInfo.secretRegion) && isTruthy(secretsInfo.secretName)
   }
 }
