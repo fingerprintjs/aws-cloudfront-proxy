@@ -20,7 +20,7 @@ jobs:
       mgmt_lambda_sha: ${{ steps.sha.outputs.mgmt_lambda_sha }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configure AWS credentials from dev account
         uses: aws-actions/configure-aws-credentials@v4
@@ -82,7 +82,7 @@ jobs:
     needs: e2e-tests
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
         uses: actions/setup-node@v4
