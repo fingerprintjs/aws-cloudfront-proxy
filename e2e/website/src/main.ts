@@ -89,7 +89,7 @@ async function getVisitorData(): Promise<VisitorData> {
     }
 
     default:
-      throw new Error('Unknown agent version')
+      throw new Error(`Unknown agent version: ${String(agentVersion)}`)
   }
 }
 
