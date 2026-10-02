@@ -25,7 +25,7 @@ describe('Validate secret', () => {
 
     expect(() => {
       validateSecret(object)
-    }).toThrow('Secrets Manager secret contains an invalid value fpjs_agent_download_path: {}')
+    }).toThrow('Secrets Manager secret contains an invalid value for fpjs_agent_download_path')
   })
 
   it('does not throw for object with partial values', () => {
