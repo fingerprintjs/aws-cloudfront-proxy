@@ -5,7 +5,7 @@ const allowedKeys = Object.values<string>(CustomerVariableName)
 
 function assertIsCustomerVariableValue(value: unknown, key: string): asserts value is CustomerVariableReturn {
   if (typeof value !== 'string' && value !== null && value !== undefined) {
-    throw new TypeError(`Secrets Manager secret contains an invalid value ${key}: ${JSON.stringify(value)}`)
+    throw new TypeError(`Secrets Manager secret contains an invalid value for ${key}`)
   }
 }
 
