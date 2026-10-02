@@ -84,6 +84,7 @@ async function handleIngress(
 
     // For the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
     case 'ingressV3':
+    default:
       if (pathMatches && pathMatches.length >= 1) {
         // Without an optional capture group match, pathMatches[1] is undefined at runtime even
         // though TS's array indexing (without noUncheckedIndexedAccess) assumes it's always string.
