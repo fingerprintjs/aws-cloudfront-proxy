@@ -44,7 +44,7 @@ export class CustomerVariables {
       try {
         const result = await provider.getVariable(variable)
 
-        if (result !== null && result !== undefined) {
+        if (result !== null && result !== undefined && result !== '') {
           console.debug(`Resolved customer variable ${variable} with provider ${provider.name}`)
 
           return {
