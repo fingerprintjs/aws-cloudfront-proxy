@@ -79,7 +79,7 @@ async function doHealthCheck(url: string, waitMs: number) {
   let attempts = 0
   const maxAttempts = 5
 
-  while (attempts <= maxAttempts) {
+  while (attempts < maxAttempts) {
     const response = await fetch(url).catch((error: unknown) => {
       console.error(`Failed to get response from ${url}`, error)
 
@@ -91,7 +91,10 @@ async function doHealthCheck(url: string, waitMs: number) {
     }
 
     attempts++
-    await wait(waitMs)
+
+    if (attempts < maxAttempts) {
+      await wait(waitMs)
+    }
   }
 
   throw new Error(`Failed to get response from ${url} after ${maxAttempts} attempts`)
