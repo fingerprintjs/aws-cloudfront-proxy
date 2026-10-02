@@ -60,15 +60,6 @@ export function getCloudfrontUrls(): CloudfrontUrls {
   return cache
 }
 
-export function getCloudfrontUrl(urlType: keyof CloudfrontUrls, path: string) {
-  const urls = getCloudfrontUrls()
-
-  const url = new URL(urls[urlType])
-  url.pathname = path
-
-  return url.toString()
-}
-
 export async function waitForCloudfront(waitMs = 1000) {
   const urls = Object.values(getCloudfrontUrls()).map((url) => {
     const urlObject = new URL(url)
@@ -79,19 +70,31 @@ export async function waitForCloudfront(waitMs = 1000) {
 
   await Promise.all(
     urls.map(async (url) => {
-      const response = await fetch(url).catch((error: unknown) => {
-        console.error(`Failed to get response from ${url}`, error)
-
-        return null
-      })
-
-      if (response?.ok === true) {
-        return
-      }
-
-      await wait(waitMs)
+      await doHealthCheck(url, waitMs)
     })
   )
+}
+
+async function doHealthCheck(url: string, waitMs: number) {
+  let attempts = 0
+  const maxAttempts = 5
+
+  while (attempts <= maxAttempts) {
+    const response = await fetch(url).catch((error: unknown) => {
+      console.error(`Failed to get response from ${url}`, error)
+
+      return null
+    })
+
+    if (response?.ok === true) {
+      return
+    }
+
+    attempts++
+    await wait(waitMs)
+  }
+
+  throw new Error(`Failed to get response from ${url} after ${maxAttempts} attempts`)
 }
 
 function getBehaviourPath() {
