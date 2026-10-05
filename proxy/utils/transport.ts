@@ -90,18 +90,15 @@ export async function sendIngressRequest(
       data: incomingRequest.body?.data,
       headers: requestHeaders,
     })
-    const isJavascript = response.headers['content-type']?.includes('text/javascript')
-
     console.debug('Response from Ingress API', {
       statusCode: response.statusCode,
       payload: data.toString('utf-8'),
-      isJavascript,
     })
 
     return {
       status: response.statusCode?.toString() ?? '500',
       statusDescription: response.statusMessage,
-      headers: updateResponseHeaders(response.headers, isJavascript),
+      headers: updateResponseHeaders(response.headers),
       bodyEncoding: 'base64',
       body: data.toString('base64'),
     }
