@@ -118,8 +118,8 @@ export function filterRequestHeaders(request: CloudFrontRequest, dropCookies: bo
 /**
  * Updates the response headers based on the provided headers object.
  *
- * Cache directives are passed through as the origin sent them, so the origin owns both the browser
- * and the edge cache lifetime.
+ * Cache directives are passed through as the origin sent them. The origin controls the browser cache
+ * lifetime, while CloudFront applies its configured cache policy limits to the edge cache lifetime.
  *
  * @param {IncomingHttpHeaders} headers - The incoming HTTP headers from the request. These are processed to generate the response headers.
  * @return {CloudFrontHeaders} The updated headers formatted as CloudFront-compatible response headers.
