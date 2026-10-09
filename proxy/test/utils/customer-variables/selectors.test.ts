@@ -1,14 +1,14 @@
-import { CloudFrontRequest } from 'aws-lambda'
-import { CustomerVariables } from '../../../utils/customer-variables/customer-variables'
-import { HeaderCustomerVariables } from '../../../utils/customer-variables/header-customer-variables'
-import { getAgentUri, getResultUri, getStatusUri } from '../../../utils'
-import { SecretsManagerVariables } from '../../../utils/customer-variables/secrets-manager/secrets-manager-variables'
-import { CustomerVariablesRecord, CustomerVariableName } from '../../../utils/customer-variables/types'
-import { clearSecretsCache } from '../../../utils/customer-variables/secrets-manager/retrieve-secret'
+import type { CloudFrontRequest } from 'aws-lambda'
+import { CustomerVariables } from '../../../utils/customer-variables/customer-variables.ts'
+import { HeaderCustomerVariables } from '../../../utils/customer-variables/header-customer-variables.ts'
+import { getAgentUri, getResultUri, getStatusUri } from '../../../utils/index.ts'
+import { SecretsManagerVariables } from '../../../utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
+import type { CustomerVariablesRecord } from '../../../utils/customer-variables/types.ts'
+import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
+import { clearSecretsCache } from '../../../utils/customer-variables/secrets-manager/retrieve-secret.ts'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { mockClient } from 'aws-sdk-client-mock'
-import 'aws-sdk-client-mock-jest'
-import { getAgentDownloadPath } from '../../../utils/customer-variables/selectors'
+import { getAgentDownloadPath } from '../../../utils/customer-variables/selectors.ts'
 
 describe('customer variables selectors', () => {
   describe('from headers', () => {

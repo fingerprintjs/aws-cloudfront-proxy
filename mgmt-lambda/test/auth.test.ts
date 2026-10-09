@@ -1,12 +1,11 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
-import {
+import type {
   APIGatewayProxyEventV2WithRequestContext,
   APIGatewayEventRequestContextV2,
   APIGatewayProxyEventHeaders,
 } from 'aws-lambda'
-import { getAuthSettings, retrieveAuthToken } from '../auth'
-import 'aws-sdk-client-mock-jest'
+import { getAuthSettings, retrieveAuthToken } from '../auth.ts'
 
 const secretMock = mockClient(SecretsManagerClient)
 const secretManagerClient = new SecretsManagerClient({})
@@ -15,7 +14,7 @@ describe('auth test', () => {
   const OLD_ENV = process.env
 
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     secretMock.reset()
     process.env = { ...OLD_ENV }
   })

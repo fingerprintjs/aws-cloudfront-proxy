@@ -1,4 +1,4 @@
-import { CloudFrontRequest, CloudFrontRequestEvent } from 'aws-lambda'
+import type { CloudFrontRequest, CloudFrontRequestEvent } from 'aws-lambda'
 
 export function toAwsResponse<T>(value: T) {
   return {

@@ -1,7 +1,8 @@
 import type { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
-import { getProjectName } from './src/project'
-import { CloudfrontUrls, getCloudfrontUrls, testMatches } from './src/utils/cloudfront'
+import { getProjectName } from './src/project.ts'
+import type { CloudfrontUrls } from './src/utils/cloudfront.ts'
+import { getCloudfrontUrls, testMatches } from './src/utils/cloudfront.ts'
 
 /**
  * Read environment variables from file.
@@ -27,9 +28,9 @@ const config: PlaywrightTestConfig = {
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env.CI,
+  forbidOnly: Boolean(process.env.CI),
   /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI !== undefined && process.env.CI !== '' ? 2 : 0,
   /* Opt out of parallel tests on CI. */
   workers: 3,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */

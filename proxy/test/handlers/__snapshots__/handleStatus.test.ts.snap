@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`Get status info returns correct response with empty non obfuscated variable 1`] = `
+exports[`Get status info > returns correct response with empty non obfuscated variable 1`] = `
 {
   "envInfo": [
     {
@@ -63,7 +63,7 @@ exports[`Get status info returns correct response with empty non obfuscated vari
 }
 `;
 
-exports[`Get status info returns correct response with empty pre shared secret 1`] = `
+exports[`Get status info > returns correct response with empty pre shared secret 1`] = `
 {
   "envInfo": [
     {
@@ -126,7 +126,7 @@ exports[`Get status info returns correct response with empty pre shared secret 1
 }
 `;
 
-exports[`Get status info returns correct status info 1`] = `
+exports[`Get status info > returns correct status info 1`] = `
 {
   "envInfo": [
     {
@@ -189,7 +189,7 @@ exports[`Get status info returns correct status info 1`] = `
 }
 `;
 
-exports[`Handle status returns correct status info in html if all variables are set 1`] = `
+exports[`Handle status > returns correct status info in html if all variables are set 1`] = `
 "<html lang="en-US">
       <head>
         <title>CloudFront integration status</title>
@@ -299,7 +299,7 @@ exports[`Handle status returns correct status info in html if all variables are 
     </html>"
 `;
 
-exports[`Handle status returns correct status info in html if some variables are missing 1`] = `
+exports[`Handle status > returns correct status info in html if some variables are missing 1`] = `
 "<html lang="en-US">
       <head>
         <title>CloudFront integration status</title>
@@ -409,7 +409,7 @@ exports[`Handle status returns correct status info in html if some variables are
     </html>"
 `;
 
-exports[`Handle status returns correct status info in html if some variables are using default values 1`] = `
+exports[`Handle status > returns correct status info in html if some variables are using default values 1`] = `
 "<html lang="en-US">
       <head>
         <title>CloudFront integration status</title>

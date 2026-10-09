@@ -1,18 +1,19 @@
-import { CustomerVariables, GetVariableResult } from './customer-variables'
-import { CustomerVariableName } from './types'
+import type { CustomerVariables, GetVariableResult } from './customer-variables.ts'
+import { CustomerVariableName } from './types.ts'
+import { isTruthy } from '../is-truthy.ts'
 
 const extractVariable = <T extends CustomerVariableName>(result: GetVariableResult<T>) => result.value
 
 export const getAgentUri = async (variables: CustomerVariables) => {
   const agentDownloadPath = await getAgentDownloadPath(variables)
 
-  return agentDownloadPath ? `/${agentDownloadPath}` : null
+  return isTruthy(agentDownloadPath) ? `/${agentDownloadPath}` : null
 }
 
 export const getResultUri = async (variables: CustomerVariables) => {
   const resultPath = await getResultPath(variables)
 
-  return resultPath ? `/${resultPath}(/.*)?` : null
+  return isTruthy(resultPath) ? `/${resultPath}(/.*)?` : null
 }
 
 export const getStatusUri = () => `/status`

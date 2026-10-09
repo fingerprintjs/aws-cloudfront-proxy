@@ -1,20 +1,21 @@
+import type { Mock, MockInstance } from 'vitest'
 import https from 'https'
 import { EventEmitter } from 'events'
-import { mockEvent, mockRequest } from '../../aws'
-import { handler } from '../../../app'
-import { generateErrorResponse } from '../../../utils/generateErrorResponse'
-import { CustomerVariableName } from '../../../utils/customer-variables/types'
+import { mockEvent, mockRequest } from '../../aws.ts'
+import { handler } from '../../../app.ts'
+import { generateErrorResponse } from '../../../utils/generateErrorResponse.ts'
+import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
 
 const requestUri = '/behavior/web/v4/ujKG34hUYKLJKJ1F'
 describe('Download agent endpoint V4', () => {
   const origin: string = '__ingress_api__'
 
-  let requestSpy: jest.SpyInstance
+  let requestSpy: MockInstance<(...args: any[]) => any>
 
-  const setEncoding = jest.fn()
+  const setEncoding = vi.fn()
 
   let mockHttpResponse: EventEmitter & {
-    setEncoding: jest.Mock
+    setEncoding: Mock
     headers: any
     statusCode: number
   }
@@ -30,13 +31,13 @@ describe('Download agent endpoint V4', () => {
   }
 
   beforeEach(() => {
-    requestSpy = jest.spyOn(https, 'request')
+    requestSpy = vi.spyOn(https, 'request')
 
     mockHttpResponse = new EventEmitter() as any
     mockHttpRequest = new EventEmitter()
 
     Object.assign(mockHttpRequest, {
-      end: jest.fn(),
+      end: vi.fn(),
     })
     Object.assign(mockHttpResponse, {
       setEncoding,
@@ -57,7 +58,7 @@ describe('Download agent endpoint V4', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('Successful call', async () => {

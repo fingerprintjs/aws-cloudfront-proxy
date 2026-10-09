@@ -1,6 +1,6 @@
-import { CustomerVariableName } from '../../../utils/customer-variables/types'
-import { maybeObfuscateVariable, OBFUSCATED_VALUE } from '../../../utils/customer-variables/maybe-obfuscate-variable'
-import { getInMemoryCustomerVariables } from './in-memory-customer-variables'
+import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
+import { maybeObfuscateVariable, OBFUSCATED_VALUE } from '../../../utils/customer-variables/maybe-obfuscate-variable.ts'
+import { getInMemoryCustomerVariables } from './in-memory-customer-variables.ts'
 
 const { variables, customerVariables } = getInMemoryCustomerVariables()
 

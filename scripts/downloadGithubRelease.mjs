@@ -10,12 +10,12 @@ const config = {
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
-const legacyPackageName = "package.zip"
+const legacyPackageName = 'package.zip'
 
 const assetsToFind = [
   'mgmt_lambda_latest.zip',
   'lambda_latest.zip',
-  
+
   // Legacy package
   legacyPackageName,
 ]
@@ -39,7 +39,7 @@ async function main() {
     console.warn('No assets found')
     return
   }
-  
+
   for (const asset of assets) {
     const zip = await downloadReleaseAsset(asset.url)
     const fileName = asset.name === legacyPackageName ? 'lambda_latest.zip' : asset.name
@@ -86,7 +86,7 @@ async function doGitHubGetRequest(url) {
 
 async function downloadReleaseAsset(url) {
   console.info('Downloading asset', url)
-  
+
   const headers = {
     Accept: 'application/octet-stream',
     'User-Agent': 'fingerprint-pro-cloudfront-integration',
@@ -105,7 +105,8 @@ async function downloadReleaseAsset(url) {
 
 export async function findAssets(assets) {
   return assets?.filter(
-    (asset) =>  assetsToFind.includes(asset.name) && asset.state === 'uploaded' && asset.content_type === 'application/zip',
+    (asset) =>
+      assetsToFind.includes(asset.name) && asset.state === 'uploaded' && asset.content_type === 'application/zip'
   )
 }
 

@@ -1,8 +1,8 @@
 import { expect } from '@playwright/test'
-import { waitForCloudfront } from '../../utils/cloudfront'
-import { cloudfrontTest as test } from '../../cloudfrontTest'
-import { trackRequests } from '../../utils/playwright'
-import { checkResponse } from '../../utils/checkResponse'
+import { waitForCloudfront } from '../../utils/cloudfront.ts'
+import { cloudfrontTest as test } from '../../cloudfrontTest.ts'
+import { trackRequests } from '../../utils/playwright.ts'
+import { checkResponse } from '../../utils/checkResponse.ts'
 
 test.describe('[v4] visitorId', () => {
   test.beforeEach(async () => {
@@ -32,7 +32,7 @@ test.describe('[v4] visitorId', () => {
     const requestsWithDifferentHost = requests.filter((req) => !req.url().includes(rootUrl.hostname))
     expect(
       requestsWithDifferentHost,
-      `Following requests have invalid URL: ${requestsWithDifferentHost.map((it) => it.url())}`
+      `Following requests have invalid URL: ${requestsWithDifferentHost.map((it) => it.url()).join(', ')}`
     ).toHaveLength(0)
 
     const agentRequest = requests.find((req) => req.url().includes('/fpjs/web/v4'))

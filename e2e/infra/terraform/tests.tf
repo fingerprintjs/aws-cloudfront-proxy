@@ -31,7 +31,7 @@ resource "null_resource" "mock-warden-tests" {
   count = var.run_mock_warden_tests ? 1 : 0
 
   provisioner "local-exec" {
-    command     = "pnpm exec ts-node e2e/scripts/mockTests.ts --project tsconfig.json"
+    command     = "pnpm test:mock-e2e"
     working_dir = "../../../"
     environment = {
       CLOUDFRONT_WITH_HEADERS_URL    = aws_cloudfront_distribution.with_headers.domain_name
@@ -62,7 +62,7 @@ resource "null_resource" "mock-warden-tests-v4" {
   count = var.run_mock_warden_tests ? 1 : 0
 
   provisioner "local-exec" {
-    command     = "pnpm exec ts-node e2e/scripts/mockTests.ts --project tsconfig.json"
+    command     = "pnpm test:mock-e2e"
     working_dir = "../../../"
     environment = {
       CLOUDFRONT_WITH_HEADERS_URL    = aws_cloudfront_distribution.with_headers.domain_name
