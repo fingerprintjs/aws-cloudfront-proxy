@@ -109,101 +109,55 @@ describe('Download agent endpoint V4', () => {
     )
   })
 
-  test('Browser cache set to an hour when original value is higher', async () => {
-    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
+  test('Origin cache-control is passed through as it is', async () => {
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
-    addResponseHeader('cache-control', 'public, max-age=3613')
+    Object.assign(mockHttpResponse.headers, {
+      'cache-control': 'public, max-age=3613',
+    })
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
+      'cache-control': [
+        {
+          key: 'cache-control',
+          value: 'public, max-age=3613',
+        },
+      ],
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
-        },
-      ],
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=60',
         },
       ],
     })
   })
 
-  test('Browser cache is the same when original value is lower than an hour', async () => {
-    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
+  test('Origin s-maxage is passed through as it is', async () => {
+    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
 
-    addResponseHeader('cache-control', 'public, max-age=100')
-
-    const event = mockEvent(request)
-
-    const response = await handler(event)
-
-    expect(response.headers).toEqual({
-      'content-type': [
-        {
-          key: 'content-type',
-          value: 'text/javascript; charset=utf-8',
-        },
-      ],
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=100, s-maxage=60',
-        },
-      ],
+    Object.assign(mockHttpResponse.headers, {
+      'cache-control': 'public, max-age=3613, s-maxage=575500',
     })
-  })
-
-  test('Proxy cache set to a minute when original value is higher', async () => {
-    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
-
-    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=575500')
 
     const event = mockEvent(request)
 
     const response = await handler(event)
 
     expect(response.headers).toEqual({
+      'cache-control': [
+        {
+          key: 'cache-control',
+          value: 'public, max-age=3613, s-maxage=575500',
+        },
+      ],
       'content-type': [
         {
           key: 'content-type',
           value: 'text/javascript; charset=utf-8',
-        },
-      ],
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=60',
-        },
-      ],
-    })
-  })
-
-  test('Proxy cache is the same when original value is lower than a minute', async () => {
-    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
-
-    addResponseHeader('cache-control', 'public, max-age=3613, s-maxage=10')
-
-    const event = mockEvent(request)
-
-    const response = await handler(event)
-
-    expect(response.headers).toEqual({
-      'content-type': [
-        {
-          key: 'content-type',
-          value: 'text/javascript; charset=utf-8',
-        },
-      ],
-      'cache-control': [
-        {
-          key: 'cache-control',
-          value: 'public, max-age=3600, s-maxage=10',
         },
       ],
     })
