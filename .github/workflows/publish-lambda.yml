@@ -14,7 +14,9 @@ permissions:
 jobs:          
   e2e-tests:
     name: Run E2E tests on release artifact
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.x in e2e/tests cannot install browsers on ubuntu-latest (26.04)
+    # https://playwright.dev/docs/intro#system-requirements
+    runs-on: ubuntu-24.04
     outputs:
       lambda_sha: ${{ steps.sha.outputs.lambda_sha }}
       mgmt_lambda_sha: ${{ steps.sha.outputs.mgmt_lambda_sha }}
@@ -78,7 +80,9 @@ jobs:
   deploy-to-s3:
     name: Deploy artifact to S3 bucket
     environment: production
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.x in e2e/tests cannot install browsers on ubuntu-latest (26.04)
+    # https://playwright.dev/docs/intro#system-requirements
+    runs-on: ubuntu-24.04
     needs: e2e-tests
     steps:
       - name: Checkout code

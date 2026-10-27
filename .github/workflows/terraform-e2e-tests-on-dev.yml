@@ -11,7 +11,9 @@ permissions:
   contents: read # This is required for actions/checkout
 jobs:
   e2e-tests:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.x in e2e/tests cannot install browsers on ubuntu-latest (26.04)
+    # https://playwright.dev/docs/intro#system-requirements
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,7 +64,9 @@ jobs:
           TF_VAR_fpjs_shared_secret: ${{ secrets.PROXY_SECRET }}
 
   mock-warden-e2e-tests:
-    runs-on: ubuntu-latest
+    # Pinned: Playwright 1.x in e2e/tests cannot install browsers on ubuntu-latest (26.04)
+    # https://playwright.dev/docs/intro#system-requirements
+    runs-on: ubuntu-24.04
     needs: e2e-tests
     steps:
       - name: Checkout code
