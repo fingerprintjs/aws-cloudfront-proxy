@@ -1,11 +1,11 @@
-import type { CustomerVariableProvider, CustomerVariableName, CustomerVariableReturn } from '../types.ts'
+import type { CustomerVariableProvider, CustomerVariableName, CustomerVariableReturn } from '../types'
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import type { CloudFrontRequest } from 'aws-lambda'
-import { getHeaderValue } from '../../headers.ts'
-import { retrieveSecret } from './retrieve-secret.ts'
-import type { NonNullableObject } from '../../types.ts'
-import { DEFAULT_REGION, SECRET_NAME_HEADER_KEY } from '../defaults.ts'
-import { isTruthy } from '../../is-truthy.ts'
+import { getHeaderValue } from '../../headers'
+import { retrieveSecret } from './retrieve-secret'
+import type { NonNullableObject } from '../../types'
+import { DEFAULT_REGION, SECRET_NAME_HEADER_KEY } from '../defaults'
+import { isTruthy } from '../../is-truthy'
 
 interface SecretsInfo {
   secretName: string | null

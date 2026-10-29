@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test'
-import { cloudfrontTest as test } from '../cloudfrontTest.ts'
-import { waitForCloudfront } from '../utils/cloudfront.ts'
+import { cloudfrontTest as test } from '../cloudfrontTest'
+import { waitForCloudfront } from '../utils/cloudfront'
 
 test.describe('Status check', () => {
   test.beforeEach(async () => {

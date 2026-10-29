@@ -1,7 +1,7 @@
 import { test } from '@playwright/test'
-import { extractUrlTypeFromProjectName } from './project.ts'
-import type { CloudfrontUrls } from './utils/cloudfront.ts'
-import { urlTypeCustomerVariableSourceMap } from './utils/cloudfront.ts'
+import { extractUrlTypeFromProjectName } from './project'
+import type { CloudfrontUrls } from './utils/cloudfront'
+import { urlTypeCustomerVariableSourceMap } from './utils/cloudfront'
 
 export const cloudfrontTest = test.extend<{
   urlType: keyof CloudfrontUrls

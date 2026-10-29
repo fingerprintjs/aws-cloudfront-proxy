@@ -1,5 +1,5 @@
-import { Region } from '../model/index.ts'
-import { isTruthy } from './is-truthy.ts'
+import { Region } from '../model/index'
+import { isTruthy } from './is-truthy'
 
 // In V4, the ingress path is the root path
 export const V4_INGRESS_PATH = '/.*'

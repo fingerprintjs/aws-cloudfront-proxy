@@ -1,4 +1,4 @@
-import { isNonNegativeInteger } from './validation.ts'
+import { isNonNegativeInteger } from './validation'
 
 interface CacheItem<T> {
   value: T

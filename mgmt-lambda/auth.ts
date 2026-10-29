@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
-import type { AuthSettings } from './model/AuthSettings.ts'
+import type { AuthSettings } from './model/AuthSettings'
 import type { SecretsManagerClient, GetSecretValueResponse } from '@aws-sdk/client-secrets-manager'
 import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 

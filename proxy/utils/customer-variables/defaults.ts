@@ -1,5 +1,5 @@
-import type { CustomerVariablesRecord, CustomerVariableType } from './types.ts'
-import { CustomerVariableName } from './types.ts'
+import type { CustomerVariablesRecord, CustomerVariableType } from './types'
+import { CustomerVariableName } from './types'
 
 const defaultCustomerVariables = {
   [CustomerVariableName.GetResultPath]: null,

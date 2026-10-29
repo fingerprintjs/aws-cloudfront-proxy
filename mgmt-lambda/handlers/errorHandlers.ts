@@ -1,5 +1,5 @@
 import type { APIGatewayProxyResult } from 'aws-lambda'
-import { ErrorCode } from '../exceptions.ts'
+import { ErrorCode } from '../exceptions'
 import { ResourceNotFoundException } from '@aws-sdk/client-lambda'
 
 export function handleNoAuthentication(): Promise<APIGatewayProxyResult> {

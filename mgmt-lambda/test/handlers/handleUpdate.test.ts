@@ -20,9 +20,9 @@ import {
   GetDistributionConfigCommand,
   UpdateDistributionCommand,
 } from '@aws-sdk/client-cloudfront'
-import { handleUpdate } from '../../handlers/updateHandler.ts'
-import type { DeploymentSettings } from '../../model/DeploymentSettings.ts'
-import { ErrorCode } from '../../exceptions.ts'
+import { handleUpdate } from '../../handlers/updateHandler'
+import type { DeploymentSettings } from '../../model/DeploymentSettings'
+import { ErrorCode } from '../../exceptions'
 
 const lambdaMock = mockClient(LambdaClient)
 const lambdaClient = new LambdaClient({ region: 'us-east-1' })

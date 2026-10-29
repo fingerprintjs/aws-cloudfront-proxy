@@ -1,6 +1,6 @@
 import type { CacheBehavior, DefaultCacheBehavior, DistributionConfig, Origin } from '@aws-sdk/client-cloudfront'
 import { EventType } from '@aws-sdk/client-cloudfront'
-import { defaults } from '../DefaultSettings.ts'
+import { defaults } from '../DefaultSettings'
 import type { LambdaFunctionAssociation } from '@aws-sdk/client-cloudfront'
 
 export function getFPCDNOrigins(distributionConfig: DistributionConfig | undefined): Origin[] {

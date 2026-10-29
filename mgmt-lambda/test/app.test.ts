@@ -10,7 +10,7 @@ import {
 } from '@aws-sdk/client-lambda'
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
-import { handler } from '../app.ts'
+import { handler } from '../app'
 import type {
   CreateInvalidationCommandInput,
   GetDistributionConfigResult,
@@ -25,7 +25,7 @@ import {
   GetDistributionConfigCommand,
   UpdateDistributionCommand,
 } from '@aws-sdk/client-cloudfront'
-import { ErrorCode } from '../exceptions.ts'
+import { ErrorCode } from '../exceptions'
 
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)

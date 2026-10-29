@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect } from '@playwright/test'
-import { isRequestIdValid } from './areVisitorIdAndRequestIdValid.ts'
+import { isRequestIdValid } from './areVisitorIdAndRequestIdValid'
 
 export async function checkResponse(page: Page) {
   const response = await page.waitForSelector('#response pre').then((element) => element.textContent())

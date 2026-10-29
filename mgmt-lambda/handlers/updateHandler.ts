@@ -1,6 +1,6 @@
 import type { APIGatewayProxyResult } from 'aws-lambda'
-import type { DeploymentSettings } from '../model/DeploymentSettings.ts'
-import { defaults } from '../DefaultSettings.ts'
+import type { DeploymentSettings } from '../model/DeploymentSettings'
+import { defaults } from '../DefaultSettings'
 import type {
   CloudFrontClient,
   CreateInvalidationCommandInput,
@@ -14,13 +14,13 @@ import {
 } from '@aws-sdk/client-cloudfront'
 import type { FunctionConfiguration, LambdaClient, UpdateFunctionCodeCommandOutput } from '@aws-sdk/client-lambda'
 import { GetFunctionCommand, ListVersionsByFunctionCommand, UpdateFunctionCodeCommand } from '@aws-sdk/client-lambda'
-import { ApiException, ErrorCode } from '../exceptions.ts'
-import { delay } from '../utils/delay.ts'
+import { ApiException, ErrorCode } from '../exceptions'
+import { delay } from '../utils/delay'
 import {
   doesCacheBehaviorUseOrigins,
   getCacheBehaviorLambdaFunctionAssociations,
   getFPCDNOrigins,
-} from '../utils/cloudfrontUtils.ts'
+} from '../utils/cloudfrontUtils'
 
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_COUNT = 5
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_DELAY = 3000 // Milliseconds

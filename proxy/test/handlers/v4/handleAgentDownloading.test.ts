@@ -1,10 +1,10 @@
 import type { Mock, MockInstance } from 'vitest'
 import https from 'https'
 import { EventEmitter } from 'events'
-import { mockEvent, mockRequest } from '../../aws.ts'
-import { handler } from '../../../app.ts'
-import { generateErrorResponse } from '../../../utils/generateErrorResponse.ts'
-import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
+import { mockEvent, mockRequest } from '../../aws'
+import { handler } from '../../../app'
+import { generateErrorResponse } from '../../../utils/generateErrorResponse'
+import { CustomerVariableName } from '../../../utils/customer-variables/types'
 
 const requestUri = '/behavior/web/v4/ujKG34hUYKLJKJ1F'
 describe('Download agent endpoint V4', () => {

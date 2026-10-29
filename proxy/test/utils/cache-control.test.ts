@@ -1,4 +1,4 @@
-import { updateCacheControlHeader } from '../../utils/cache-control.ts'
+import { updateCacheControlHeader } from '../../utils/cache-control'
 
 describe('updateCacheControlHeader', () => {
   test('adjust max-age to lower value', () => {

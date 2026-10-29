@@ -1,5 +1,5 @@
 import type { APIGatewayProxyResult } from 'aws-lambda'
-import type { DeploymentSettings } from '../model/DeploymentSettings.ts'
+import type { DeploymentSettings } from '../model/DeploymentSettings'
 import type { LambdaClient } from '@aws-sdk/client-lambda'
 import { GetFunctionCommand } from '@aws-sdk/client-lambda'
 import type { CloudFrontClient } from '@aws-sdk/client-cloudfront'
@@ -8,12 +8,12 @@ import type {
   IntegrationStatus,
   LambdaFunctionInformation,
   CloudFrontDistributionInformation,
-} from '../model/IntegrationStatus.ts'
+} from '../model/IntegrationStatus'
 import {
   doesCacheBehaviorUseOrigins,
   getCacheBehaviorLambdaFunctionAssociations,
   getFPCDNOrigins,
-} from '../utils/cloudfrontUtils.ts'
+} from '../utils/cloudfrontUtils'
 
 export async function handleStatus(
   lambdaClient: LambdaClient,

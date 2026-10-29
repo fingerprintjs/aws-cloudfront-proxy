@@ -1,9 +1,9 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda'
-import type { DeploymentSettings } from '../../model/DeploymentSettings.ts'
-import { handleStatus } from '../../handlers/statusHandler.ts'
+import type { DeploymentSettings } from '../../model/DeploymentSettings'
+import { handleStatus } from '../../handlers/statusHandler'
 import { CloudFrontClient, GetDistributionCommand } from '@aws-sdk/client-cloudfront'
-import type { IntegrationStatus } from '../../model/IntegrationStatus.ts'
+import type { IntegrationStatus } from '../../model/IntegrationStatus'
 
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)

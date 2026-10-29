@@ -1,5 +1,5 @@
-import type { CustomerVariablesRecord, CustomerVariableReturn } from '../types.ts'
-import { CustomerVariableName } from '../types.ts'
+import type { CustomerVariablesRecord, CustomerVariableReturn } from '../types'
+import { CustomerVariableName } from '../types'
 
 const allowedKeys = Object.values<string>(CustomerVariableName)
 

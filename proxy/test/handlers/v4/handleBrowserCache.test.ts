@@ -1,6 +1,6 @@
 import type { MockInstance } from 'vitest'
-import { handler } from '../../../app.ts'
-import { mockEvent, mockRequest } from '../../aws.ts'
+import { handler } from '../../../app'
+import { mockEvent, mockRequest } from '../../aws'
 import { ClientRequest, IncomingMessage } from 'http'
 import https, { Agent } from 'https'
 import { Socket } from 'net'

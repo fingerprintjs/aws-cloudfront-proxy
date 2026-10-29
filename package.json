@@ -21,7 +21,7 @@
     "test:coverage": "vitest run --coverage",
     "test:coverage:diff": "vitest run --coverage --reporter json --outputFile.json=report.json",
     "test:dts": "tsc --project tsconfig.eslint.json",
-    "test:mock-e2e": "node --experimental-transform-types e2e/scripts/mockTests.ts",
+    "test:mock-e2e": "vitest run --config vitest.e2e.config.ts",
     "prepare-package": "bash ./scripts/preparePackage.sh",
     "changeset:publish": "HUSKY=0 changeset publish",
     "changeset:version": "changeset version"

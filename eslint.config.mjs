@@ -29,7 +29,7 @@ const config = [
       'import/extensions': [
         'error',
         {
-          ts: 'always',
+          ts: 'never',
         },
       ],
     },

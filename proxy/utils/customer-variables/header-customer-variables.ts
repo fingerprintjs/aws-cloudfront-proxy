@@ -1,6 +1,6 @@
-import type { CustomerVariableProvider, CustomerVariableName } from './types.ts'
+import type { CustomerVariableProvider, CustomerVariableName } from './types'
 import type { CloudFrontRequest } from 'aws-lambda'
-import { getHeaderValue } from '../headers.ts'
+import { getHeaderValue } from '../headers'
 
 export class HeaderCustomerVariables implements CustomerVariableProvider {
   readonly name = 'HeaderCustomerVariables'

@@ -3,11 +3,11 @@ import {
   getHost,
   prepareHeadersForIngressRequest,
   updateResponseHeaders,
-} from '../../utils/index.ts'
+} from '../../utils/index'
 import type { CloudFrontHeaders, CloudFrontRequest } from 'aws-lambda'
 import type { IncomingHttpHeaders } from 'http'
-import { CustomerVariables } from '../../utils/customer-variables/customer-variables.ts'
-import { HeaderCustomerVariables } from '../../utils/customer-variables/header-customer-variables.ts'
+import { CustomerVariables } from '../../utils/customer-variables/customer-variables'
+import { HeaderCustomerVariables } from '../../utils/customer-variables/header-customer-variables'
 
 const getCustomerVariables = (request: CloudFrontRequest) =>
   new CustomerVariables([new HeaderCustomerVariables(request)])

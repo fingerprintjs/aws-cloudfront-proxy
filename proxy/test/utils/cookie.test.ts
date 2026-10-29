@@ -1,4 +1,4 @@
-import { filterCookie } from '../../utils/cookie.ts'
+import { filterCookie } from '../../utils/cookie'
 
 describe('filterCookies', () => {
   const predicate = (key: string) => key === '_iidt'

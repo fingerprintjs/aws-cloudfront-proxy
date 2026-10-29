@@ -1,6 +1,6 @@
 import type { CloudFrontRequest } from 'aws-lambda'
-import { Region } from '../model/index.ts'
-import { isTruthy } from './is-truthy.ts'
+import { Region } from '../model/index'
+import { isTruthy } from './is-truthy'
 
 export const getApiKey = (request: CloudFrontRequest): string | undefined => getQueryParameter(request, 'apiKey')
 

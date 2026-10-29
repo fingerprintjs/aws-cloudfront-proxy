@@ -1,6 +1,6 @@
-import type { CustomerVariables, GetVariableResult } from './customer-variables.ts'
-import { CustomerVariableName } from './types.ts'
-import { isTruthy } from '../is-truthy.ts'
+import type { CustomerVariables, GetVariableResult } from './customer-variables'
+import { CustomerVariableName } from './types'
+import { isTruthy } from '../is-truthy'
 
 const extractVariable = <T extends CustomerVariableName>(result: GetVariableResult<T>) => result.value
 

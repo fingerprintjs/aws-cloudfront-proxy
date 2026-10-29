@@ -5,7 +5,7 @@ import type {
   APIGatewayEventRequestContextV2,
   APIGatewayProxyEventHeaders,
 } from 'aws-lambda'
-import { getAuthSettings, retrieveAuthToken } from '../auth.ts'
+import { getAuthSettings, retrieveAuthToken } from '../auth'
 
 const secretMock = mockClient(SecretsManagerClient)
 const secretManagerClient = new SecretsManagerClient({})

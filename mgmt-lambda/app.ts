@@ -4,20 +4,15 @@ import type {
   APIGatewayProxyResult,
 } from 'aws-lambda'
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
-import { getAuthSettings, retrieveAuthToken } from './auth.ts'
-import type { DeploymentSettings } from './model/DeploymentSettings.ts'
-import {
-  handleError,
-  handleNoAuthentication,
-  handleNotFound,
-  handleWrongConfiguration,
-} from './handlers/errorHandlers.ts'
-import { defaults } from './DefaultSettings.ts'
-import { handleStatus } from './handlers/statusHandler.ts'
-import { handleUpdate } from './handlers/updateHandler.ts'
+import { getAuthSettings, retrieveAuthToken } from './auth'
+import type { DeploymentSettings } from './model/DeploymentSettings'
+import { handleError, handleNoAuthentication, handleNotFound, handleWrongConfiguration } from './handlers/errorHandlers'
+import { defaults } from './DefaultSettings'
+import { handleStatus } from './handlers/statusHandler'
+import { handleUpdate } from './handlers/updateHandler'
 import { LambdaClient } from '@aws-sdk/client-lambda'
 import { CloudFrontClient } from '@aws-sdk/client-cloudfront'
-import { removeLeadingAndTrailingSlashes } from './routing.ts'
+import { removeLeadingAndTrailingSlashes } from './routing'
 
 export async function handler(
   event: APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>

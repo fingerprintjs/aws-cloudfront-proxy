@@ -1,10 +1,10 @@
-import type { CustomerVariablesRecord } from '../types.ts'
+import type { CustomerVariablesRecord } from '../types'
 import type { GetSecretValueCommandOutput, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
 import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
-import { arrayBufferToString } from '../../buffer.ts'
-import { validateSecret } from './validate-secret.ts'
-import { normalizeSecret } from './normalize-secret.ts'
-import { TTLCache } from '../../cache.ts'
+import { arrayBufferToString } from '../../buffer'
+import { validateSecret } from './validate-secret'
+import { normalizeSecret } from './normalize-secret'
+import { TTLCache } from '../../cache'
 
 /**
  * Global cache for customer variables fetched from Secrets Manager.

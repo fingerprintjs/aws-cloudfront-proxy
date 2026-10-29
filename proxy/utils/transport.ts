@@ -1,11 +1,11 @@
 import type { RequestOptions } from 'https'
 import https from 'https'
-import { updateResponseHeaders } from './index.ts'
-import { generateErrorResponse } from './generateErrorResponse.ts'
+import { updateResponseHeaders } from './index'
+import { generateErrorResponse } from './generateErrorResponse'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
 import type { IncomingMessage, OutgoingHttpHeaders } from 'http'
 import type { CloudFrontResultResponse } from 'aws-lambda'
-import { isTruthy } from './is-truthy.ts'
+import { isTruthy } from './is-truthy'
 
 type SendHttpRequestResult = {
   response: IncomingMessage
