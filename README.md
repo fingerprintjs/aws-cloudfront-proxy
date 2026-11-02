@@ -25,7 +25,7 @@ The Fingerprint CloudFront Integration is responsible for
 This [improves](https://docs.fingerprint.com/docs/cloudfront-proxy-integration-v2#the-benefits-of-using-the-cloudfront-integration) both accuracy and reliability of visitor identification and bot detection on your site.
 
 > [!IMPORTANT]  
-> CloudFront integration v1 has been [deprecated](https://docs.fingerprint.com/docs/cloudfront-proxy-integration).
+> CloudFront integration v1 has been [deprecated](https://docs.fingerprint.com/docs/v3/cloudfront-proxy-integration).
 > This repository now contains the source code for [CloudFront Integration v2](https://docs.fingerprint.com/docs/cloudfront-proxy-integration-v2).
 > If you are currently using v1, see our guide for [Migrating CloudFront proxy integration from v1 to v2](https://docs.fingerprint.com/docs/v3/cloudfront-integration-migration-from-v1-to-v2).
 
