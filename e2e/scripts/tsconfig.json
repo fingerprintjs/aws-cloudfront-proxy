@@ -1,14 +1,5 @@
 {
-  "compilerOptions": {
-    "types": ["node"],
-    "module": "CommonJS",
-    "esModuleInterop": true,
-    "resolveJsonModule": true
-  },
-  "exclude": [
-    "node_modules"
-  ],
-  "include": [
-    "**/*.ts"
-  ]
+  "extends": "../../tsconfig.json",
+  "exclude": ["node_modules"],
+  "include": ["**/*.ts"]
 }

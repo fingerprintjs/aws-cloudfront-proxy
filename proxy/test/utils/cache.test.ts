@@ -1,12 +1,12 @@
-import { TTLCache } from '../../utils/cache'
+import { TTLCache } from '../../utils/cache.ts'
 
 describe('TTLCache', () => {
   beforeEach(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterEach(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   test('should store and retrieve values', () => {
@@ -31,7 +31,7 @@ describe('TTLCache', () => {
     expect(cache.get('key1')).toBe('value1')
 
     // Advance time past TTL
-    jest.advanceTimersByTime(1001)
+    vi.advanceTimersByTime(1001)
 
     expect(cache.get('key1')).toBeUndefined()
     expect(cache.has('key1')).toBe(false)
@@ -45,7 +45,7 @@ describe('TTLCache', () => {
     expect(cache.has('key1')).toBe(true)
 
     // Advance time past TTL
-    jest.advanceTimersByTime(1001)
+    vi.advanceTimersByTime(1001)
 
     expect(cache.get('key1')).toBeUndefined()
     expect(cache.has('key1')).toBe(false)
@@ -60,13 +60,13 @@ describe('TTLCache', () => {
     cache.set('key2', 'value2', 2000)
 
     // Advance past first item's TTL but before second item's TTL
-    jest.advanceTimersByTime(1000)
+    vi.advanceTimersByTime(1000)
 
     expect(cache.get('key1')).toBeUndefined()
     expect(cache.get('key2')).toBe('value2')
 
     // Advance past second item's TTL
-    jest.advanceTimersByTime(1001)
+    vi.advanceTimersByTime(1001)
 
     expect(cache.get('key2')).toBeUndefined()
   })
@@ -77,7 +77,7 @@ describe('TTLCache', () => {
     cache.set('key1', 'value1', NaN)
     expect(cache.get('key1')).toBe('value1')
 
-    jest.advanceTimersByTime(1001)
+    vi.advanceTimersByTime(1001)
 
     expect(cache.get('key1')).toBeUndefined()
   })
@@ -109,7 +109,7 @@ describe('TTLCache', () => {
     const cache = new TTLCache<string, string>(1000)
     cache.set('key1', 'value1')
 
-    jest.advanceTimersByTime(1001)
+    vi.advanceTimersByTime(1001)
 
     expect(cache.has('key1')).toBe(false)
     // Underlying map should have been cleaned up by has() which calls get()

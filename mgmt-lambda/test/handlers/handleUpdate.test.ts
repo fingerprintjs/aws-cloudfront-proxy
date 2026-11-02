@@ -1,28 +1,28 @@
 import { mockClient } from 'aws-sdk-client-mock'
+import type { GetFunctionResponse, ListVersionsByFunctionResponse } from '@aws-sdk/client-lambda'
 import {
   GetFunctionCommand,
-  GetFunctionResponse,
   LambdaClient,
   ListVersionsByFunctionCommand,
-  ListVersionsByFunctionResponse,
   ResourceNotFoundException,
   State,
   UpdateFunctionCodeCommand,
 } from '@aws-sdk/client-lambda'
+import type {
+  CreateInvalidationCommandInput,
+  GetDistributionConfigResult,
+  UpdateDistributionCommandInput,
+} from '@aws-sdk/client-cloudfront'
 import {
   AccessDenied,
   CloudFrontClient,
   CreateInvalidationCommand,
-  CreateInvalidationCommandInput,
   GetDistributionConfigCommand,
-  GetDistributionConfigResult,
   UpdateDistributionCommand,
-  UpdateDistributionCommandInput,
 } from '@aws-sdk/client-cloudfront'
-import { handleUpdate } from '../../handlers/updateHandler'
-import type { DeploymentSettings } from '../../model/DeploymentSettings'
-import 'aws-sdk-client-mock-jest'
-import { ErrorCode } from '../../exceptions'
+import { handleUpdate } from '../../handlers/updateHandler.ts'
+import type { DeploymentSettings } from '../../model/DeploymentSettings.ts'
+import { ErrorCode } from '../../exceptions.ts'
 
 const lambdaMock = mockClient(LambdaClient)
 const lambdaClient = new LambdaClient({ region: 'us-east-1' })
@@ -201,7 +201,7 @@ const createInvalidation: CreateInvalidationCommandInput = {
 
 describe('Handle mgmt-update', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
     cloudFrontMock.reset()
   })

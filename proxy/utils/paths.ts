@@ -1,4 +1,5 @@
-import { Region } from '../model'
+import { Region } from '../model/index.ts'
+import { isTruthy } from './is-truthy.ts'
 
 // In V4, the ingress path is the root path
 export const V4_INGRESS_PATH = '/.*'
@@ -20,7 +21,7 @@ export function getV3AgentPath(params: URLSearchParams): string {
   const loaderVersion = params.get('loaderVersion')
   const version = params.get('version') ?? '3'
 
-  const lv: string = loaderVersion ? `/loader_v${loaderVersion}.js` : ''
+  const lv: string = isTruthy(loaderVersion) ? `/loader_v${loaderVersion}.js` : ''
   return `/v${version}/${apiKey}${lv}`
 }
 

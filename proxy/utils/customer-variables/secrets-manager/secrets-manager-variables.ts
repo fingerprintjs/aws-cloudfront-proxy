@@ -1,10 +1,11 @@
-import { CustomerVariableProvider, CustomerVariableName, CustomerVariableReturn } from '../types'
+import type { CustomerVariableProvider, CustomerVariableName, CustomerVariableReturn } from '../types.ts'
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
-import { CloudFrontRequest } from 'aws-lambda'
-import { getHeaderValue } from '../../headers'
-import { retrieveSecret } from './retrieve-secret'
-import { NonNullableObject } from '../../types'
-import { DEFAULT_REGION, SECRET_NAME_HEADER_KEY } from '../defaults'
+import type { CloudFrontRequest } from 'aws-lambda'
+import { getHeaderValue } from '../../headers.ts'
+import { retrieveSecret } from './retrieve-secret.ts'
+import type { NonNullableObject } from '../../types.ts'
+import { DEFAULT_REGION, SECRET_NAME_HEADER_KEY } from '../defaults.ts'
+import { isTruthy } from '../../is-truthy.ts'
 
 interface SecretsInfo {
   secretName: string | null
@@ -16,6 +17,8 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
 
   private secretsInfo?: SecretsInfo
 
+  private validSecretsInfo?: NonNullableObject<SecretsInfo>
+
   private readonly secretsManager?: SecretsManagerClient
 
   constructor(
@@ -25,6 +28,8 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
     this.readSecretsInfoFromHeaders()
 
     if (SecretsManagerVariables.isValidSecretInfo(this.secretsInfo)) {
+      this.validSecretsInfo = this.secretsInfo
+
       try {
         this.secretsManager = new SecretsManagerClient({ region: this.secretsInfo.secretRegion })
       } catch (error) {
@@ -39,16 +44,22 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
   async getVariable(variable: CustomerVariableName): Promise<CustomerVariableReturn> {
     const secretsObject = await this.retrieveSecrets()
 
-    return secretsObject?.[variable]?.toString() ?? null
+    if (secretsObject === null) {
+      return null
+    }
+
+    const value = secretsObject[variable]
+
+    return value === null || value === undefined ? null : value.toString()
   }
 
   private async retrieveSecrets() {
-    if (!this.secretsManager) {
+    if (!this.secretsManager || !this.validSecretsInfo) {
       return null
     }
 
     try {
-      return await retrieveSecret(this.secretsManager, this.secretsInfo!.secretName!, this.cacheTtlMs)
+      return await retrieveSecret(this.secretsManager, this.validSecretsInfo.secretName, this.cacheTtlMs)
     } catch (error) {
       console.error('Error retrieving secret from secrets manager', {
         error,
@@ -60,15 +71,13 @@ export class SecretsManagerVariables implements CustomerVariableProvider {
   }
 
   private readSecretsInfoFromHeaders() {
-    if (!this.secretsInfo) {
-      this.secretsInfo = {
-        secretName: getHeaderValue(this.request, SECRET_NAME_HEADER_KEY),
-        secretRegion: DEFAULT_REGION,
-      }
+    this.secretsInfo ??= {
+      secretName: getHeaderValue(this.request, SECRET_NAME_HEADER_KEY),
+      secretRegion: DEFAULT_REGION,
     }
   }
 
   private static isValidSecretInfo(secretsInfo?: SecretsInfo): secretsInfo is NonNullableObject<SecretsInfo> {
-    return Boolean(secretsInfo?.secretRegion && secretsInfo?.secretName)
+    return secretsInfo !== undefined && isTruthy(secretsInfo.secretRegion) && isTruthy(secretsInfo.secretName)
   }
 }

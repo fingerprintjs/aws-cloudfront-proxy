@@ -1,8 +1,11 @@
-import { CustomerVariableName, CustomerVariableProvider, CustomerVariableType, parseCustomerVariable } from './types'
-import { getDefaultCustomerVariable } from './defaults'
+import type { CustomerVariableName, CustomerVariableProvider, CustomerVariableType } from './types.ts'
+import { parseCustomerVariable } from './types.ts'
+import { getDefaultCustomerVariable } from './defaults.ts'
 
 export interface GetVariableResult<T extends CustomerVariableName> {
-  value: CustomerVariableType<T>
+  // The customer variable's own type can never be null, but unset variables fall back to
+  // their (sometimes null) default, so the resolved value can still be null here.
+  value: CustomerVariableType<T> | null
   resolvedBy: string | null
 }
 
@@ -41,7 +44,7 @@ export class CustomerVariables {
       try {
         const result = await provider.getVariable(variable)
 
-        if (result) {
+        if (result !== null && result !== undefined && result !== '') {
           console.debug(`Resolved customer variable ${variable} with provider ${provider.name}`)
 
           return {

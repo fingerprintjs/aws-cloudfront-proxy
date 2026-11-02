@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "license": "MIT",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
-    "@playwright/test": "^1.49.1"
+    "@playwright/test": "^1.63.0"
   },
   "scripts": {
     "test": "playwright test"

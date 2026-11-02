@@ -1,4 +1,4 @@
-import { addTrafficMonitoring } from '../../utils'
+import { addTrafficMonitoring } from '../../utils/index.ts'
 
 test('test ingress call', () => {
   const url = new URL('https://foo.bar/visitorId?smth')

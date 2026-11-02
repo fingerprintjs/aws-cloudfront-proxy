@@ -12,3 +12,4 @@ jobs:
     uses: fingerprintjs/dx-team-toolkit/.github/workflows/coverage-diff.yml@v1
     with:
       nodeVersion: 24
+      testScript: pnpm test:coverage:diff

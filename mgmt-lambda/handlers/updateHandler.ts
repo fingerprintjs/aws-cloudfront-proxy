@@ -1,30 +1,26 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
-import type { DeploymentSettings } from '../model/DeploymentSettings'
-import { defaults } from '../DefaultSettings'
-import {
+import type { APIGatewayProxyResult } from 'aws-lambda'
+import type { DeploymentSettings } from '../model/DeploymentSettings.ts'
+import { defaults } from '../DefaultSettings.ts'
+import type {
   CloudFrontClient,
-  CreateInvalidationCommand,
   CreateInvalidationCommandInput,
-  GetDistributionConfigCommand,
   GetDistributionConfigCommandOutput,
-  UpdateDistributionCommand,
   UpdateDistributionCommandInput,
 } from '@aws-sdk/client-cloudfront'
 import {
-  GetFunctionCommand,
-  FunctionConfiguration,
-  LambdaClient,
-  ListVersionsByFunctionCommand,
-  UpdateFunctionCodeCommand,
-  UpdateFunctionCodeCommandOutput,
-} from '@aws-sdk/client-lambda'
-import { ApiException, ErrorCode } from '../exceptions'
-import { delay } from '../utils/delay'
+  CreateInvalidationCommand,
+  GetDistributionConfigCommand,
+  UpdateDistributionCommand,
+} from '@aws-sdk/client-cloudfront'
+import type { FunctionConfiguration, LambdaClient, UpdateFunctionCodeCommandOutput } from '@aws-sdk/client-lambda'
+import { GetFunctionCommand, ListVersionsByFunctionCommand, UpdateFunctionCodeCommand } from '@aws-sdk/client-lambda'
+import { ApiException, ErrorCode } from '../exceptions.ts'
+import { delay } from '../utils/delay.ts'
 import {
   doesCacheBehaviorUseOrigins,
   getCacheBehaviorLambdaFunctionAssociations,
   getFPCDNOrigins,
-} from '../utils/cloudfrontUtils'
+} from '../utils/cloudfrontUtils.ts'
 
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_COUNT = 5
 const CLOUDFRONT_CONFIG_UPDATE_ATTEMPT_DELAY = 3000 // Milliseconds
@@ -42,11 +38,11 @@ export async function handleUpdate(
   console.info(`Settings: ${JSON.stringify(settings)}`)
 
   const functionInformationBeforeUpdate = await getLambdaFunctionInformation(lambdaClient, settings.LambdaFunctionName)
-  if (!functionInformationBeforeUpdate?.FunctionArn) {
+  if (functionInformationBeforeUpdate?.FunctionArn === undefined) {
     throw new ApiException(ErrorCode.LambdaFunctionNotFound)
   }
-  const currentRevisionId = functionInformationBeforeUpdate?.RevisionId
-  if (!currentRevisionId) {
+  const currentRevisionId = functionInformationBeforeUpdate.RevisionId
+  if (currentRevisionId === undefined) {
     console.error('Lambda@Edge function expected to have a revision ID of the current deployment')
     throw new ApiException(ErrorCode.LambdaFunctionCurrentRevisionNotDefined)
   }
@@ -58,18 +54,18 @@ export async function handleUpdate(
     currentRevisionId
   )
   const newRevisionId = newVersionConfiguration.RevisionId
-  if (!newRevisionId) {
+  if (newRevisionId === undefined) {
     console.error('New revision for Lambda@Edge function was not created')
     throw new ApiException(ErrorCode.LambdaFunctionUpdateRevisionNotCreated)
   }
   const functionArn = newVersionConfiguration.FunctionArn
-  if (!functionArn) {
+  if (functionArn === undefined) {
     console.error('Function ARN for new version is not defined')
     throw new ApiException(ErrorCode.LambdaFunctionARNNotFound)
   }
 
   const listVersionsAfterUpdate = await listLambdaFunctionVersions(lambdaClient, settings.LambdaFunctionName)
-  const newVersions = listVersionsAfterUpdate.filter((conf) => conf?.RevisionId === newRevisionId)
+  const newVersions = listVersionsAfterUpdate.filter((conf) => conf.RevisionId === newRevisionId)
   if (newVersions.length !== 1) {
     console.error(`Excepted one new version, but found: ${newVersions.length} versions`)
     throw new ApiException(ErrorCode.LambdaFunctionWrongNewVersionsCount)
@@ -118,7 +114,7 @@ async function updateCloudFrontConfig(
   const getConfigCommand = new GetDistributionConfigCommand(configParams)
   const cfConfig: GetDistributionConfigCommandOutput = await cloudFrontClient.send(getConfigCommand)
 
-  if (!cfConfig.ETag || !cfConfig.DistributionConfig) {
+  if (cfConfig.ETag === undefined || cfConfig.DistributionConfig === undefined) {
     throw new ApiException(ErrorCode.CloudFrontDistributionNotFound)
   }
 
@@ -130,7 +126,7 @@ async function updateCloudFrontConfig(
   let fpCacheBehaviorsUpdated = 0
   const invalidationPathPatterns: string[] = []
   const fpCDNOrigins = getFPCDNOrigins(distributionConfig)
-  console.log('fpCDNOrigins.length', fpCDNOrigins?.length)
+  console.log('fpCDNOrigins.length', fpCDNOrigins.length)
 
   if (doesCacheBehaviorUseOrigins(DefaultCacheBehavior, fpCDNOrigins)) {
     fpCacheBehaviorsFound++
@@ -147,17 +143,17 @@ async function updateCloudFrontConfig(
     }
   }
 
-  for (const cacheBehavior of CacheBehaviors?.Items || []) {
+  for (const cacheBehavior of CacheBehaviors?.Items ?? []) {
     if (!doesCacheBehaviorUseOrigins(cacheBehavior, fpCDNOrigins)) {
       continue
     }
 
     fpCacheBehaviorsFound++
     const lambdaAssocList = getCacheBehaviorLambdaFunctionAssociations(cacheBehavior, lambdaFunctionName)
-    if (lambdaAssocList?.length === 1) {
+    if (lambdaAssocList.length === 1) {
       lambdaAssocList[0].LambdaFunctionARN = latestFunctionArn
       fpCacheBehaviorsUpdated++
-      if (cacheBehavior.PathPattern) {
+      if (cacheBehavior.PathPattern !== undefined) {
         let pathPattern = cacheBehavior.PathPattern
         if (!cacheBehavior.PathPattern.startsWith('/')) {
           pathPattern = '/' + pathPattern
@@ -210,8 +206,8 @@ async function updateCloudFrontConfig(
       console.info(`CloudFront update has finished, ${JSON.stringify(updateCFResult)}`)
       console.info('Going to invalidate routes for upgraded cache behavior')
       invalidateFingerprintIntegrationCache(cloudFrontClient, cloudFrontDistributionId, invalidationPathPatterns).catch(
-        (e) => {
-          console.info(`Cache invalidation has failed: ${e.message}`)
+        (e: unknown) => {
+          console.info(`Cache invalidation has failed: ${e instanceof Error ? e.message : String(e)}`)
         }
       )
       return
@@ -287,12 +283,15 @@ async function updateLambdaFunctionCode(
   try {
     result = await lambdaClient.send(command)
   } catch (e) {
-    console.error(`Lambda function update has failed. Error: ${e}`)
+    console.error(`Lambda function update has failed. Error: ${String(e)}`)
     throw new ApiException(ErrorCode.LambdaFunctionUpdateFailed)
   }
 
   console.info(`Got update command result: ${JSON.stringify(result)}`)
 
+  // The AWS SDK client can resolve with undefined for an unmocked/unmatched call in tests, even
+  // though the SDK's own type claims `result` is always a populated FunctionConfiguration.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
   if (!result?.FunctionArn) {
     throw new ApiException(ErrorCode.LambdaFunctionARNNotFound)
   }
@@ -315,9 +314,12 @@ async function listLambdaFunctionVersions(
 
   console.info(`Got ListVersionsByFunctionCommand result: ${JSON.stringify(result)}`)
 
+  // The AWS SDK client can resolve with undefined for an unmocked/unmatched call in tests, even
+  // though the SDK's own type claims `result` is always populated.
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
   if (!result) {
     throw new ApiException(ErrorCode.LambdaFunctionARNNotFound)
   }
 
-  return result.Versions || []
+  return result.Versions ?? []
 }

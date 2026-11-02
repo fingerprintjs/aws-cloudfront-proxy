@@ -1,59 +1,65 @@
-import { APIGatewayProxyResult } from 'aws-lambda'
-import { ErrorCode } from '../exceptions'
+import type { APIGatewayProxyResult } from 'aws-lambda'
+import { ErrorCode } from '../exceptions.ts'
 import { ResourceNotFoundException } from '@aws-sdk/client-lambda'
 
-export async function handleNoAuthentication(): Promise<APIGatewayProxyResult> {
+export function handleNoAuthentication(): Promise<APIGatewayProxyResult> {
   const body = {
     status: 'Token is not specified or not valid',
   }
-  return {
+  return Promise.resolve({
     statusCode: 401,
     body: JSON.stringify(body),
     headers: {
       'content-type': 'application/json',
     },
-  }
+  })
 }
 
-export async function handleWrongConfiguration(error: any): Promise<APIGatewayProxyResult> {
+export function handleWrongConfiguration(error: unknown): Promise<APIGatewayProxyResult> {
   const body = {
     status:
       'Wrong function configuration. Check environment variables for Lambda@Edge function and CloudFront Distribution id',
-    error: error.message || error,
+    error: error instanceof Error ? error.message : error,
   }
-  return {
+  return Promise.resolve({
     statusCode: 500,
     body: JSON.stringify(body),
     headers: {
       'content-type': 'application/json',
     },
-  }
+  })
 }
 
-export function handleError(error: any): APIGatewayProxyResult {
-  if (error.name?.includes('AccessDenied')) {
-    error.code = ErrorCode.AWSAccessDenied
-  } else if (error.name === ResourceNotFoundException.name) {
-    error.code = ErrorCode.AWSResourceNotFound
+type ErrorWithCode = Partial<Error> & {
+  code?: ErrorCode
+}
+
+export function handleError(error: unknown): APIGatewayProxyResult {
+  const errorWithCode: ErrorWithCode = error instanceof Error ? error : {}
+
+  if (errorWithCode.name?.includes('AccessDenied') === true) {
+    errorWithCode.code = ErrorCode.AWSAccessDenied
+  } else if (errorWithCode.name === ResourceNotFoundException.name) {
+    errorWithCode.code = ErrorCode.AWSResourceNotFound
   }
   return {
     statusCode: 500,
-    body: JSON.stringify({ status: 'Error occurred', errorCode: error.code || ErrorCode.UnknownError }),
+    body: JSON.stringify({ status: 'Error occurred', errorCode: errorWithCode.code ?? ErrorCode.UnknownError }),
     headers: {
       'content-type': 'application/json',
     },
   }
 }
 
-export async function handleNotFound(): Promise<APIGatewayProxyResult> {
+export function handleNotFound(): Promise<APIGatewayProxyResult> {
   const body = {
     status: 'Path not found',
   }
-  return {
+  return Promise.resolve({
     statusCode: 404,
     body: JSON.stringify(body),
     headers: {
       'content-type': 'application/json',
     },
-  }
+  })
 }

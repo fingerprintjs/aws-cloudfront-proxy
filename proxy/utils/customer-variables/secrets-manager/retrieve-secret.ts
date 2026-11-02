@@ -1,13 +1,10 @@
-import { CustomerVariablesRecord } from '../types'
-import {
-  GetSecretValueCommand,
-  GetSecretValueCommandOutput,
-  SecretsManagerClient,
-} from '@aws-sdk/client-secrets-manager'
-import { arrayBufferToString } from '../../buffer'
-import { validateSecret } from './validate-secret'
-import { normalizeSecret } from './normalize-secret'
-import { TTLCache } from '../../cache'
+import type { CustomerVariablesRecord } from '../types.ts'
+import type { GetSecretValueCommandOutput, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
+import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { arrayBufferToString } from '../../buffer.ts'
+import { validateSecret } from './validate-secret.ts'
+import { normalizeSecret } from './normalize-secret.ts'
+import { TTLCache } from '../../cache.ts'
 
 /**
  * Global cache for customer variables fetched from Secrets Manager.
@@ -35,7 +32,7 @@ function convertSecretToString(result: GetSecretValueCommandOutput): string {
   if (result.SecretBinary) {
     return arrayBufferToString(result.SecretBinary)
   } else {
-    return result.SecretString || ''
+    return result.SecretString ?? ''
   }
 }
 

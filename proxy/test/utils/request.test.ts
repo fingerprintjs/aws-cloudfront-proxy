@@ -1,5 +1,5 @@
-import { getApiKey, getLoaderVersion, getRegion } from '../../utils'
-import { CloudFrontRequest } from 'aws-lambda'
+import { getApiKey, getLoaderVersion, getRegion } from '../../utils/index.ts'
+import type { CloudFrontRequest } from 'aws-lambda'
 
 describe('api key', () => {
   test('api key is not defined', () => {

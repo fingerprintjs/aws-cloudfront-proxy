@@ -1,10 +1,9 @@
 import { mockClient } from 'aws-sdk-client-mock'
 import { LambdaClient, GetFunctionCommand } from '@aws-sdk/client-lambda'
-import type { DeploymentSettings } from '../../model/DeploymentSettings'
-import { handleStatus } from '../../handlers/statusHandler'
-import 'aws-sdk-client-mock-jest'
+import type { DeploymentSettings } from '../../model/DeploymentSettings.ts'
+import { handleStatus } from '../../handlers/statusHandler.ts'
 import { CloudFrontClient, GetDistributionCommand } from '@aws-sdk/client-cloudfront'
-import { IntegrationStatus } from '../../model/IntegrationStatus'
+import type { IntegrationStatus } from '../../model/IntegrationStatus.ts'
 
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)
@@ -18,7 +17,7 @@ const options: DeploymentSettings = {
 
 describe('Handle mgmt-status', () => {
   beforeEach(() => {
-    jest.resetModules()
+    vi.resetModules()
     lambdaMock.reset()
   })
 
@@ -31,7 +30,7 @@ describe('Handle mgmt-status', () => {
         Configuration: {
           FunctionName: 'fingerprint-pro-lambda-function',
           FunctionArn: 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function',
-          Runtime: 'nodejs16.x',
+          Runtime: 'nodejs24.x',
           Role: 'arn:aws:iam::1234567890:role/fingerprint-pro-lambda-role-12345',
           Handler: 'fingerprintjs-pro-cloudfront-lambda-function.handler',
           CodeSize: 216954,
@@ -159,21 +158,22 @@ describe('Handle mgmt-status', () => {
       FunctionName: options.LambdaFunctionName,
     })
     expect(lambdaMock).toHaveReceivedCommandTimes(GetFunctionCommand, 1)
-  }),
-    it('error while communicating with AWS', async () => {
-      lambdaMock
-        .on(GetFunctionCommand, {
-          FunctionName: options.LambdaFunctionName,
-        })
-        .rejects()
+  })
 
-      cloudFrontMock
-        .on(GetDistributionCommand, {
-          Id: options.CFDistributionId,
-        })
-        .rejects()
+  it('error while communicating with AWS', async () => {
+    lambdaMock
+      .on(GetFunctionCommand, {
+        FunctionName: options.LambdaFunctionName,
+      })
+      .rejects()
 
-      const status = await handleStatus(lambdaClient, cloudFrontClient, options)
-      expect(status.statusCode).toBe(200)
-    })
+    cloudFrontMock
+      .on(GetDistributionCommand, {
+        Id: options.CFDistributionId,
+      })
+      .rejects()
+
+    const status = await handleStatus(lambdaClient, cloudFrontClient, options)
+    expect(status.statusCode).toBe(200)
+  })
 })

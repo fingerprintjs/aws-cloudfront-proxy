@@ -1,4 +1,4 @@
-import { OutgoingHttpHeaders } from 'http'
+import type { OutgoingHttpHeaders } from 'http'
 
 export interface AgentOptions {
   querystring: string

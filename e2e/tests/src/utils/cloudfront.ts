@@ -1,6 +1,6 @@
-import { wait } from './wait'
-import { readTerraformOutput } from './terraform'
-import { PlaywrightTestConfig } from '@playwright/test'
+import { wait } from './wait.ts'
+import { readTerraformOutput } from './terraform.ts'
+import type { PlaywrightTestConfig } from '@playwright/test'
 
 export type CloudfrontUrls = {
   cloudfrontWithHeadersUrl: string
@@ -22,7 +22,7 @@ export const urlTypeCustomerVariableSourceMap: Record<keyof CloudfrontUrls, stri
 
 let cache: CloudfrontUrls | undefined
 
-function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
+function getCloudfrontUrlsFromEnv(): { [K in keyof CloudfrontUrls]: string | undefined } {
   return {
     cloudfrontWithHeadersUrl: process.env.CLOUDFRONT_WITH_HEADERS_URL,
     cloudfrontWithSecretsUrl: process.env.CLOUDFRONT_WITH_SECRETS_URL,
@@ -33,7 +33,11 @@ function getCloudfrontUrlsFromEnv(): Partial<CloudfrontUrls> {
 export function getCloudfrontUrls(): CloudfrontUrls {
   if (!cache) {
     const fromEnv = getCloudfrontUrlsFromEnv()
-    if (fromEnv.cloudfrontWithHeadersUrl && fromEnv.cloudfrontWithSecretsUrl && fromEnv.cloudfrontWithSecretsV4Url) {
+    if (
+      fromEnv.cloudfrontWithHeadersUrl !== undefined &&
+      fromEnv.cloudfrontWithSecretsUrl !== undefined &&
+      fromEnv.cloudfrontWithSecretsV4Url !== undefined
+    ) {
       cache = {
         cloudfrontWithHeadersUrl: `https://${fromEnv.cloudfrontWithHeadersUrl}`,
         cloudfrontWithSecretsUrl: `https://${fromEnv.cloudfrontWithSecretsUrl}`,
@@ -56,15 +60,6 @@ export function getCloudfrontUrls(): CloudfrontUrls {
   return cache
 }
 
-export function getCloudfrontUrl(urlType: keyof CloudfrontUrls, path: string) {
-  const urls = getCloudfrontUrls()
-
-  const url = new URL(urls[urlType])
-  url.pathname = path
-
-  return url.toString()
-}
-
 export async function waitForCloudfront(waitMs = 1000) {
   const urls = Object.values(getCloudfrontUrls()).map((url) => {
     const urlObject = new URL(url)
@@ -74,22 +69,35 @@ export async function waitForCloudfront(waitMs = 1000) {
   })
 
   await Promise.all(
-    urls.map((url) => {
-      return new Promise<void>(async (resolve) => {
-        const response = await fetch(url).catch((error) => {
-          console.error(`Failed to get response from ${url}`, error)
-
-          return null
-        })
-
-        if (response?.ok) {
-          return resolve()
-        }
-
-        await wait(waitMs)
-      })
+    urls.map(async (url) => {
+      await doHealthCheck(url, waitMs)
     })
   )
+}
+
+async function doHealthCheck(url: string, waitMs: number) {
+  let attempts = 0
+  const maxAttempts = 5
+
+  while (attempts < maxAttempts) {
+    const response = await fetch(url).catch((error: unknown) => {
+      console.error(`Failed to get response from ${url}`, error)
+
+      return null
+    })
+
+    if (response?.ok === true) {
+      return
+    }
+
+    attempts++
+
+    if (attempts < maxAttempts) {
+      await wait(waitMs)
+    }
+  }
+
+  throw new Error(`Failed to get response from ${url} after ${maxAttempts} attempts`)
 }
 
 function getBehaviourPath() {

@@ -1,5 +1,5 @@
-import { OutgoingHttpHeaders } from 'http'
-import { Region } from './'
+import type { OutgoingHttpHeaders } from 'http'
+import type { Region } from './index.ts'
 
 export interface ResultOptions {
   fpIngressBaseHost: string

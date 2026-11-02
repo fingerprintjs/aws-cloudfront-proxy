@@ -1,14 +1,15 @@
-import { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
+import type { CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda'
 
-import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils'
-import { CustomerVariables } from './utils/customer-variables/customer-variables'
-import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables'
-import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables'
+import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, setLogLevel } from './utils/index.ts'
+import { isTruthy } from './utils/is-truthy.ts'
+import { CustomerVariables } from './utils/customer-variables/customer-variables.ts'
+import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables.ts'
+import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
-import { createIngressHandler } from './handlers/handleIngress'
-import { handleStatus } from './handlers/handleStatus'
-import { V4_INGRESS_PATH } from './utils/paths'
-import { getSecretCacheTtlMs } from './utils/headers'
+import { createIngressHandler } from './handlers/handleIngress.ts'
+import { handleStatus } from './handlers/handleStatus.ts'
+import { V4_INGRESS_PATH } from './utils/paths.ts'
+import { getSecretCacheTtlMs } from './utils/headers.ts'
 
 export type Route = {
   pathPattern: RegExp
@@ -23,7 +24,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   const routes: Route[] = []
 
   const agentUri = await getAgentUri(customerVariables)
-  if (agentUri) {
+  if (isTruthy(agentUri)) {
     routes.push({
       pathPattern: createRoute(agentUri),
       handler: createIngressHandler('agentV3'),
@@ -31,7 +32,7 @@ async function createRoutes(customerVariables: CustomerVariables): Promise<Route
   }
 
   const resultUri = await getResultUri(customerVariables)
-  if (resultUri) {
+  if (isTruthy(resultUri)) {
     routes.push({
       pathPattern: createRoute(resultUri),
       handler: createIngressHandler('ingressV3'),
@@ -91,9 +92,9 @@ export function handleRequestWithRoutes(
 }
 
 function handleNoMatch(): Promise<CloudFrontResultResponse> {
-  return new Promise((resolve) =>
+  return new Promise((resolve) => {
     resolve({
       status: '404',
     })
-  )
+  })
 }

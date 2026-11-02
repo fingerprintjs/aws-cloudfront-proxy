@@ -1,12 +1,13 @@
-import { handler } from '../../../app'
-import { mockEvent, mockRequest } from '../../aws'
-import * as utils from '../../../utils'
-import { addTrafficMonitoring } from '../../../utils'
+import type { MockInstance } from 'vitest'
+import { handler } from '../../../app.ts'
+import { mockEvent, mockRequest } from '../../aws.ts'
+import * as utils from '../../../utils/index.ts'
+import { addTrafficMonitoring } from '../../../utils/index.ts'
 import https, { Agent } from 'https'
 import { EventEmitter } from 'events'
 import { ClientRequest, IncomingMessage } from 'http'
 import { Socket } from 'net'
-import { CustomerVariableName } from '../../../utils/customer-variables/types'
+import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
 
 describe('Result Endpoint V4', () => {
   const requestUri = '/behavior'
@@ -17,11 +18,11 @@ describe('Result Endpoint V4', () => {
   const queryStringWithRegion = (region: string) =>
     `?region=${region}&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress`
 
-  let requestSpy: jest.SpyInstance
+  let requestSpy: MockInstance<(...args: any[]) => any>
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoring')
-    requestSpy = jest.spyOn(https, 'request')
+    vi.spyOn(utils, 'addTrafficMonitoring')
+    requestSpy = vi.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
       options.agent = new Agent()
@@ -33,7 +34,7 @@ describe('Result Endpoint V4', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('Call with region', async () => {
@@ -301,7 +302,7 @@ describe('Result Endpoint V4', () => {
 
       Object.assign(emitter, {
         statusCode: 200,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -353,7 +354,7 @@ describe('Result Endpoint V4', () => {
 
       Object.assign(emitter, {
         statusCode: 500,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -404,8 +405,8 @@ describe('Result Endpoint V4', () => {
       const emitter = new EventEmitter()
 
       Object.assign(emitter, {
-        write: jest.fn(),
-        end: jest.fn(),
+        write: vi.fn(),
+        end: vi.fn(),
       })
 
       setTimeout(() => {
@@ -437,7 +438,7 @@ describe('Result Endpoint V4', () => {
 
       Object.assign(emitter, {
         statusCode: 200,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'set-cookie': [
             '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',

@@ -1,4 +1,4 @@
-import { CloudfrontUrls } from './utils/cloudfront'
+import type { CloudfrontUrls } from './utils/cloudfront.ts'
 
 export function getProjectName(browser: string, urlType: keyof CloudfrontUrls) {
   return `${browser}-${urlType}`

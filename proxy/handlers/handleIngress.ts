@@ -1,11 +1,12 @@
-import { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
-import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors'
-import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { addTrafficMonitoring, prepareHeadersForIngressRequest } from '../utils'
-import { getValidRegion, isMethodAuthorized } from '../utils/request'
-import { extractIngressPath, getIngressAPIHost, getV3AgentPath, INGRESS_CDN_PATH } from '../utils/paths'
-import { sendIngressRequest } from '../utils/transport'
-import { Region } from '../model'
+import type { CloudFrontRequest, CloudFrontResultResponse } from 'aws-lambda'
+import { getBehaviorPathNestLevel, getFpIngressBaseHost } from '../utils/customer-variables/selectors.ts'
+import type { CustomerVariables } from '../utils/customer-variables/customer-variables.ts'
+import { addTrafficMonitoring, prepareHeadersForIngressRequest } from '../utils/index.ts'
+import { getValidRegion, isMethodAuthorized } from '../utils/request.ts'
+import { extractIngressPath, getIngressAPIHost, getV3AgentPath, INGRESS_CDN_PATH } from '../utils/paths.ts'
+import { sendIngressRequest } from '../utils/transport.ts'
+import { isTruthy } from '../utils/is-truthy.ts'
+import type { Region } from '../model/index.ts'
 
 export type RequestType = 'agentV3' | 'ingressV3' | 'v4'
 
@@ -55,10 +56,12 @@ async function handleIngress(
 ): Promise<CloudFrontResultResponse> {
   // In V4, we need to leverage the new behavior path nest level variable to figure out the path for the ingress request
   const useBehaviorPathNestLevel = requestType === 'v4'
-  const behaviorPathNestLevel = useBehaviorPathNestLevel ? await getBehaviorPathNestLevel(customerVariables) : 0
+  const behaviorPathNestLevel = useBehaviorPathNestLevel
+    ? ((await getBehaviorPathNestLevel(customerVariables)) ?? 0)
+    : 0
 
   const ingressBaseHost = await getFpIngressBaseHost(customerVariables)
-  if (!ingressBaseHost) {
+  if (!isTruthy(ingressBaseHost)) {
     return {
       status: '500',
     }
@@ -80,9 +83,13 @@ async function handleIngress(
       suffix = incomingRequest.uri
       break
 
+    // For the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
+    case 'ingressV3':
     default:
-      // For the rest, so the "ingressV3" request, we'll extract path using path matches. It's an approach that was used in the old ingress handler.
       if (pathMatches && pathMatches.length >= 1) {
+        // Without an optional capture group match, pathMatches[1] is undefined at runtime even
+        // though TS's array indexing (without noUncheckedIndexedAccess) assumes it's always string.
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         suffix = pathMatches[1] ?? ''
       }
   }

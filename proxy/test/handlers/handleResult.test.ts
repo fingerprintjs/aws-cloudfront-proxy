@@ -1,11 +1,12 @@
+import type { MockInstance } from 'vitest'
 import https, { Agent } from 'https'
 import { ClientRequest, IncomingMessage } from 'http'
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
-import { mockEvent, mockRequest } from '../aws'
-import * as utils from '../../utils'
-import { addTrafficMonitoring } from '../../utils'
-import { handler } from '../../app'
+import { mockEvent, mockRequest } from '../aws.ts'
+import * as utils from '../../utils/index.ts'
+import { addTrafficMonitoring } from '../../utils/index.ts'
+import { handler } from '../../app.ts'
 
 describe('Result Endpoint', function () {
   const origin: string = '__ingress_api__'
@@ -15,15 +16,15 @@ describe('Result Endpoint', function () {
   const queryStringWithRegion = (region: string) =>
     `?apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2&region=${region}&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress`
 
-  let requestSpy: jest.SpyInstance
+  let requestSpy: MockInstance<(...args: any[]) => any>
 
   beforeAll(() => {
-    jest.spyOn(utils, 'addTrafficMonitoring')
-    requestSpy = jest.spyOn(https, 'request')
+    vi.spyOn(utils, 'addTrafficMonitoring')
+    requestSpy = vi.spyOn(https, 'request')
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('Call with region', async () => {
@@ -60,7 +61,6 @@ describe('Result Endpoint', function () {
     const queryStringWithUSRegion =
       '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo&ii=fingerprintjs-pro-cloudfront%2F__lambda_func_version__%2Fingress'
     const request = mockRequest({ uri: '/behavior/result', querystring: queryString })
-    request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
     await handler(event)
@@ -91,7 +91,6 @@ describe('Result Endpoint', function () {
     const queryString = 'apiKey=foo.bar/baz&version=bar.foo/baz&loaderVersion=baz.bar/foo'
     const queryStringWithUSRegion = '?apiKey=foo.bar%2Fbaz&version=bar.foo%2Fbaz&loaderVersion=baz.bar%2Ffoo'
     const request = mockRequest({ uri: '/behavior/result', querystring: queryString, method: 'GET' })
-    request.querystring = `${request.querystring}`
     const event = mockEvent(request)
 
     await handler(event)
@@ -219,7 +218,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 200,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -271,7 +270,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 500,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'access-control-allow-credentials': ['true'],
           'access-control-expose-headers': ['Retry-After'],
@@ -322,8 +321,8 @@ describe('Result Endpoint', function () {
       const emitter = new EventEmitter()
 
       Object.assign(emitter, {
-        write: jest.fn(),
-        end: jest.fn(),
+        write: vi.fn(),
+        end: vi.fn(),
       })
 
       setTimeout(() => {
@@ -355,7 +354,7 @@ describe('Result Endpoint', function () {
 
       Object.assign(emitter, {
         statusCode: 200,
-        setEncoding: jest.fn(),
+        setEncoding: vi.fn(),
         headers: {
           'set-cookie': [
             '_iidt=GlMQaHMfzYvomxCuA7Uymy7ArmjH04jPkT+enN7j/Xk8tJG+UYcQV+Qw60Ry4huw9bmDoO/smyjQp5vLCuSf8t4Jow==; Path=/; Domain=fpjs.io; Expires=Fri, 19 Jan 2024 08:54:36 GMT; HttpOnly; Secure; SameSite=None, anotherCookie=anotherValue; Domain=fpjs.io;',
@@ -403,11 +402,11 @@ describe('Result Endpoint', function () {
 })
 
 describe('Browser caching endpoint', () => {
-  let requestSpy: jest.MockInstance<ClientRequest, any>
+  let requestSpy: MockInstance<(...args: any[]) => any>
   const cacheControlValue = 'max-age=31536000, immutable, private'
 
   beforeEach(() => {
-    requestSpy = jest.spyOn(https, 'request')
+    requestSpy = vi.spyOn(https, 'request')
     requestSpy.mockImplementation((...args) => {
       const [, options, cb] = args
       options.agent = new Agent()
@@ -420,13 +419,13 @@ describe('Browser caching endpoint', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   test('cache-control header is returned as is', async () => {
     const reqEvent = mockEvent(mockRequest({ uri: '/behavior/result/some/suffix', querystring: '', method: 'GET' }))
     const response = await handler(reqEvent)
-    expect(response?.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
+    expect(response.headers?.['cache-control']?.[0]?.['value']).toBe(cacheControlValue)
   })
 
   test('Req headers are the same, except cookies, which should be dropped', async () => {

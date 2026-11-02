@@ -1,7 +1,8 @@
-import { CloudFrontResultResponse } from 'aws-lambda'
-import { CustomerVariables } from '../utils/customer-variables/customer-variables'
-import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types'
-import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable'
+import type { CloudFrontResultResponse } from 'aws-lambda'
+import type { CustomerVariables } from '../utils/customer-variables/customer-variables.ts'
+import { CustomerVariableName, internalVariables } from '../utils/customer-variables/types.ts'
+import { maybeObfuscateVariable } from '../utils/customer-variables/maybe-obfuscate-variable.ts'
+import { isTruthy } from '../utils/is-truthy.ts'
 
 export interface EnvVarInfo {
   envVarName: string
@@ -32,7 +33,7 @@ async function getEnvInfo(customerVariables: CustomerVariables) {
       return {
         envVarName: variable,
         value: value.value,
-        isSet: value.value !== null && value.value !== undefined && value.value !== '',
+        isSet: value.value !== null && value.value !== '',
         isInternal: internalVariables.has(variable),
         isOptional: optionalValues.includes(variable),
         resolvedBy: value.resolvedBy,
@@ -54,7 +55,7 @@ function renderItemRow({ title, description, children = '' }: ItemRow) {
   return `
           <div class="item">
               <h3>${title}</h3> 
-              ${description ? `<p>${description}</p>` : ''}
+              ${isTruthy(description) ? `<p>${description}</p>` : ''}
               ${children}
           </div>
 `.trim()
@@ -65,10 +66,10 @@ const v3Icon = `<span data-tooltip="This variable is relevant only for V3 versio
 function renderEnvInfoRow(info: EnvVarInfo) {
   let description = ''
 
-  if (info.isSet && info.resolvedBy) {
+  if (info.isSet && isTruthy(info.resolvedBy)) {
     description = `Value is set`
   } else {
-    description = `⚠️ Value is not defined ${info.value ? `and uses default value: ${info.value}` : ''}`
+    description = `⚠️ Value is not defined ${info.value !== null && info.value !== '' ? `and uses default value: ${info.value}` : ''}`
   }
 
   return `
@@ -81,7 +82,7 @@ function renderEnvInfoRow(info: EnvVarInfo) {
 function renderEnvInfo(envInfo: EnvVarInfo[]) {
   const isAllCustomerDefinedVariablesSet = envInfo
     .filter((info) => !info.isInternal && !info.isOptional)
-    .every((info) => info.isSet && info.resolvedBy)
+    .every((info) => info.isSet && isTruthy(info.resolvedBy))
 
   return renderItemRow({
     title: 'Variables',
@@ -196,7 +197,7 @@ function renderHtml({ version, envInfo, styleNonce }: StatusInfo) {
 
 export async function getStatusInfo(customerVariables: CustomerVariables, styleNonce: string): Promise<StatusInfo> {
   return {
-    version: '__lambda_func_version__',
+    version: __lambda_func_version__,
     envInfo: await getEnvInfo(customerVariables),
     styleNonce,
   }

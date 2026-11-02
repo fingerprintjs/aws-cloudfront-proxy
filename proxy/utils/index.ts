@@ -1,7 +1,7 @@
-import { filterRequestHeaders, getHost, prepareHeadersForIngressRequest, updateResponseHeaders } from './headers'
-import { getApiKey, getLoaderVersion, getRegion, getVersion } from './request'
-import { addTrafficMonitoring } from './traffic'
-import { getAgentUri, getResultUri, getStatusUri } from './customer-variables/selectors'
+import { filterRequestHeaders, getHost, prepareHeadersForIngressRequest, updateResponseHeaders } from './headers.ts'
+import { getApiKey, getLoaderVersion, getRegion, getVersion } from './request.ts'
+import { addTrafficMonitoring } from './traffic.ts'
+import { getAgentUri, getResultUri, getStatusUri } from './customer-variables/selectors.ts'
 import {
   addEndingTrailingSlashToRoute,
   addPathnameMatchBeforeRoute,
@@ -9,9 +9,9 @@ import {
   createRoute,
   removeTrailingSlashesAndMultiSlashes,
   replaceDot,
-} from './routing'
-import { setLogLevel } from './log'
-import { generateRandom } from './string'
+} from './routing.ts'
+import { setLogLevel } from './log.ts'
+import { generateRandom } from './string.ts'
 
 export {
   getAgentUri,
