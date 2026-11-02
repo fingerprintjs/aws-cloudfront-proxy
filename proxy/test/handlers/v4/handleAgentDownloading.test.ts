@@ -110,7 +110,7 @@ describe('Download agent endpoint V4', () => {
   })
 
   test('Origin cache-control is passed through as it is', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613',
@@ -137,7 +137,7 @@ describe('Download agent endpoint V4', () => {
   })
 
   test('Origin s-maxage is passed through as it is', async () => {
-    const request = mockRequest({ uri: '/behavior/greiodsfkljlds', method: 'GET' })
+    const request = mockRequest({ uri: requestUri, querystring: '', method: 'GET' })
 
     Object.assign(mockHttpResponse.headers, {
       'cache-control': 'public, max-age=3613, s-maxage=575500',
