@@ -12,7 +12,7 @@ export default defineConfig({
     globals: true,
     setupFiles: ['vitest.setup.ts'],
     environment: 'node',
-    include: ['proxy/**/*.test.ts', 'mgmt-lambda/**/*.test.ts'],
+    include: ['proxy/**/*.test.ts', 'mgmt-lambda/**/*.test.ts', 'e2e/scripts/**/*.test.ts'],
     passWithNoTests: true,
     coverage: {
       provider: 'istanbul',

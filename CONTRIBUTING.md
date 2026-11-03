@@ -51,6 +51,24 @@ You are required to follow [conventional commits](https://www.conventionalcommit
 End-to-end tests are written using [Playwright](https://github.com/microsoft/playwright) and use [Terraform](https://developer.hashicorp.com/terraform) to deploy the required infrastructure. They are located in the [e2e](e2e) directory.
 These tests run automatically on every pull request via the [terraform-e2e-tests-on-dev.yml](.github/workflows/terraform-e2e-tests-on-dev.yml) workflow, so there's no need to run them locally.
 
+#### Management Lambda upgrade test
+
+[e2e/scripts/mgmtLambdaE2E.ts](e2e/scripts/mgmtLambdaE2E.ts) checks that the management Lambda can upgrade the proxy Lambda. It downgrades the proxy to the newest stable GitHub release that differs from the package in S3, calls the management Lambda's `/update` endpoint, and verifies that the proxy runs the S3 package and that CloudFront serves it.
+
+The [mgmt-lambda-e2e.yml](.github/workflows/mgmt-lambda-e2e.yml) workflow runs it on pull requests that touch the management Lambda, the CloudFormation template, `package.json` or the lockfile. You can also start it manually from the Actions tab. The workflow deploys the PR's CloudFormation template into the persistent `fingerprint-mgmt-lambda-e2e` stack in the dev account and swaps in the PR-built management Lambda.
+
+To run it locally against an existing stack (AWS credentials for `us-east-1` and the AWS CLI are required):
+
+```shell
+pnpm build && pnpm prepare-package
+EXISTING_STACK_NAME=<your-stack-name> pnpm test:mgmt-e2e
+```
+
+> [!WARNING]
+> The test modifies the target stack: it replaces the management Lambda code, publishes new proxy Lambda versions and changes the CloudFront distribution's Lambda associations. Do not point it at a stack you care about.
+
+If the first deployment of the CI stack fails, CloudFormation leaves it in `ROLLBACK_COMPLETE`. Delete the stack by hand before the next run.
+
 ### How to release a new version
 
 We use [changesets](https://github.com/changesets/changesets) for handling release notes. If there are relevant changes, please add them to changeset via `pnpm exec changeset`. You need to run `pnpm install` before doing so.
