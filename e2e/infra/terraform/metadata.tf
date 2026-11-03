@@ -1,5 +1,5 @@
 module "test_metadata" {
-  source = "git@github.com:fingerprintjs/fp-infra-module-metadata.git//modules/metadata?ref=v0.6.0"
+  source = "git@github.com:fingerprintjs/fp-infra-module-metadata.git//modules/metadata?ref=v0.6.1"
 
   env  = "${var.env}-${var.tier}"
   tier = var.tier

@@ -1,7 +1,6 @@
 import type { CloudFrontHeaders, CloudFrontRequest } from 'aws-lambda'
 import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
 import { filterCookie } from './cookie.ts'
-import { updateCacheControlHeader } from './cache-control.ts'
 import type { CustomerVariables } from './customer-variables/customer-variables.ts'
 import { getPreSharedSecret } from './customer-variables/selectors.ts'
 import { TTLCache } from './cache.ts'
@@ -9,6 +8,8 @@ import { isTruthy } from './is-truthy.ts'
 
 export const BLACKLISTED_HEADERS = new Set([
   'age',
+  // Upstream CDN purge tag. It carries an API-key-derived hash and is of no use to clients.
+  'cache-tag',
   'connection',
   'expect',
   'keep-alive',
@@ -51,8 +52,6 @@ const READ_ONLY_RESPONSE_HEADERS = new Set([
 ])
 
 const READ_ONLY_REQUEST_HEADERS = new Set(['content-length', 'host', 'transfer-encoding', 'via'])
-
-export const CACHE_CONTROL_HEADER_NAME = 'cache-control'
 
 /**
  * Prepares the headers for an ingress request by filtering incoming request headers
@@ -117,16 +116,15 @@ export function filterRequestHeaders(request: CloudFrontRequest, dropCookies: bo
 }
 
 /**
- * Updates the response headers based on the provided headers object and an optional flag to override the Cache-Control header.
+ * Updates the response headers based on the provided headers object.
+ *
+ * Cache directives are passed through as the origin sent them. The origin controls the browser cache
+ * lifetime, while CloudFront applies its configured cache policy limits to the edge cache lifetime.
  *
  * @param {IncomingHttpHeaders} headers - The incoming HTTP headers from the request. These are processed to generate the response headers.
- * @param {boolean} [overrideCacheControl=false] - A flag indicating whether to override the Cache-Control header if it exists. Defaults to `false`.
  * @return {CloudFrontHeaders} The updated headers formatted as CloudFront-compatible response headers.
  */
-export function updateResponseHeaders(
-  headers: IncomingHttpHeaders,
-  overrideCacheControl: boolean = false
-): CloudFrontHeaders {
+export function updateResponseHeaders(headers: IncomingHttpHeaders): CloudFrontHeaders {
   const resultHeaders: CloudFrontHeaders = {}
 
   for (const [key, value] of Object.entries(headers)) {
@@ -136,14 +134,7 @@ export function updateResponseHeaders(
       continue
     }
 
-    if (overrideCacheControl && key === CACHE_CONTROL_HEADER_NAME && typeof value === 'string') {
-      resultHeaders[CACHE_CONTROL_HEADER_NAME] = [
-        {
-          key: CACHE_CONTROL_HEADER_NAME,
-          value: updateCacheControlHeader(value),
-        },
-      ]
-    } else if (value !== undefined) {
+    if (value !== undefined) {
       resultHeaders[key] = [
         {
           key: key,
