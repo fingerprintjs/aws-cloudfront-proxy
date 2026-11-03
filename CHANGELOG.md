@@ -1,3 +1,10 @@
+## 2.2.1
+
+### Patch Changes
+
+- Upgrade AWS SDK Clients to latest version (`^3.1144.0`). ([51192a4](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/51192a44d35039b4f7a0fc54dc1d8587e423bca7))
+- Pass the origin's `Cache-Control` for the agent through as it is. The proxy no longer caps `max-age` at 3600 or injects `s-maxage=60`, so the browser cache lifetime follows the origin. CloudFront derives its edge TTL from the origin directives subject to the cache policy's limits, and uses the policy default when the origin sends no cache lifetime. Strip the upstream `Cache-Tag` header, which carries the upstream CDN's purge tag and an API-key-derived hash. ([6dc6eef](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/6dc6eefaa8d0f7002c342cf50f65337e0ad6c9e3))
+
 ## 2.2.1-rc.0
 
 ### Patch Changes
