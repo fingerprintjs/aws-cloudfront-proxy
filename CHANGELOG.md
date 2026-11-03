@@ -1,3 +1,10 @@
+## 2.2.1-rc.0
+
+### Patch Changes
+
+- Upgrade AWS SDK Clients to latest version (`^3.1144.0`). ([51192a4](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/51192a44d35039b4f7a0fc54dc1d8587e423bca7))
+- Pass the origin's `Cache-Control` for the agent through as it is. The proxy no longer caps `max-age` at 3600 or injects `s-maxage=60`, so the browser cache lifetime follows the origin. CloudFront derives its edge TTL from the origin directives subject to the cache policy's limits, and uses the policy default when the origin sends no cache lifetime. Strip the upstream `Cache-Tag` header, which carries the upstream CDN's purge tag and an API-key-derived hash. ([6dc6eef](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/6dc6eefaa8d0f7002c342cf50f65337e0ad6c9e3))
+
 ## 2.2.0
 
 ### Minor Changes
@@ -13,8 +20,7 @@
 - Add FPJS_INTEGRATION_PATH_DEPTH header to CloudFormation template ([7b93386](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/7b93386e4f7cf8ea16920fac4aaa9774376de85e))
 - Add `lambda:InvokeFunction` to the management function.
 
-  Starting from October 2025, AWS requires new function URLs to have this permissions alongside the `lambda:InvokeFunctionUrl`.
-  See https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html to learn more. ([79c008f](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/79c008fab0ac9edf8d6140121b017e8d1de09ed7))
+  Starting from October 2025, AWS requires new function URLs to have this permissions alongside the `lambda:InvokeFunctionUrl`. See https://docs.aws.amazon.com/lambda/latest/dg/urls-auth.html to learn more. ([79c008f](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/79c008fab0ac9edf8d6140121b017e8d1de09ed7))
 
 - Skip creation of V3-related routes if related variables are empty ([dc29d6c](https://github.com/fingerprintjs/aws-cloudfront-proxy/commit/dc29d6c6f95c76d010bbaedcc21f59f4d1bf035d))
 
