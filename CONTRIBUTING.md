@@ -70,6 +70,12 @@ To use a named AWS profile, set `AWS_PROFILE`. Both the AWS CLI and the AWS SDK 
 AWS_PROFILE=<your-profile> EXISTING_STACK_NAME=<your-stack-name> pnpm test:mgmt-e2e
 ```
 
+If your stack reuses an existing distribution with the proxy under a path pattern, set `STATUS_PATH` to the proxy's status page (defaults to `/status`):
+
+```shell
+STATUS_PATH=/fpjs/status EXISTING_STACK_NAME=<your-stack-name> pnpm test:mgmt-e2e
+```
+
 > [!WARNING]
 > The test modifies the target stack: it replaces the management Lambda code, publishes new proxy Lambda versions and changes the CloudFront distribution's Lambda associations. Do not point it at a stack you care about.
 

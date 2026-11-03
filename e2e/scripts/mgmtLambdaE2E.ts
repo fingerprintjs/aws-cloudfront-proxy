@@ -307,8 +307,9 @@ async function main() {
 
   const { Distribution } = await cloudFrontClient.send(new GetDistributionCommand({ Id: outputs.distributionId }))
   assert(Distribution?.DomainName !== undefined, `distribution ${outputs.distributionId} has no domain name`)
-  // The CloudFormation distribution routes everything to the proxy, so the status page is at the root
-  const statusUrl = `https://${Distribution.DomainName}/status`
+  // The CloudFormation distribution routes everything to the proxy, so the status page is at the root.
+  // Stacks reusing a distribution with the proxy under a path (e.g. `/fpjs/*`) set STATUS_PATH
+  const statusUrl = `https://${Distribution.DomainName}${getEnv('STATUS_PATH', '/status')}`
 
   step(`Hashing S3 package ${S3_PACKAGE_URL}`)
   const s3Sha = sha256Base64(await download(S3_PACKAGE_URL))
