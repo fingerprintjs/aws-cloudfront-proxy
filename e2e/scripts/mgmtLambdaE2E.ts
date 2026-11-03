@@ -1,3 +1,4 @@
+import assert from 'assert'
 import { execFileSync } from 'child_process'
 import { createHash } from 'crypto'
 import { readFileSync } from 'fs'
@@ -29,13 +30,13 @@ import { type GitHubRelease, parseStatusVersion, pickDowngradeRelease } from './
  * WARNING: it modifies the target stack (mgmt-lambda code, proxy Lambda code, CloudFront associations).
  */
 
-const DEFAULT_STACK_NAME = 'fingerprint-mgmt-lambda-e2e'
 const RELEASES_URL =
   'https://api.github.com/repos/fingerprintjs/fingerprint-pro-cloudfront-integration/releases?per_page=50'
 const S3_PACKAGE_URL = `https://${defaults.LAMBDA_DISTRIBUTION_BUCKET}.s3.amazonaws.com/${defaults.LAMBDA_DISTRIBUTION_BUCKET_KEY}`
 const ALL_VARIABLES_SET_TEXT = '✅ All required environment variables are set:'
 // CloudFront propagation is slow, waiters get generous limits (seconds)
 const DEPLOY_WAIT_SECONDS = 1800
+const LAMBDA_WAIT_SECONDS = 300
 const STATUS_POLL_TIMEOUT_MS = 15 * 60 * 1000
 const STATUS_POLL_INTERVAL_MS = 20 * 1000
 
@@ -52,9 +53,15 @@ interface StackOutputs {
   mgmtSettingsSecret: string
 }
 
-function getEnvOr(name: string, fallback: string) {
+function getEnv(name: string, fallback?: string) {
   const value = process.env[name]
-  return value === undefined || value === '' ? fallback : value
+  if (value !== undefined && value !== '') {
+    return value
+  }
+  if (fallback === undefined) {
+    throw new Error(`${name} is not set`)
+  }
+  return fallback
 }
 
 function step(message: string) {
@@ -66,18 +73,16 @@ function sha256Base64(data: Buffer) {
   return createHash('sha256').update(data).digest('base64')
 }
 
-function assert(condition: boolean, message: string): asserts condition {
-  if (!condition) {
-    throw new Error(`Assertion failed: ${message}`)
-  }
-}
-
-async function download(url: string, headers: Record<string, string> = {}) {
+async function fetchOk(url: string, headers: Record<string, string> = {}) {
   const response = await fetch(url, { headers })
   if (!response.ok) {
-    throw new Error(`GET ${url} failed with ${response.status}`)
+    throw new Error(`GET ${url} failed with ${response.status}: ${await response.text()}`)
   }
-  return Buffer.from(await response.arrayBuffer())
+  return response
+}
+
+async function download(url: string) {
+  return Buffer.from(await (await fetchOk(url)).arrayBuffer())
 }
 
 function getStackOutputs(stackName: string): StackOutputs {
@@ -180,17 +185,21 @@ async function swapMgmtLambda({ mgmtFunctionName }: StackOutputs, zipPath: strin
   await lambdaClient.send(
     new UpdateFunctionCodeCommand({ FunctionName: mgmtFunctionName, ZipFile: readFileSync(zipPath) })
   )
-  await waitUntilFunctionUpdatedV2({ client: lambdaClient, maxWaitTime: 300 }, { FunctionName: mgmtFunctionName })
+  await waitUntilFunctionUpdatedV2(
+    { client: lambdaClient, maxWaitTime: LAMBDA_WAIT_SECONDS },
+    { FunctionName: mgmtFunctionName }
+  )
 }
 
 async function downgradeProxy(outputs: StackOutputs, s3Sha: string, statusUrl: string) {
   step('Picking downgrade target')
-  const githubToken = process.env.GITHUB_TOKEN
-  const releases = (await (
-    await fetch(RELEASES_URL, {
-      headers: githubToken !== undefined && githubToken !== '' ? { Authorization: `Bearer ${githubToken}` } : {},
-    })
-  ).json()) as GitHubRelease[]
+  // Authenticated requests avoid the shared unauthenticated rate limit of CI runners
+  const githubToken = getEnv('GITHUB_TOKEN', '')
+  const releasesResponse = await fetchOk(
+    RELEASES_URL,
+    githubToken === '' ? {} : { Authorization: `Bearer ${githubToken}` }
+  )
+  const releases = (await releasesResponse.json()) as GitHubRelease[]
   const zips = new Map<string, Buffer>()
   const target = await pickDowngradeRelease(releases, s3Sha, async (url) => {
     zips.set(url, await download(url))
@@ -208,7 +217,7 @@ async function downgradeProxy(outputs: StackOutputs, s3Sha: string, statusUrl: s
   )
   assert(versionArn !== undefined && Version !== undefined, 'downgrade did not publish a version')
   await waitUntilPublishedVersionActive(
-    { client: lambdaClient, maxWaitTime: 300 },
+    { client: lambdaClient, maxWaitTime: LAMBDA_WAIT_SECONDS },
     { FunctionName: outputs.proxyFunctionName, Qualifier: Version }
   )
   console.info(`Published ${versionArn}`)
@@ -281,16 +290,16 @@ async function verifyUpgrade(outputs: StackOutputs, s3Sha: string, statusUrl: st
 
   step('Verifying status page serves the upgraded proxy')
   await waitForDistributionDeployed(outputs.distributionId)
-  await pollStatusPage(
-    statusUrl,
-    `a version other than ${baselineVersion} with all variables set`,
-    (html) => parseStatusVersion(html) !== baselineVersion && html.includes(ALL_VARIABLES_SET_TEXT)
-  )
+  await pollStatusPage(statusUrl, `a version other than ${baselineVersion} with all variables set`, (html) => {
+    const version = parseStatusVersion(html)
+    return version !== undefined && version !== baselineVersion && html.includes(ALL_VARIABLES_SET_TEXT)
+  })
 }
 
 async function main() {
-  const stackName = getEnvOr('EXISTING_STACK_NAME', DEFAULT_STACK_NAME)
-  const mgmtZipPath = getEnvOr('MGMT_LAMBDA_ZIP', 'mgmt_lambda_latest.zip')
+  // Required on purpose: a missing value must not silently target the shared CI stack
+  const stackName = getEnv('EXISTING_STACK_NAME')
+  const mgmtZipPath = getEnv('MGMT_LAMBDA_ZIP', 'mgmt_lambda_latest.zip')
 
   step(`Reading outputs of stack ${stackName}`)
   const outputs = getStackOutputs(stackName)
