@@ -6,5 +6,8 @@
     "e2e-tests": "0.0.1",
     "website": "0.0.1"
   },
-  "changesets": []
+  "changesets": [
+    "deps-update",
+    "pass-through-agent-cache-headers"
+  ]
 }
