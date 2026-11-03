@@ -64,6 +64,12 @@ pnpm build && pnpm prepare-package
 EXISTING_STACK_NAME=<your-stack-name> pnpm test:mgmt-e2e
 ```
 
+To use a named AWS profile, set `AWS_PROFILE`. Both the AWS CLI and the AWS SDK clients in the script pick it up:
+
+```shell
+AWS_PROFILE=<your-profile> EXISTING_STACK_NAME=<your-stack-name> pnpm test:mgmt-e2e
+```
+
 > [!WARNING]
 > The test modifies the target stack: it replaces the management Lambda code, publishes new proxy Lambda versions and changes the CloudFront distribution's Lambda associations. Do not point it at a stack you care about.
 
