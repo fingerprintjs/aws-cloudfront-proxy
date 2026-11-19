@@ -30,7 +30,7 @@ import { ErrorCode } from '../exceptions.ts'
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)
 const ssmMock = mockClient(SSMClient)
-const parameterName = '/fingerprint-pro-mgmt-settings/abc/token'
+const parameterName = '/fingerprint-pro-cloudfront-integration/abc/mgmt/token'
 
 const correctToken = 'qazwsx123edc456'
 const wrongToken = 'wrong-token'

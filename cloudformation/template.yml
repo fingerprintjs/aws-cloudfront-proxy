@@ -97,7 +97,6 @@ Resources:
               - ssm:DeleteParameter
             Resource:
               - !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/*']]
-              - !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/*']]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -179,16 +178,6 @@ Resources:
               - lambda.amazonaws.com
               - edgelambda.amazonaws.com
       Policies:
-      - PolicyName: LambdaExecutionPolicy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Resource: arn:aws:logs:*:*:*
       - PolicyName: ParameterStoreAccess
         PolicyDocument:
           Version: '2012-10-17'
@@ -199,6 +188,14 @@ Resources:
             Resource:
               # Lambda@Edge always reads settings from us-east-1, where the stack is deployed.
               - !Join ['', [!Sub 'arn:aws:ssm:us-east-1:${AWS::AccountId}:parameter/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+          # The mgmt token lives in a sub-path (<path>/mgmt/token); the proxy must not read it.
+          - Effect: Deny
+            Action:
+              - ssm:GetParametersByPath
+            Resource: '*'
+            Condition:
+              StringEquals:
+                ssm:Recursive: 'true'
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -320,16 +317,6 @@ Resources:
             Service:
               - lambda.amazonaws.com
       Policies:
-      - PolicyName: LogsPolicy
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-              - logs:CreateLogGroup
-              - logs:CreateLogStream
-              - logs:PutLogEvents
-            Resource: arn:aws:logs:*:*:*
       - PolicyName: ParameterStoreAccess
         PolicyDocument:
           Version: '2012-10-17'
@@ -337,7 +324,7 @@ Resources:
           - Effect: Allow
             Action:
               - ssm:GetParameter
-            Resource: !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/token']]
+            Resource: !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/mgmt/token']]
       - PolicyName: S3LambdaDistributionAccess
         PolicyDocument:
           Version: '2012-10-17'
@@ -389,7 +376,7 @@ Resources:
     Type: Custom::SecureStringParameter
     Properties:
       ServiceToken: !GetAtt SecureStringParameterFunction.Arn
-      Name: !Join ['', ['/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/token']]
+      Name: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/mgmt/token']]
       Generate: 'true'
 
   FingerprintProMgmtLambda:

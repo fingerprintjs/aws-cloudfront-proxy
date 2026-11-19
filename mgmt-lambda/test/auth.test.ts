@@ -9,7 +9,7 @@ import { getAuthSettings, retrieveAuthToken } from '../auth.ts'
 
 const ssmMock = mockClient(SSMClient)
 const ssmClient = new SSMClient({})
-const parameterName = '/fingerprint-pro-mgmt-settings/abc/token'
+const parameterName = '/fingerprint-pro-cloudfront-integration/abc/mgmt/token'
 
 describe('auth test', () => {
   const OLD_ENV = process.env
