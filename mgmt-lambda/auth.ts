@@ -1,36 +1,37 @@
 import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
 import type { AuthSettings } from './model/AuthSettings.ts'
-import type { SecretsManagerClient, GetSecretValueResponse } from '@aws-sdk/client-secrets-manager'
-import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import type { SSMClient } from '@aws-sdk/client-ssm'
+import { GetParameterCommand } from '@aws-sdk/client-ssm'
 
 const MGMT_TOKEN_SCHEME = 'mgmt-token'
 const EMPTY_TOKEN = ''
 
-export async function getAuthSettings(secretManagerClient: SecretsManagerClient): Promise<AuthSettings> {
-  const secretName = process.env.SettingsSecretName
-  if (secretName === undefined || secretName === '') {
-    throw new Error('Unable to retrieve secret. Error: environment variable SettingsSecretName not found')
+/**
+ * Reads the management token from a SecureString parameter in Parameter Store.
+ * The parameter name is passed via the `SettingsParameterName` environment variable.
+ * */
+export async function getAuthSettings(ssmClient: SSMClient): Promise<AuthSettings> {
+  const parameterName = process.env.SettingsParameterName
+  if (parameterName === undefined || parameterName === '') {
+    throw new Error('Unable to retrieve parameter. Error: environment variable SettingsParameterName not found')
   }
 
   try {
-    const command = new GetSecretValueCommand({
-      SecretId: secretName,
-    })
+    const response = await ssmClient.send(
+      new GetParameterCommand({
+        Name: parameterName,
+        WithDecryption: true,
+      })
+    )
 
-    const response: GetSecretValueResponse = await secretManagerClient.send(command)
+    const token = response.Parameter?.Value
+    if (token === undefined || token === '') {
+      throw new Error('parameter is empty')
+    }
 
-    if (response.SecretBinary) {
-      // Secrets Manager payload isn't schema-validated at runtime; trust its shape here.
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      return JSON.parse(Buffer.from(response.SecretBinary).toString('utf8')) as AuthSettings
-    }
-    if (response.SecretString !== undefined && response.SecretString !== '') {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      return JSON.parse(response.SecretString) as AuthSettings
-    }
-    throw new Error('secret is empty')
+    return { token }
   } catch (error) {
-    throw new Error(`Unable to retrieve secret. ${String(error)}`)
+    throw new Error(`Unable to retrieve parameter. ${String(error)}`)
   }
 }
 

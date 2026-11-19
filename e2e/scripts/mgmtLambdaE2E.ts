@@ -21,7 +21,7 @@ import {
   waitUntilFunctionUpdatedV2,
   waitUntilPublishedVersionActive,
 } from '@aws-sdk/client-lambda'
-import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
+import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm'
 import { defaults } from '../../mgmt-lambda/DefaultSettings.ts'
 import { type GitHubRelease, parseStatusVersion, pickDowngradeRelease } from './mgmtLambdaE2EUtils.ts'
 
@@ -43,14 +43,14 @@ const STATUS_POLL_INTERVAL_MS = 20 * 1000
 const region = defaults.AWS_REGION
 const lambdaClient = new LambdaClient({ region })
 const cloudFrontClient = new CloudFrontClient({ region })
-const secretsClient = new SecretsManagerClient({ region })
+const ssmClient = new SSMClient({ region })
 
 interface StackOutputs {
   proxyFunctionName: string
   mgmtFunctionName: string
   distributionId: string
   mgmtFunctionUrl: string
-  mgmtSettingsSecret: string
+  mgmtTokenParameter: string
 }
 
 function getEnv(name: string, fallback?: string) {
@@ -118,7 +118,7 @@ function getStackOutputs(stackName: string): StackOutputs {
     mgmtFunctionName: get('FingerprintProMgmtLambda'),
     distributionId: get('CloudFrontDistributionId'),
     mgmtFunctionUrl: get('MgmtLambdaFunctionUrl'),
-    mgmtSettingsSecret: get('MgmtSettingsSecret'),
+    mgmtTokenParameter: get('MgmtTokenParameter'),
   }
 }
 
@@ -248,11 +248,13 @@ async function downgradeProxy(outputs: StackOutputs, s3Sha: string, statusUrl: s
   return target.version
 }
 
-async function triggerUpdate({ mgmtFunctionUrl, mgmtSettingsSecret }: StackOutputs) {
+async function triggerUpdate({ mgmtFunctionUrl, mgmtTokenParameter }: StackOutputs) {
   step('Triggering mgmt-lambda update')
-  const { SecretString } = await secretsClient.send(new GetSecretValueCommand({ SecretId: mgmtSettingsSecret }))
-  const { token } = JSON.parse(SecretString ?? '{}') as { token?: string }
-  assert(token !== undefined && token !== '', `secret ${mgmtSettingsSecret} has no token`)
+  const { Parameter } = await ssmClient.send(
+    new GetParameterCommand({ Name: mgmtTokenParameter, WithDecryption: true })
+  )
+  const token = Parameter?.Value
+  assert(token !== undefined && token !== '', `parameter ${mgmtTokenParameter} has no token`)
 
   const response = await fetch(new URL('update', mgmtFunctionUrl), {
     method: 'POST',

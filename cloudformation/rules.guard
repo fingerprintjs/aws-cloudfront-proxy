@@ -6,11 +6,19 @@ rule check_conditions {
     Conditions.AttachDomainToCloudFront is_struct
 }
 
-rule check_secret {
-    Resources.FingerprintIntegrationSettingsSecret {
-        Type == "AWS::SecretsManager::Secret"
+rule check_settings_parameters {
+    Resources.FpjsPreSharedSecretParameter {
+        Type == "Custom::SecureStringParameter"
         Properties {
-            SecretString !empty
+            Name !empty
+            Value !empty
+        }
+    }
+
+    Resources.MgmtTokenParameter {
+        Type == "Custom::SecureStringParameter"
+        Properties {
+            Generate == "true"
         }
     }
 }

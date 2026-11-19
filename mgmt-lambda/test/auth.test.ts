@@ -1,5 +1,5 @@
 import { mockClient } from 'aws-sdk-client-mock'
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm'
 import type {
   APIGatewayProxyEventV2WithRequestContext,
   APIGatewayEventRequestContextV2,
@@ -7,79 +7,46 @@ import type {
 } from 'aws-lambda'
 import { getAuthSettings, retrieveAuthToken } from '../auth.ts'
 
-const secretMock = mockClient(SecretsManagerClient)
-const secretManagerClient = new SecretsManagerClient({})
+const ssmMock = mockClient(SSMClient)
+const ssmClient = new SSMClient({})
+const parameterName = '/fingerprint-pro-mgmt-settings/abc/token'
 
 describe('auth test', () => {
   const OLD_ENV = process.env
 
   beforeEach(() => {
     vi.resetModules()
-    secretMock.reset()
+    ssmMock.reset()
     process.env = { ...OLD_ENV }
   })
 
-  it('AWS Secret is available (string)', async () => {
-    const secretName = 'fingerprint-mgmt-lambda-auth-settings'
-    process.env.SettingsSecretName = secretName
-    secretMock
-      .on(GetSecretValueCommand, {
-        SecretId: secretName,
+  it('SecureString parameter is available', async () => {
+    process.env.SettingsParameterName = parameterName
+    ssmMock
+      .on(GetParameterCommand, {
+        Name: parameterName,
+        WithDecryption: true,
       })
       .resolves({
-        SecretString: '{"token": "4uxgk6nlew"}',
+        Parameter: { Value: '4uxgk6nlew', Type: 'SecureString' },
       })
 
-    const settings = await getAuthSettings(secretManagerClient)
+    const settings = await getAuthSettings(ssmClient)
     expect(settings.token).toBe('4uxgk6nlew')
-    expect(secretMock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+    expect(ssmMock).toHaveReceivedCommandTimes(GetParameterCommand, 1)
   })
 
-  it('AWS Secret is available (byte array)', async () => {
-    const secretName = 'fingerprint-mgmt-lambda-auth-settings'
-    process.env.SettingsSecretName = secretName
-    secretMock
-      .on(GetSecretValueCommand, {
-        SecretId: secretName,
-      })
-      .resolves({
-        SecretBinary: Buffer.from('{"token": "4uxgk6nlew"}'),
-      })
+  it('parameter is available, but empty', async () => {
+    process.env.SettingsParameterName = parameterName
+    ssmMock.on(GetParameterCommand, { Name: parameterName }).resolves({})
 
-    const settings = await getAuthSettings(secretManagerClient)
-    expect(settings.token).toBe('4uxgk6nlew')
-    expect(secretMock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+    await expect(getAuthSettings(ssmClient)).rejects.toThrow('Unable to retrieve parameter. Error: parameter is empty')
   })
 
-  it('AWS Secret is available, but empty', async () => {
-    const secretName = 'fingerprint-mgmt-lambda-auth-settings'
-    process.env.SettingsSecretName = secretName
-    secretMock
-      .on(GetSecretValueCommand, {
-        SecretId: secretName,
-      })
-      .resolves({})
-
-    try {
-      await getAuthSettings(secretManagerClient)
-    } catch (error: any) {
-      expect(error.message).toBe('Unable to retrieve secret. Error: secret is empty')
-    }
-  })
-
-  it('No env var with secret name', async () => {
-    const secretName = 'fingerprint-mgmt-lambda-auth-settings'
-    secretMock
-      .on(GetSecretValueCommand, {
-        SecretId: secretName,
-      })
-      .resolves({})
-
-    try {
-      await getAuthSettings(secretManagerClient)
-    } catch (error: any) {
-      expect(error.message).toBe('Unable to retrieve secret. Error: environment variable SettingsSecretName not found')
-    }
+  it('No env var with parameter name', async () => {
+    await expect(getAuthSettings(ssmClient)).rejects.toThrow(
+      'Unable to retrieve parameter. Error: environment variable SettingsParameterName not found'
+    )
   })
 })
 

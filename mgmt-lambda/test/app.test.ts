@@ -8,7 +8,7 @@ import {
   State,
   UpdateFunctionCodeCommand,
 } from '@aws-sdk/client-lambda'
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm'
 import type { APIGatewayProxyEventV2WithRequestContext, APIGatewayEventRequestContextV2 } from 'aws-lambda'
 import { handler } from '../app.ts'
 import type {
@@ -29,16 +29,16 @@ import { ErrorCode } from '../exceptions.ts'
 
 const lambdaMock = mockClient(LambdaClient)
 const cloudFrontMock = mockClient(CloudFrontClient)
-const secretMock = mockClient(SecretsManagerClient)
-const secretName = 'fingerprint-mgmt-lambda-auth-settings'
+const ssmMock = mockClient(SSMClient)
+const parameterName = '/fingerprint-pro-mgmt-settings/abc/token'
 
 const correctToken = 'qazwsx123edc456'
 const wrongToken = 'wrong-token'
 
 const OLD_ENV = process.env
 
-function setSecretEnv() {
-  process.env.SettingsSecretName = secretName
+function setParameterEnv() {
+  process.env.SettingsParameterName = parameterName
 }
 
 function setConfigEnv() {
@@ -47,13 +47,14 @@ function setConfigEnv() {
   process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
 }
 
-function mockSecret(tokenValue: string) {
-  secretMock
-    .on(GetSecretValueCommand, {
-      SecretId: secretName,
+function mockParameter(tokenValue: string) {
+  ssmMock
+    .on(GetParameterCommand, {
+      Name: parameterName,
+      WithDecryption: true,
     })
     .resolves({
-      SecretString: `{"token": "${tokenValue}"}`,
+      Parameter: { Value: tokenValue, Type: 'SecureString' },
     })
 }
 
@@ -308,15 +309,15 @@ describe('Basic test', () => {
   beforeEach(() => {
     vi.resetModules()
     lambdaMock.reset()
-    secretMock.reset()
+    ssmMock.reset()
     cloudFrontMock.reset()
     process.env = { ...OLD_ENV }
   })
 
   test('basic auth test', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     lambdaMock
       .on(GetFunctionCommand, {
@@ -337,9 +338,9 @@ describe('Basic test', () => {
   })
 
   test('wrong auth token', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(wrongToken)
 
@@ -348,8 +349,8 @@ describe('Basic test', () => {
   })
 
   test('no update configuration env vars', async () => {
-    setSecretEnv()
-    mockSecret(correctToken)
+    setParameterEnv()
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken)
 
@@ -358,9 +359,9 @@ describe('Basic test', () => {
   })
 
   test('status endpoint with POST', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'POST')
 
@@ -369,9 +370,9 @@ describe('Basic test', () => {
   })
 
   test('wrong endpoint', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'PUT', 'fsdkjlkj')
 
@@ -380,9 +381,9 @@ describe('Basic test', () => {
   })
 
   test('endpoint with leading slashes', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'GET', '///status')
 
@@ -391,9 +392,9 @@ describe('Basic test', () => {
   })
 
   test('endpoint with trailing slashes', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'GET', 'status/')
 
@@ -402,9 +403,9 @@ describe('Basic test', () => {
   })
 
   test('endpoint with leading and trailing slashes', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'GET', '//status/')
 
@@ -413,9 +414,9 @@ describe('Basic test', () => {
   })
 
   test('status endpoint with additional path', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'GET', '//status/something')
 
@@ -424,9 +425,9 @@ describe('Basic test', () => {
   })
 
   test('wrong endpoint', async () => {
-    setSecretEnv()
+    setParameterEnv()
     setConfigEnv()
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken, 'GET', '//statuss')
 
@@ -439,12 +440,12 @@ describe('Check environment', () => {
   beforeEach(() => {
     vi.resetModules()
     lambdaMock.reset()
-    secretMock.reset()
+    ssmMock.reset()
     cloudFrontMock.reset()
     process.env = { ...OLD_ENV }
   })
 
-  test('no secret env var', async () => {
+  test('no parameter env var', async () => {
     const event = generateStatusRequest(correctToken)
 
     const result = await handler(event)
@@ -452,8 +453,8 @@ describe('Check environment', () => {
   })
 
   test('no deployment config', async () => {
-    setSecretEnv()
-    mockSecret(correctToken)
+    setParameterEnv()
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken)
 
@@ -469,10 +470,10 @@ describe('Check environment', () => {
   })
 
   test('CFDistributionConfig is not defined', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken)
 
@@ -486,11 +487,11 @@ describe('Check environment', () => {
   })
 
   test('CFDistributionConfig is defined, but empty', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = ''
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
 
     const event = generateStatusRequest(correctToken)
 
@@ -508,17 +509,17 @@ describe('Update endpoint', () => {
   beforeEach(() => {
     vi.resetModules()
     lambdaMock.reset()
-    secretMock.reset()
+    ssmMock.reset()
     cloudFrontMock.reset()
     process.env = { ...OLD_ENV }
   })
 
   test('handle update', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -557,11 +558,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be FunctionARNNotFound', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -606,11 +607,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be AWSResourceNotFound', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -625,11 +626,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be AWSAccessDenied', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionName = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionArn = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -644,11 +645,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be Cloudfront Distribution not found', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -689,11 +690,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be Cache Behavior Pattern not defined', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -764,11 +765,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be Lambda Function ARN not found', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -796,11 +797,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be Lambda Function Revision ID not found', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionArn = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionName = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,
@@ -827,11 +828,11 @@ describe('Update endpoint', () => {
   })
 
   test('expect errorCode to be latest version not present', async () => {
-    setSecretEnv()
+    setParameterEnv()
     process.env.CFDistributionId = 'ABCDEF123456'
     process.env.LambdaFunctionName = 'arn:aws:lambda:us-east-1:1234567890:function:fingerprint-pro-lambda-function'
     process.env.LambdaFunctionArn = 'fingerprint-pro-lambda-function'
-    mockSecret(correctToken)
+    mockParameter(correctToken)
     lambdaMock
       .on(GetFunctionCommand, {
         FunctionName: process.env.LambdaFunctionName,

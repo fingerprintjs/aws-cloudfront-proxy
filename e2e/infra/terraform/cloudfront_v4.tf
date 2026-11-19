@@ -1,7 +1,7 @@
 resource "aws_cloudfront_distribution" "with_secret_v4_only" {
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "CloudFront distribution for E2E Tests using Secrets Manager with V4 only"
+  comment             = "CloudFront distribution for E2E Tests using Parameter Store with V4 only"
   default_root_object = "index.html"
 
   default_cache_behavior {
@@ -19,7 +19,9 @@ resource "aws_cloudfront_distribution" "with_secret_v4_only" {
   }
 
   depends_on = [
-    aws_s3_bucket_policy.website_bucket_policy
+    aws_s3_bucket_policy.website_bucket_policy,
+    aws_ssm_parameter.fpjs_pre_shared_secret_v4_only,
+    aws_iam_role_policy.fpjs_proxy_parameter_store_v4_only
   ]
 
   origin {
@@ -43,8 +45,8 @@ resource "aws_cloudfront_distribution" "with_secret_v4_only" {
       origin_ssl_protocols   = ["TLSv1.2"]
     }
     custom_header {
-      name  = "FPJS_SECRET_NAME"
-      value = module.fingerprint_cloudfront_integration_v4_only.fpjs_secret_manager_arn
+      name  = "FPJS_PARAMETER_PATH"
+      value = local.fpjs_parameter_path_v4_only
     }
     custom_header {
       name  = "fpjs_debug"

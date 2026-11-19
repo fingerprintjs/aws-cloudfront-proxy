@@ -4,7 +4,7 @@ import { createRoute, generateRandom, getAgentUri, getResultUri, getStatusUri, s
 import { isTruthy } from './utils/is-truthy.ts'
 import { CustomerVariables } from './utils/customer-variables/customer-variables.ts'
 import { HeaderCustomerVariables } from './utils/customer-variables/header-customer-variables.ts'
-import { SecretsManagerVariables } from './utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
+import { ParameterStoreVariables } from './utils/customer-variables/parameter-store/parameter-store-variables.ts'
 import type { CloudFrontRequest } from 'aws-lambda/common/cloudfront'
 import { createIngressHandler } from './handlers/handleIngress.ts'
 import { handleStatus } from './handlers/handleStatus.ts'
@@ -66,7 +66,7 @@ export const handler = async (event: CloudFrontRequestEvent): Promise<CloudFront
   setLogLevel(request)
 
   const customerVariables = new CustomerVariables([
-    new SecretsManagerVariables(request, getSecretCacheTtlMs(request)),
+    new ParameterStoreVariables(request, getSecretCacheTtlMs(request)),
     new HeaderCustomerVariables(request),
   ])
 

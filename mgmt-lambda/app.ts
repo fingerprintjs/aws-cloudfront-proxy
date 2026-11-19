@@ -3,7 +3,7 @@ import type {
   APIGatewayProxyEventV2WithRequestContext,
   APIGatewayProxyResult,
 } from 'aws-lambda'
-import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager'
+import { SSMClient } from '@aws-sdk/client-ssm'
 import { getAuthSettings, retrieveAuthToken } from './auth.ts'
 import type { DeploymentSettings } from './model/DeploymentSettings.ts'
 import {
@@ -22,10 +22,10 @@ import { removeLeadingAndTrailingSlashes } from './routing.ts'
 export async function handler(
   event: APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>
 ): Promise<APIGatewayProxyResult> {
-  const secretManagerClient = new SecretsManagerClient({ region: defaults.AWS_REGION })
+  const ssmClient = new SSMClient({ region: defaults.AWS_REGION })
 
   try {
-    const authSettings = await getAuthSettings(secretManagerClient)
+    const authSettings = await getAuthSettings(ssmClient)
     const authToken = retrieveAuthToken(event)
     if (!authToken || !authSettings.token) {
       return await handleNoAuthentication()

@@ -2,11 +2,10 @@ import type { CloudFrontRequest } from 'aws-lambda'
 import { CustomerVariables } from '../../../utils/customer-variables/customer-variables.ts'
 import { HeaderCustomerVariables } from '../../../utils/customer-variables/header-customer-variables.ts'
 import { getAgentUri, getResultUri, getStatusUri } from '../../../utils/index.ts'
-import { SecretsManagerVariables } from '../../../utils/customer-variables/secrets-manager/secrets-manager-variables.ts'
-import type { CustomerVariablesRecord } from '../../../utils/customer-variables/types.ts'
+import { ParameterStoreVariables } from '../../../utils/customer-variables/parameter-store/parameter-store-variables.ts'
 import { CustomerVariableName } from '../../../utils/customer-variables/types.ts'
-import { clearSecretsCache } from '../../../utils/customer-variables/secrets-manager/retrieve-secret.ts'
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
+import { clearParametersCache } from '../../../utils/customer-variables/parameter-store/retrieve-parameters.ts'
+import { SSMClient, GetParametersByPathCommand } from '@aws-sdk/client-ssm'
 import { mockClient } from 'aws-sdk-client-mock'
 import { getAgentDownloadPath } from '../../../utils/customer-variables/selectors.ts'
 
@@ -135,23 +134,22 @@ describe('customer variables selectors', () => {
     })
   })
 
-  describe('from secrets manager', () => {
-    const mock = mockClient(SecretsManagerClient)
+  describe('from parameter store', () => {
+    const mock = mockClient(SSMClient)
 
-    const getSecretsManagerCustomerVariables = (request: CloudFrontRequest) =>
-      new CustomerVariables([new SecretsManagerVariables(request)])
+    const getParameterStoreCustomerVariables = (request: CloudFrontRequest) =>
+      new CustomerVariables([new ParameterStoreVariables(request)])
 
-    const stringToArrayBuffer = (str: string) => {
-      const buf = new ArrayBuffer(str.length)
-      const bufView = new Uint8Array(buf)
-      for (let i = 0, strLen = str.length; i < strLen; i++) {
-        bufView[i] = str.charCodeAt(i)
-      }
-      return bufView
+    const parameterPath = '/fingerprint/my-integration'
+
+    const parameterHeaders = {
+      fpjs_parameter_path: [
+        {
+          key: 'fpjs_parameter_path',
+          value: parameterPath,
+        },
+      ],
     }
-
-    const secretName = 'my_secret'
-    const secretRegion = 'us-east-1'
 
     const req: CloudFrontRequest = {
       clientIp: '1.1.1.1',
@@ -168,26 +166,13 @@ describe('customer variables selectors', () => {
           protocol: 'https',
           readTimeout: 60,
           sslProtocols: ['TLSv2'],
-          customHeaders: {
-            fpjs_secret_name: [
-              {
-                key: 'fpjs_secret_name',
-                value: secretName,
-              },
-            ],
-            fpjs_secret_region: [
-              {
-                key: 'fpjs_secret_region',
-                value: secretRegion,
-              },
-            ],
-          },
+          customHeaders: parameterHeaders,
         },
       },
     }
 
     const runAssertions = async (request = req) => {
-      const customerVariables = getSecretsManagerCustomerVariables(request)
+      const customerVariables = getParameterStoreCustomerVariables(request)
 
       const checkVariables = async () => {
         expect(await getAgentUri(customerVariables)).toBe('/download')
@@ -197,59 +182,52 @@ describe('customer variables selectors', () => {
 
       await checkVariables()
 
-      expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
-      expect(mock).toHaveReceivedCommandWith(GetSecretValueCommand, {
-        SecretId: secretName,
+      expect(mock).toHaveReceivedCommandTimes(GetParametersByPathCommand, 1)
+      expect(mock).toHaveReceivedCommandWith(GetParametersByPathCommand, {
+        Path: parameterPath,
+        WithDecryption: true,
       })
 
       await checkVariables()
 
-      // Ensure that the secret is only fetched once
-      expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+      // Ensure that the parameters are only fetched once
+      expect(mock).toHaveReceivedCommandTimes(GetParametersByPathCommand, 1)
     }
 
     beforeEach(() => {
-      clearSecretsCache()
+      clearParametersCache()
 
       mock.reset()
+      mock.on(GetParametersByPathCommand, { Path: parameterPath }).resolves({
+        Parameters: [
+          { Name: `${parameterPath}/${CustomerVariableName.AgentDownloadPath}`, Value: 'download', Type: 'String' },
+          { Name: `${parameterPath}/${CustomerVariableName.GetResultPath}`, Value: 'result', Type: 'String' },
+          { Name: `${parameterPath}/${CustomerVariableName.PreSharedSecret}`, Value: 'abcd', Type: 'SecureString' },
+        ],
+      })
     })
 
-    const variablesRecord = {
-      [CustomerVariableName.AgentDownloadPath]: 'download',
-      [CustomerVariableName.GetResultPath]: 'result',
-      [CustomerVariableName.PreSharedSecret]: 'abcd',
-    } as CustomerVariablesRecord
-    const variablesRecordStr = JSON.stringify(variablesRecord)
-
-    test.each([
-      stringToArrayBuffer(variablesRecordStr),
-      new TextEncoder().encode(variablesRecordStr),
-      Buffer.from(variablesRecordStr),
-    ])('positive scenario for custom origin with buffer secret', async (buffer) => {
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: secretName,
-        })
-        .resolves({
-          SecretBinary: buffer,
-        })
-
+    test('positive scenario for custom origin', async () => {
       await runAssertions()
     })
 
-    test('positive scenario for custom origin with string secret', async () => {
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: secretName,
-        })
-        .resolves({
-          SecretString: variablesRecordStr,
-        })
+    test('normalizes path without leading slash and with trailing slash', async () => {
+      const request: CloudFrontRequest = {
+        ...req,
+        origin: {
+          custom: {
+            ...req.origin!.custom!,
+            customHeaders: {
+              fpjs_parameter_path: [{ key: 'fpjs_parameter_path', value: `${parameterPath.slice(1)}/` }],
+            },
+          },
+        },
+      }
 
-      await runAssertions()
+      await runAssertions(request)
     })
 
-    test('positive scenario for s3 origin with string secret', async () => {
+    test('positive scenario for s3 origin', async () => {
       const req: CloudFrontRequest = {
         clientIp: '1.1.1.1',
         method: 'GET',
@@ -262,44 +240,43 @@ describe('customer variables selectors', () => {
             path: '/',
             region: 'us',
             authMethod: 'origin-access-identity',
-            customHeaders: {
-              fpjs_secret_name: [
-                {
-                  key: 'fpjs_secret_name',
-                  value: secretName,
-                },
-              ],
-              fpjs_secret_region: [
-                {
-                  key: 'fpjs_secret_region',
-                  value: secretRegion,
-                },
-              ],
-            },
+            customHeaders: parameterHeaders,
           },
         },
       }
-
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: secretName,
-        })
-        .resolves({
-          SecretString: variablesRecordStr,
-        })
 
       await runAssertions(req)
     })
   })
 
-  describe('from secrets manager and headers', () => {
-    const mock = mockClient(SecretsManagerClient)
-    //const client = new SecretsManagerClient({})
+  describe('from parameter store and headers', () => {
+    const mock = mockClient(SSMClient)
 
     const getCustomerVariables = (request: CloudFrontRequest) =>
-      new CustomerVariables([new SecretsManagerVariables(request), new HeaderCustomerVariables(request)])
+      new CustomerVariables([new ParameterStoreVariables(request), new HeaderCustomerVariables(request)])
 
-    const req: CloudFrontRequest = {
+    const variableHeaders = {
+      fpjs_pre_shared_secret: [
+        {
+          key: 'fpjs_pre_shared_secret',
+          value: 'qwertyuio1356767',
+        },
+      ],
+      fpjs_agent_download_path: [
+        {
+          key: 'fpjs_agent_download_path',
+          value: 'greiodsfkljlds',
+        },
+      ],
+      fpjs_get_result_path: [
+        {
+          key: 'fpjs_get_result_path',
+          value: 'eiwflsdkadlsjdsa',
+        },
+      ],
+    }
+
+    const buildRequest = (customHeaders: Record<string, { key: string; value: string }[]>): CloudFrontRequest => ({
       clientIp: '1.1.1.1',
       method: 'GET',
       uri: 'fpjs/agent',
@@ -314,124 +291,47 @@ describe('customer variables selectors', () => {
           protocol: 'https',
           readTimeout: 60,
           sslProtocols: ['TLSv2'],
-          customHeaders: {
-            fpjs_pre_shared_secret: [
-              {
-                key: 'fpjs_pre_shared_secret',
-                value: 'qwertyuio1356767',
-              },
-            ],
-            fpjs_agent_download_path: [
-              {
-                key: 'fpjs_agent_download_path',
-                value: 'greiodsfkljlds',
-              },
-            ],
-            fpjs_get_result_path: [
-              {
-                key: 'fpjs_get_result_path',
-                value: 'eiwflsdkadlsjdsa',
-              },
-            ],
-            fpjs_secret_name: [
-              {
-                key: 'fpjs_secret_name',
-                value: 'my_secret',
-              },
-            ],
-            fpjs_secret_region: [
-              {
-                key: 'fpjs_secret_region',
-                value: 'eu-west-1',
-              },
-            ],
-          },
+          customHeaders,
         },
       },
-    }
+    })
+
+    const req = buildRequest({
+      ...variableHeaders,
+      fpjs_parameter_path: [{ key: 'fpjs_parameter_path', value: '/my/path' }],
+    })
 
     beforeEach(() => {
-      clearSecretsCache()
+      clearParametersCache()
 
       mock.reset()
     })
 
-    it('should fallback to headers if secrets manager value is empty', async () => {
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: 'my_secret',
-        })
-        .resolves({})
+    it('should fallback to headers if parameter store has no parameters', async () => {
+      mock.on(GetParametersByPathCommand, { Path: '/my/path' }).resolves({})
 
       const result = await getAgentDownloadPath(getCustomerVariables(req))
 
       expect(result).toBe('greiodsfkljlds')
-      expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+      expect(mock).toHaveReceivedCommandTimes(GetParametersByPathCommand, 1)
     })
 
-    it('should fallback to headers if secrets manager constructor throws', async () => {
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: 'my_secret',
-        })
-        .rejects({})
+    it('should fallback to headers if parameter store throws', async () => {
+      mock.on(GetParametersByPathCommand, { Path: '/my/path' }).rejects({})
 
       const result = await getAgentDownloadPath(getCustomerVariables(req))
 
       expect(result).toBe('greiodsfkljlds')
-      expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 1)
+      expect(mock).toHaveReceivedCommandTimes(GetParametersByPathCommand, 1)
     })
 
-    it('should fallback to headers if secrets manager related headers are empty', async () => {
-      mock
-        .on(GetSecretValueCommand, {
-          SecretId: 'my_secret',
-        })
-        .resolves({})
+    it('should fallback to headers if parameter path header is empty', async () => {
+      mock.on(GetParametersByPathCommand).resolves({})
 
-      const req: CloudFrontRequest = {
-        clientIp: '1.1.1.1',
-        method: 'GET',
-        uri: 'fpjs/agent',
-        querystring: 'apiKey=ujKG34hUYKLJKJ1F&version=3&loaderVersion=3.6.2',
-        headers: {},
-        origin: {
-          custom: {
-            domainName: 'adewe.cloudfront.net',
-            keepaliveTimeout: 60,
-            path: '/',
-            port: 443,
-            protocol: 'https',
-            readTimeout: 60,
-            sslProtocols: ['TLSv2'],
-            customHeaders: {
-              fpjs_pre_shared_secret: [
-                {
-                  key: 'fpjs_pre_shared_secret',
-                  value: 'qwertyuio1356767',
-                },
-              ],
-              fpjs_agent_download_path: [
-                {
-                  key: 'fpjs_agent_download_path',
-                  value: 'greiodsfkljlds',
-                },
-              ],
-              fpjs_get_result_path: [
-                {
-                  key: 'fpjs_get_result_path',
-                  value: 'eiwflsdkadlsjdsa',
-                },
-              ],
-            },
-          },
-        },
-      }
-
-      const result = await getAgentDownloadPath(getCustomerVariables(req))
+      const result = await getAgentDownloadPath(getCustomerVariables(buildRequest(variableHeaders)))
 
       expect(result).toBe('greiodsfkljlds')
-      expect(mock).toHaveReceivedCommandTimes(GetSecretValueCommand, 0)
+      expect(mock).toHaveReceivedCommandTimes(GetParametersByPathCommand, 0)
     })
   })
 })

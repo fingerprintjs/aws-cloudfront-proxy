@@ -1,11 +1,11 @@
-import { validateSecret } from '../../../../utils/customer-variables/secrets-manager/validate-secret.ts'
+import { validateParameters } from '../../../../utils/customer-variables/parameter-store/validate-parameters.ts'
 import { CustomerVariableName } from '../../../../utils/customer-variables/types.ts'
 
-describe('Validate secret', () => {
+describe('Validate parameters', () => {
   it.each(['not_a_secret', null])('throws if secret is not an object', (value) => {
     expect(() => {
-      validateSecret(value)
-    }).toThrow('Secrets Manager secret is not an object')
+      validateParameters(value)
+    }).toThrow('Parameter Store settings is not an object')
   })
 
   it('does not throw if object contains unexpected keys', () => {
@@ -14,7 +14,7 @@ describe('Validate secret', () => {
     }
 
     expect(() => {
-      validateSecret(object)
+      validateParameters(object)
     }).not.toThrow()
   })
 
@@ -24,8 +24,8 @@ describe('Validate secret', () => {
     }
 
     expect(() => {
-      validateSecret(object)
-    }).toThrow('Secrets Manager secret contains an invalid value for fpjs_agent_download_path')
+      validateParameters(object)
+    }).toThrow('Parameter Store settings contains an invalid value for fpjs_agent_download_path')
   })
 
   it('does not throw for object with partial values', () => {
@@ -35,7 +35,7 @@ describe('Validate secret', () => {
     }
 
     expect(() => {
-      validateSecret(object)
+      validateParameters(object)
     }).not.toThrow()
   })
 })

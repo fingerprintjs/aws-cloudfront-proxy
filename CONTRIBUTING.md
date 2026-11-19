@@ -105,9 +105,9 @@ CloudFront Integration by Fingerprint always uses the latest stable version for 
 
 During testing, you might need the integration to proxy requests to the CDN and API hosts of your choosing (for example, the staging environment) instead of the production Fingerprint CDN and API.
 
-To achieve this, you can add your custom *host* (not URL) values to the **AWS Secret** associated with the proxy integration: 
+To achieve this, you can add your custom *host* (not URL) values as `String` parameters under the **Parameter Store path** associated with the proxy integration (the `FPJS_PARAMETER_PATH` origin header, e.g. `/fingerprint-pro-cloudfront-integration/<id>`):
 
 ```
-FPJS_CDN_URL: your.cdn.net
-FPJS_INGRESS_BASE_HOST: your.api.net
+<path>/fpjs_cdn_url: your.cdn.net
+<path>/fpjs_ingress_base_host: your.api.net
 ```

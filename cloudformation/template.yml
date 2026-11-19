@@ -34,6 +34,8 @@ Parameters:
 Conditions:
   CreateCloudFrontDistribution:
     !Equals [!Ref DistributionId, ""]
+  HasGetResultPath: !Not [!Equals [!Ref FpjsGetResultPath, ""]]
+  HasAgentDownloadPath: !Not [!Equals [!Ref FpjsAgentDownloadPath, ""]]
   AttachDomainToCloudFront: !And
     - !Not [!Equals [!Ref DomainNames, ""]]
     - !Not [!Equals [!Ref ACMCertificateARN, ""]]
@@ -41,41 +43,127 @@ Conditions:
 Resources:
   ## Lambda@Edge function for Fingerprint Pro integration
 
-  FingerprintIntegrationSettingsSecret:
-    Type: AWS::SecretsManager::Secret
+  ## Integration settings in SSM Parameter Store.
+  ## All settings live under /fingerprint-pro-cloudfront-integration/<id>/ and are read with a single
+  ## GetParametersByPath call. Paths are plain String parameters, the pre-shared secret is a SecureString.
+
+  FpjsGetResultPathParameter:
+    Type: AWS::SSM::Parameter
+    Condition: HasGetResultPath
     Properties:
-      Description: AWS Secret with a custom Fingerprint integration settings
-      Name: !Join ['-', ['fingerprint-pro-cloudfront-integration-settings-secret', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
-      SecretString:
-        !Join
-          - ''
-          - - '{'
-            - !Join
-                - ','
-                - - !Join
-                      - ':'
-                      - - '"fpjs_get_result_path"'
-                        - !Sub
-                            - '"${value}"'
-                            - value: !Ref FpjsGetResultPath
-                  - !Join
-                      - ':'
-                      - - '"fpjs_agent_download_path"'
-                        - !Sub
-                            - '"${value}"'
-                            - value: !Ref FpjsAgentDownloadPath
-                  - !Join
-                      - ':'
-                      - - '"fpjs_pre_shared_secret"'
-                        - !Sub
-                            - '"${value}"'
-                            - value: !Ref FpjsPreSharedSecret
-            - '}'
+      Description: Fingerprint integration request path used to send V3 identification requests
+      Type: String
+      Name: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/fpjs_get_result_path']]
+      Value: !Ref FpjsGetResultPath
+
+  FpjsAgentDownloadPathParameter:
+    Type: AWS::SSM::Parameter
+    Condition: HasAgentDownloadPath
+    Properties:
+      Description: Fingerprint integration request path used to send V3 ProCDN requests
+      Type: String
+      Name: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/fpjs_agent_download_path']]
+      Value: !Ref FpjsAgentDownloadPath
+
+  # CloudFormation can't create SecureString parameters natively, so a small custom resource does it.
+  FpjsPreSharedSecretParameter:
+    Type: Custom::SecureStringParameter
+    Properties:
+      ServiceToken: !GetAtt SecureStringParameterFunction.Arn
+      Name: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/fpjs_pre_shared_secret']]
+      Value: !Ref FpjsPreSharedSecret
+
+  SecureStringParameterFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role for the custom resource that manages SecureString parameters
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service:
+              - lambda.amazonaws.com
+      Policies:
+      - PolicyName: ManageSecureStringParameters
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+              - ssm:PutParameter
+              - ssm:GetParameter
+              - ssm:DeleteParameter
+            Resource:
+              - !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/*']]
+              - !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/*']]
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  SecureStringParameterFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Creates, updates and deletes SecureString parameters for the Fingerprint integration
+      Runtime: nodejs24.x
+      Handler: index.handler
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt SecureStringParameterFunctionRole.Arn
+      Code:
+        ZipFile: |
+          const { SSMClient, PutParameterCommand, GetParameterCommand, DeleteParameterCommand } = require('@aws-sdk/client-ssm')
+          const { randomBytes } = require('node:crypto')
+          const ssm = new SSMClient({})
+
+          async function respond(event, status, physicalId, reason) {
+            const body = JSON.stringify({
+              Status: status,
+              Reason: reason || 'See CloudWatch logs',
+              PhysicalResourceId: physicalId,
+              StackId: event.StackId,
+              RequestId: event.RequestId,
+              LogicalResourceId: event.LogicalResourceId,
+            })
+            await fetch(event.ResponseURL, { method: 'PUT', body, headers: { 'content-type': '' } })
+          }
+
+          async function exists(name) {
+            try {
+              await ssm.send(new GetParameterCommand({ Name: name }))
+              return true
+            } catch (e) {
+              if (e.name === 'ParameterNotFound') return false
+              throw e
+            }
+          }
+
+          exports.handler = async (event) => {
+            const { Name, Value, Generate } = event.ResourceProperties
+            const physicalId = event.RequestType === 'Delete' ? event.PhysicalResourceId : Name
+            try {
+              if (event.RequestType === 'Delete') {
+                await ssm.send(new DeleteParameterCommand({ Name: physicalId })).catch((e) => {
+                  if (e.name !== 'ParameterNotFound') throw e
+                })
+              } else if (Generate === 'true') {
+                // Keep an already generated value on stack updates.
+                if (!(await exists(Name))) {
+                  const value = randomBytes(15).toString('hex')
+                  await ssm.send(new PutParameterCommand({ Name, Type: 'SecureString', Value: value }))
+                }
+              } else {
+                await ssm.send(new PutParameterCommand({ Name, Type: 'SecureString', Value, Overwrite: true }))
+              }
+              await respond(event, 'SUCCESS', physicalId)
+            } catch (e) {
+              console.error(e)
+              await respond(event, 'FAILED', physicalId || event.LogicalResourceId, String(e))
+            }
+          }
 
   FpIntLambdaFunctionExecutionRole:
     Type: AWS::IAM::Role
-    DependsOn:
-      - FingerprintIntegrationSettingsSecret
     Metadata:
       SamResourceId: FpIntLambdaFunctionExecutionRole
     Properties:
@@ -101,14 +189,16 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: arn:aws:logs:*:*:*
-      - PolicyName: AWSSecretAccess
+      - PolicyName: ParameterStoreAccess
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Effect: Allow
             Action:
-              - secretsmanager:GetSecretValue
-            Resource: !Ref FingerprintIntegrationSettingsSecret
+              - ssm:GetParametersByPath
+            Resource:
+              # Lambda@Edge always reads settings from us-east-1, where the stack is deployed.
+              - !Join ['', [!Sub 'arn:aws:ssm:us-east-1:${AWS::AccountId}:parameter/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
@@ -198,9 +288,8 @@ Resources:
           - Id: fpcdn.io
             DomainName: fpcdn.io
             OriginCustomHeaders:
-              - HeaderName: FPJS_SECRET_NAME
-                HeaderValue: !Ref FingerprintIntegrationSettingsSecret
-                
+              - HeaderName: FPJS_PARAMETER_PATH
+                HeaderValue: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
               - HeaderName: FPJS_INTEGRATION_PATH_DEPTH
                 HeaderValue: '0'
             CustomOriginConfig:
@@ -217,8 +306,6 @@ Resources:
 
   FpMgmtLambdaFunctionExecutionRole:
     Type: AWS::IAM::Role
-    DependsOn:
-      - MgmtSettingsSecret
     Metadata:
       SamResourceId: FpMgmtLambdaFunctionExecutionRole
     Properties:
@@ -243,15 +330,14 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource: arn:aws:logs:*:*:*
-      - PolicyName: AWSSecretAccess
+      - PolicyName: ParameterStoreAccess
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Effect: Allow
             Action:
-              - secretsmanager:GetSecretValue
-            Resource:
-              Fn::Sub: ${MgmtSettingsSecret}
+              - ssm:GetParameter
+            Resource: !Join ['', [!Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/token']]
       - PolicyName: S3LambdaDistributionAccess
         PolicyDocument:
           Version: '2012-10-17'
@@ -299,22 +385,18 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
-  MgmtSettingsSecret:
-    Type: AWS::SecretsManager::Secret
+  MgmtTokenParameter:
+    Type: Custom::SecureStringParameter
     Properties:
-      Name: !Join ['-', ['fingerprint-pro-mgmt-settings-secret', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
-      GenerateSecretString:
-        IncludeSpace: false
-        ExcludePunctuation: true
-        PasswordLength: 30
-        GenerateStringKey: token
-        SecretStringTemplate: !Sub '{}'
+      ServiceToken: !GetAtt SecureStringParameterFunction.Arn
+      Name: !Join ['', ['/fingerprint-pro-mgmt-settings/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]], '/token']]
+      Generate: 'true'
 
   FingerprintProMgmtLambda:
     Type: AWS::Serverless::Function
     DependsOn:
       - FpMgmtLambdaFunctionExecutionRole
-      - MgmtSettingsSecret
+      - MgmtTokenParameter
     Properties:
       FunctionName: !Join ['-', ['fingerprint-pro-mgmt-lambda', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
       Handler: fingerprintjs-pro-cloudfront-mgmt-lambda-function.handler
@@ -325,7 +407,7 @@ Resources:
       Role: !GetAtt FpMgmtLambdaFunctionExecutionRole.Arn
       Environment:
         Variables:
-          SettingsSecretName: !Ref MgmtSettingsSecret
+          SettingsParameterName: !Ref MgmtTokenParameter
           LambdaFunctionName: !Ref FingerprintProCloudFrontLambda
           LambdaFunctionArn: !GetAtt FingerprintProCloudFrontLambda.Arn
           CFDistributionId: !If [CreateCloudFrontDistribution, !Ref CloudFrontDistribution, !Ref DistributionId]
@@ -400,15 +482,14 @@ Outputs:
       Fn::GetAtt: MgmtFunctionURL.FunctionUrl
     Export:
       Name: !Join ['-', ['fingerprint-pro-mgmt-lambda-url', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
-  FingerprintIntegrationSettingsSecret:
-    Description: Fingerprint Pro CloudFront integration settings secret
-    Value:
-      Ref: FingerprintIntegrationSettingsSecret
+  FingerprintIntegrationSettingsParameterPath:
+    Description: Parameter Store path holding the Fingerprint Pro CloudFront integration settings
+    Value: !Join ['', ['/fingerprint-pro-cloudfront-integration/', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
     Export:
-      Name: !Join ['-', ['fingerprint-pro-cloudfront-integration-settings-secret', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
-  MgmtSettingsSecret:
-    Description: Fingerprint Pro Management Lambda settings secret
+      Name: !Join ['-', ['fingerprint-pro-cloudfront-integration-settings-path', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+  MgmtTokenParameter:
+    Description: Parameter Store SecureString holding the Fingerprint Pro Management Lambda token
     Value:
-      Ref: MgmtSettingsSecret
+      Ref: MgmtTokenParameter
     Export:
-      Name: !Join ['-', ['fingerprint-pro-mgmt-settings-secret', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+      Name: !Join ['-', ['fingerprint-pro-mgmt-token-parameter', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]

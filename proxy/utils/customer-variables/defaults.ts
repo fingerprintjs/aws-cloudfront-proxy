@@ -19,4 +19,4 @@ export function getDefaultCustomerVariable<T extends CustomerVariableName>(
 }
 
 export const DEFAULT_REGION = 'us-east-1'
-export const SECRET_NAME_HEADER_KEY = 'fpjs_secret_name'
+export const PARAMETER_PATH_HEADER_KEY = 'fpjs_parameter_path'

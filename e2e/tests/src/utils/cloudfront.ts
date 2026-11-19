@@ -16,8 +16,8 @@ export const testMatches = {
 
 export const urlTypeCustomerVariableSourceMap: Record<keyof CloudfrontUrls, string> = {
   cloudfrontWithHeadersUrl: 'HeaderCustomerVariables',
-  cloudfrontWithSecretsUrl: 'SecretsManagerVariables',
-  cloudfrontWithSecretsV4Url: 'SecretsManagerVariables',
+  cloudfrontWithSecretsUrl: 'ParameterStoreVariables',
+  cloudfrontWithSecretsV4Url: 'ParameterStoreVariables',
 }
 
 let cache: CloudfrontUrls | undefined
