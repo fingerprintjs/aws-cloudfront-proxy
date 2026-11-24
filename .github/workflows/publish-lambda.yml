@@ -41,8 +41,14 @@ jobs:
       - run: pnpm exec playwright install
         working-directory: e2e/tests
 
-      - run: node scripts/downloadGithubRelease.mjs
+      # Rebuild the tagged commit: the release assets are only accepted if they match this build
+      - run: pnpm build
+
+      - name: Download and verify release assets
+        run: node scripts/downloadGithubRelease.mjs
         env:
+          GITHUB_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ github.event.release.id }}
           TAG: ${{ github.event.release.tag_name }}
 
       - run: pnpm build
@@ -72,8 +78,19 @@ jobs:
       - name: Output SHA
         id: sha
         run: |
+          set -euo pipefail
           echo "lambda_sha=$(sha256sum lambda_latest.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
           echo "mgmt_lambda_sha=$(sha256sum mgmt_lambda_latest.zip | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Store verified packages
+        uses: actions/upload-artifact@v7
+        with:
+          name: lambda-packages
+          path: |
+            lambda_latest.zip
+            mgmt_lambda_latest.zip
+          if-no-files-found: error
+          retention-days: 1
   
   deploy-to-s3:
     name: Deploy artifact to S3 bucket
@@ -84,15 +101,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v7
 
-      - name: Setup Node
-        uses: actions/setup-node@v7
+      - name: Download verified packages
+        uses: actions/download-artifact@v8
         with:
-          node-version-file: .node-version
+          name: lambda-packages
 
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-
-      - run: pnpm install
- 
       - name: Configure AWS credentials from dev account
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
@@ -100,12 +113,14 @@ jobs:
           role-session-name: GitHub_to_AWS_via_FederatedOIDC
           aws-region: ${{ env.AWS_IAM_AUTH_REGION }}
 
-      - run: node scripts/downloadGithubRelease.mjs
-        env:
-          TAG: ${{ github.event.release.tag_name }}
-
       - name: Compare SHA
         run: |
+          set -euo pipefail
+          if [ -z "$LAMBDA_SHA" ] || [ -z "$MGMT_LAMBDA_SHA" ]; then
+            echo "Expected SHA from e2e-tests job is missing"
+            exit 1
+          fi
+
           local_lambda_sha=$(sha256sum lambda_latest.zip | awk '{print $1}')
           local_mgmt_lambda_sha=$(sha256sum mgmt_lambda_latest.zip | awk '{print $1}')
           

@@ -30,8 +30,9 @@ import { type GitHubRelease, parseStatusVersion, pickDowngradeRelease } from './
  * WARNING: it modifies the target stack (mgmt-lambda code, proxy Lambda code, CloudFront associations).
  */
 
-const RELEASES_URL =
-  'https://api.github.com/repos/fingerprintjs/fingerprint-pro-cloudfront-integration/releases?per_page=50'
+// GITHUB_REPOSITORY is set by GitHub Actions; the fallback covers local runs
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY || 'fingerprintjs/aws-cloudfront-proxy'
+const RELEASES_URL = `https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=50`
 const S3_PACKAGE_URL = `https://${defaults.LAMBDA_DISTRIBUTION_BUCKET}.s3.amazonaws.com/${defaults.LAMBDA_DISTRIBUTION_BUCKET_KEY}`
 const ALL_VARIABLES_SET_TEXT = '✅ All required environment variables are set:'
 // CloudFront propagation is slow, waiters get generous limits (seconds)
